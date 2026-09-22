@@ -361,6 +361,13 @@ body.light .pipeline-bar{background:#e8efe9}
 .start-title em{font-style:normal;color:#9bc7a0}
 .start-sub{margin:13px 0 0;color:#88998e;font-size:12px;line-height:1.55;max-width:620px}
 .start-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.rules-shell{width:min(1080px,100%);max-height:90vh;overflow:auto;border:1px solid var(--stroke-strong);background:linear-gradient(155deg,#122017,#0a150e);border-radius:22px;box-shadow:0 35px 100px rgba(0,0,0,.55);padding:18px}
+.rules-toolbar{display:flex;align-items:center;gap:9px;margin-top:15px;padding:10px 12px;border:1px solid var(--stroke);background:rgba(255,255,255,.022);border-radius:12px}.rules-toolbar label{font-size:9px;color:var(--muted);font-weight:800}.rules-toolbar select{min-width:220px;border:1px solid var(--stroke);border-radius:9px;padding:8px 10px;background:rgba(255,255,255,.035);color:var(--text);font-size:10px}
+.rules-section{margin-top:12px;padding:13px;border:1px solid var(--stroke);background:rgba(255,255,255,.018);border-radius:14px}.rules-section h3{margin:0;font-family:var(--display);font-size:13px}.rules-section>p{margin:4px 0 11px;color:var(--muted);font-size:8px}.rule-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.rule-field{padding:9px;border:1px solid rgba(214,240,218,.065);border-radius:10px;background:rgba(255,255,255,.02)}.rule-field label{display:block;font-size:8px;color:#829589;font-weight:800;margin-bottom:5px}.rule-input{position:relative}.rule-input input{width:100%;height:36px;border:1px solid rgba(212,239,218,.10);border-radius:9px;padding:0 10px;background:rgba(255,255,255,.035);color:var(--text);font-size:10px;outline:none}.rule-input span{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:9px;color:#718478}.rule-product{margin-top:10px;padding:11px;border:1px solid rgba(214,240,218,.065);border-radius:11px;background:rgba(255,255,255,.014)}.rule-product-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px}.rule-product-head strong{font-size:9px}.rule-product-head span{font-size:7px;color:#718478}.rules-actions{display:flex;justify-content:space-between;gap:8px;margin-top:14px}.rules-foot{margin-top:9px;color:#67796c;font-size:8px;line-height:1.45}.rules-muted{color:#74867a;font-size:8px;padding:8px}
+.settings-box.rules-launch{width:100%;text-align:left;cursor:pointer;color:inherit}.rules-launch span{display:inline-block;margin-top:8px;color:#9fc0a5;font-size:8px;font-weight:800}
+@media(max-width:900px){.rule-grid{grid-template-columns:1fr 1fr}.rules-toolbar{align-items:flex-start;flex-direction:column}.rules-toolbar select{width:100%}}
+@media(max-width:620px){.rule-grid{grid-template-columns:1fr}.rules-actions{flex-direction:column}.rules-actions .btn{width:100%}}
+
 .start-card{
   position:relative;overflow:hidden;text-align:left;min-height:235px;padding:18px;
   border:1px solid var(--stroke);border-radius:20px;background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018));
@@ -670,24 +677,24 @@ const pct=n=>Number.isFinite(n)?(n*100).toLocaleString('pt-BR',{maximumFractionD
 const val=(v,f)=>f==='pct'?pct(v):f==='text'?v:money(v);
 const parseBR=s=>{if(typeof s!=='string')return Number(s)||0;s=s.replace(/[^\d,.-]/g,'');if(!s)return 0;if(s.includes(','))s=s.replace(/\./g,'').replace(',','.');else{const p=(s.match(/\./g)||[]).length;if(p>1)s=s.replace(/\./g,'');else if(p===1&&/\.\d{3}$/.test(s))s=s.replace('.','')}const n=parseFloat(s);return Number.isNaN(n)?0:n};
 const fmtInput=n=>!Number.isFinite(n)||n===0?'':Number.isInteger(n)?n.toLocaleString('pt-BR'):n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-function health({parcela,capacidade,entradaPct,fi}){const a=parcela<capacidade,b=entradaPct<.19,c=fi>=.77;return{ok:a&&b&&c,titulo:a&&b&&c?'Agora Sim! Negociação saudável':'Precisa ajustar a proposta',checks:[{label:'Maior parcela mensal da entrada < 30% da renda',ok:a},{label:'Entrada parcelada < 19% do imóvel',ok:b},{label:'F.I. Real ≥ 77%',ok:c}]}}
-function menorSinal(liquido,fix,inter,entradaMax){return Math.max(.77*liquido-fix,.81*liquido-fix-inter,liquido-fix-inter-entradaMax)}
+function health({parcela,capacidade,entradaPct,fi}){const R=ORBE_RULES.common;const a=parcela<capacidade,b=entradaPct<R.entryPct,c=fi>=R.fiMin;return{ok:a&&b&&c,titulo:a&&b&&c?'Agora Sim! Negociação saudável':'Precisa ajustar a proposta',checks:[{label:`Maior parcela mensal da entrada < ${rulePctText(R.incomePct)} da renda`,ok:a},{label:`Entrada parcelada < ${rulePctText(R.entryPct)} do imóvel`,ok:b},{label:`F.I. Real ≥ ${rulePctText(R.fiMin)}`,ok:c}]}}
+function menorSinal(liquido,fix,inter,entradaMax){const R=ORBE_RULES.common;return Math.max(R.fiMin*liquido-fix,(1-R.entryPct)*liquido-fix-inter,liquido-fix-inter-entradaMax)}
 const DATA={
  telesil:{nome:'Telesil',cor:'#2563eb',obs:'Entrada dividida em dois blocos pagos em sequência. Percentual e número de parcelas variam por produto.',products:{'grand-diamond':{nome:'Grand Diamond',q80:28,q20:24,pct80:67},'grand-via':{nome:'Grand Via',q80:31,q20:24,pct80:80},splendido:{nome:'Splendido',q80:35,q20:24,pct80:80},'reserva-aldeprime':{nome:'Reserva Aldeprime',q80:26,q20:28,pct80:70},custom:{nome:'Outro (manual)',q80:35,q20:24,pct80:80}},fields:[
- {k:'renda',l:'Renda do cliente',t:'money',d:7627.29},{k:'valorTabela',l:'Valor de tabela',t:'money',d:275990.39},{k:'desconto',l:'Desconto de tabela',t:'money',d:0},{k:'descontoMcem',l:'Desconto MCEM',t:'money',d:0},{k:'sinal',l:'Sinal (ato)',t:'money',d:50000},{k:'sinalIntercalado',l:'Sinal intercalado (2ª parte)',t:'money',d:0},{k:'financiamento',l:'Financiamento aprovado',t:'money',d:208000},{k:'fgts',l:'FGTS',t:'money',d:0},{k:'subsidio',l:'Subsídio',t:'money',d:0},{k:'semestrais',l:'Nº de semestrais',t:'int',d:0},{k:'valorIntercalada',l:'Valor da intercalada (semestral)',t:'money',d:0,auto:v=>Math.round(v.renda*.5*100)/100},{k:'parcelaCaixa',l:'Parcela Caixa (pós-chaves)',t:'money',d:0,info:true,auto:v=>Math.round(v.renda*.3*100)/100},{k:'q80',l:'Parcelas do 1º bloco',t:'int',d:35},{k:'q20',l:'Parcelas do 2º bloco',t:'int',d:24}],
- compute(i){const c=this;const liq=i.valorTabela-i.desconto;const cap=i.renda*.3;const f80=(i.pct80||80)/100,f20=1-f80;const inter=(i.valorIntercalada||0)*i.semestrais;const total=i.sinal+(i.sinalIntercalado||0)+i.fgts+i.subsidio+i.financiamento;const entrada=liq-total-inter;const mcemAbate=Math.min(i.descontoMcem||0,Math.max(entrada,0));const efet=entrada-mcemAbate;const b80r=entrada*f80,b20r=entrada*f20,ab20=Math.min(mcemAbate,b20r),ab80=mcemAbate-ab20,b80=Math.max(b80r-ab80,0),b20=Math.max(b20r-ab20,0);const p80=i.q80>0?b80/i.q80:0,p20=i.q20>0?b20/i.q20:0,maxp=Math.max(p80,p20);const fi=liq?(total+mcemAbate)/liq:0,ep=liq?efet/liq:0;const status=health({parcela:maxp,capacidade:cap,entradaPct:ep,fi});const k=Math.max(i.q80>0?f80/i.q80:Infinity,i.q20>0?f20/i.q20:Infinity);const entradaMax=cap/k;const fix=(total-i.sinal)+mcemAbate;const sinalMax=liq-fix-inter;const sinalSug=Math.min(menorSinal(liq,fix,inter,entradaMax),sinalMax);return{status,highlight:[['Entrada parcelada',efet,'money'],[`1ª fase — ${Math.round(f80*100)}% (${i.q80}x)`,p80,'money'],...(b20>.005?[[`2ª fase — ${Math.round(f20*100)}% (${i.q20}x)`,p20,'money']]:[]),...(i.semestrais>0?[['Intercalada (semestral)',i.valorIntercalada,'money']]:[]),['Maior parcela mensal',maxp,'money','strong']],rows:[['Líquido (tabela − desconto)',liq,'money'],['Capacidade de pagamento (30%)',cap,'money'],['Total aportado',total,'money'],['Total das intercaladas',inter,'money'],...(mcemAbate>0?[['Entrada parcelada (bruta)',entrada,'money'],['Desconto MCEM aplicado',mcemAbate,'money']]:[]),...(mcemAbate>0&&b20<=0.005?[['2ª fase quitada pelo MCEM','Sim','text']]:[]),['Entrada % do imóvel',ep,'pct'],['F.I. Real',fi,'pct'],...(!status.ok&&sinalSug>i.sinal?[['Sinal sugerido p/ ficar saudável',Math.ceil(sinalSug),'money','alert']]:[])] ,resumo:[['Valor do imóvel',i.valorTabela,'money'],...(i.desconto>0?[['Desconto aplicado',i.desconto,'money']]:[]),['Valor do imóvel com desconto',liq,'money'],['Valor do financiamento',i.financiamento,'money'],['FGTS',i.fgts||0,'money'],...(i.subsidio>0?[['Subsídio',i.subsidio,'money']]:[]),['Sinal (ato)',i.sinal,'money'],['Sinal intercalado',i.sinalIntercalado||0,'money'],...(mcemAbate>0?[['Entrada parcelada (bruta)',entrada,'money'],['Desconto MCEM',mcemAbate,'money']]:[]),['Entrada parcelada (após MCEM)',efet,'money'],['Mensais',b20>.005?`1ª fase (${Math.round(f80*100)}%): ${i.q80}x de ${money(p80)}\n2ª fase (${Math.round(f20*100)}%): ${i.q20}x de ${money(p20)}`:`1ª fase (${Math.round(f80*100)}%): ${i.q80}x de ${money(p80)}`,'text'],['Intercaladas semestrais',i.semestrais>0?`${i.semestrais}x de ${money(i.valorIntercalada)}`:'—','text'],['Valor total das intercaladas',inter,'money'],['Parcela Caixa (pós-chaves)',i.parcelaCaixa||0,'money']]};}
+ {k:'renda',l:'Renda do cliente',t:'money',d:7627.29},{k:'valorTabela',l:'Valor de tabela',t:'money',d:275990.39},{k:'desconto',l:'Desconto de tabela',t:'money',d:0},{k:'descontoMcem',l:'Desconto MCEM',t:'money',d:0},{k:'sinal',l:'Sinal (ato)',t:'money',d:50000},{k:'sinalIntercalado',l:'Sinal intercalado (2ª parte)',t:'money',d:0},{k:'financiamento',l:'Financiamento aprovado',t:'money',d:208000},{k:'fgts',l:'FGTS',t:'money',d:0},{k:'subsidio',l:'Subsídio',t:'money',d:0},{k:'semestrais',l:'Nº de semestrais',t:'int',d:0},{k:'valorIntercalada',l:'Valor da intercalada (semestral)',t:'money',d:0,auto:v=>Math.round(v.renda*ORBE_RULES.telesil.intercaladaPct*100)/100},{k:'parcelaCaixa',l:'Parcela Caixa (pós-chaves)',t:'money',d:0,info:true,auto:v=>Math.round(v.renda*ORBE_RULES.common.incomePct*100)/100},{k:'q80',l:'Parcelas do 1º bloco',t:'int',d:35},{k:'q20',l:'Parcelas do 2º bloco',t:'int',d:24}],
+ compute(i){const c=this;const liq=i.valorTabela-i.desconto;const cap=i.renda*ORBE_RULES.common.incomePct;const f80=(i.pct80||80)/100,f20=1-f80;const inter=(i.valorIntercalada||0)*i.semestrais;const total=i.sinal+(i.sinalIntercalado||0)+i.fgts+i.subsidio+i.financiamento;const entrada=liq-total-inter;const mcemAbate=Math.min(i.descontoMcem||0,Math.max(entrada,0));const efet=entrada-mcemAbate;const b80r=entrada*f80,b20r=entrada*f20,ab20=Math.min(mcemAbate,b20r),ab80=mcemAbate-ab20,b80=Math.max(b80r-ab80,0),b20=Math.max(b20r-ab20,0);const p80=i.q80>0?b80/i.q80:0,p20=i.q20>0?b20/i.q20:0,maxp=Math.max(p80,p20);const fi=liq?(total+mcemAbate)/liq:0,ep=liq?efet/liq:0;const status=health({parcela:maxp,capacidade:cap,entradaPct:ep,fi});const k=Math.max(i.q80>0?f80/i.q80:Infinity,i.q20>0?f20/i.q20:Infinity);const entradaMax=cap/k;const fix=(total-i.sinal)+mcemAbate;const sinalMax=liq-fix-inter;const sinalSug=Math.min(menorSinal(liq,fix,inter,entradaMax),sinalMax);return{status,highlight:[['Entrada parcelada',efet,'money'],[`1ª fase — ${Math.round(f80*100)}% (${i.q80}x)`,p80,'money'],...(b20>.005?[[`2ª fase — ${Math.round(f20*100)}% (${i.q20}x)`,p20,'money']]:[]),...(i.semestrais>0?[['Intercalada (semestral)',i.valorIntercalada,'money']]:[]),['Maior parcela mensal',maxp,'money','strong']],rows:[['Líquido (tabela − desconto)',liq,'money'],['Capacidade de pagamento (30%)',cap,'money'],['Total aportado',total,'money'],['Total das intercaladas',inter,'money'],...(mcemAbate>0?[['Entrada parcelada (bruta)',entrada,'money'],['Desconto MCEM aplicado',mcemAbate,'money']]:[]),...(mcemAbate>0&&b20<=0.005?[['2ª fase quitada pelo MCEM','Sim','text']]:[]),['Entrada % do imóvel',ep,'pct'],['F.I. Real',fi,'pct'],...(!status.ok&&sinalSug>i.sinal?[['Sinal sugerido p/ ficar saudável',Math.ceil(sinalSug),'money','alert']]:[])] ,resumo:[['Valor do imóvel',i.valorTabela,'money'],...(i.desconto>0?[['Desconto aplicado',i.desconto,'money']]:[]),['Valor do imóvel com desconto',liq,'money'],['Valor do financiamento',i.financiamento,'money'],['FGTS',i.fgts||0,'money'],...(i.subsidio>0?[['Subsídio',i.subsidio,'money']]:[]),['Sinal (ato)',i.sinal,'money'],['Sinal intercalado',i.sinalIntercalado||0,'money'],...(mcemAbate>0?[['Entrada parcelada (bruta)',entrada,'money'],['Desconto MCEM',mcemAbate,'money']]:[]),['Entrada parcelada (após MCEM)',efet,'money'],['Mensais',b20>.005?`1ª fase (${Math.round(f80*100)}%): ${i.q80}x de ${money(p80)}\n2ª fase (${Math.round(f20*100)}%): ${i.q20}x de ${money(p20)}`:`1ª fase (${Math.round(f80*100)}%): ${i.q80}x de ${money(p80)}`,'text'],['Intercaladas semestrais',i.semestrais>0?`${i.semestrais}x de ${money(i.valorIntercalada)}`:'—','text'],['Valor total das intercaladas',inter,'money'],['Parcela Caixa (pós-chaves)',i.parcelaCaixa||0,'money']]};}
  },
  engenharq:{nome:'Engenharq',cor:'#16a34a',obs:'Carteira parcelável em até R$ 50 mil e até 100x. O que exceder o teto precisa ser distribuído entre sinal e chaves.',products:{castanheiras:{nome:'Castanheiras'},jacarandas:{nome:'Jacarandás'},jequitibas:{nome:'Jequitibás'},coqueirais:{nome:'Coqueirais'},figueiras:{nome:'Figueiras'},laranjeiras:{nome:'Laranjeiras'}},fields:[
- {k:'renda',l:'Renda do cliente',t:'money',d:6300},{k:'valorTabela',l:'Valor de tabela',t:'money',d:296300},{k:'desconto',l:'Desconto de tabela',t:'money',d:15000},{k:'sinal',l:'Sinal (ato)',t:'money',d:10000},{k:'sinalParcelado',l:'Sinal parcelado',t:'money',d:0},{k:'chaves',l:'Chaves',t:'money',d:11300},{k:'financiamento',l:'Financiamento aprovado',t:'money',d:200000},{k:'fgts',l:'FGTS',t:'money',d:0},{k:'subsidio',l:'Subsídio',t:'money',d:0},{k:'tetoCarteira',l:'Teto da carteira (parcelável)',t:'money',d:50000,h:'Padrão R$ 50 mil; ajuste em campanhas.'},{k:'qtdMensais',l:'Nº de parcelas (até 100)',t:'int',d:100},{k:'parcelaCaixa',l:'Parcela Caixa (pós-chaves)',t:'money',d:0,info:true,auto:v=>Math.round(v.renda*.3*100)/100}],
- compute(i){const teto=i.tetoCarteira||50000,liq=i.valorTabela-i.desconto,cap=i.renda*.3,total=i.sinal+i.sinalParcelado+i.chaves+i.fgts+i.subsidio+i.financiamento,nec=liq-total,carteira=Math.min(Math.max(nec,0),teto),exced=Math.max(0,nec-teto),parc=i.qtdMensais>0?carteira/i.qtdMensais:0,fi=liq?total/liq:0,sobra=Math.max(0,-nec),okP=i.qtdMensais>0&&i.qtdMensais<=100,ok=exced<=0&&okP&&sobra===0;const status={ok,titulo:sobra?'Aportes maiores que o imóvel — revisar':!okP?'Nº de parcelas fora do limite (máx. 100x)':exced?'Acima do teto — distribuir excedente entre sinal e chaves':`Carteira dentro do teto de ${money(teto)}`,checks:[{label:sobra?'Aportes não podem superar o valor do imóvel':`Carteira a parcelar ≤ ${money(teto)}`,ok:!sobra&&exced<=0},{label:`Parcelamento em até 100x (atual: ${i.qtdMensais}x)`,ok:okP}]};return{status,highlight:[['Carteira a parcelar',carteira,'money'],[`Parcela mensal (${i.qtdMensais}x)`,parc,'money','strong'],...(exced>0?[['Distribuir entre sinal/chaves',exced,'money','strong']]:[])],rows:[['Líquido (tabela − desconto)',liq,'money'],['Total aportado',total,'money'],['Entrada necessária (além dos aportes)',nec,'money'],['Capacidade de pagamento (30%)',cap,'money'],['F.I. Real',fi,'pct'],...(sobra>0?[['Sobra de aportes',sobra,'money','alert']]:[]),...(exced>0?[['Excedente acima do teto',exced,'money','alert'],['Sinal sugerido',Math.ceil(i.sinal+exced),'money','alert']]:[]),...(!okP?[['Nº de parcelas informado',`${i.qtdMensais}x`,'text','alert']]:[])],resumo:[['Valor do imóvel',i.valorTabela,'money'],...(i.desconto>0?[['Desconto aplicado',i.desconto,'money']]:[]),['Valor do imóvel com desconto',liq,'money'],['Valor do financiamento',i.financiamento,'money'],['FGTS',i.fgts||0,'money'],...(i.subsidio>0?[['Subsídio',i.subsidio,'money']]:[]),['Sinal (ato)',i.sinal,'money'],['Sinal parcelado',i.sinalParcelado,'money'],['Chaves',i.chaves,'money'],['Entrada parcelada (carteira)',carteira,'money'],...(exced>0?[['A distribuir (sinal/chaves)',exced,'money']]:[]),['Mensais',`${i.qtdMensais}x de ${money(parc)}`,'text'],['Parcela Caixa (pós-chaves)',i.parcelaCaixa||0,'money']]};}
+ {k:'renda',l:'Renda do cliente',t:'money',d:6300},{k:'valorTabela',l:'Valor de tabela',t:'money',d:296300},{k:'desconto',l:'Desconto de tabela',t:'money',d:15000},{k:'sinal',l:'Sinal (ato)',t:'money',d:10000},{k:'sinalParcelado',l:'Sinal parcelado',t:'money',d:0},{k:'chaves',l:'Chaves',t:'money',d:11300},{k:'financiamento',l:'Financiamento aprovado',t:'money',d:200000},{k:'fgts',l:'FGTS',t:'money',d:0},{k:'subsidio',l:'Subsídio',t:'money',d:0},{k:'tetoCarteira',l:'Teto da carteira (parcelável)',t:'money',d:50000,h:'Padrão R$ 50 mil; ajuste em campanhas.'},{k:'qtdMensais',l:'Nº de parcelas (até 100)',t:'int',d:100},{k:'parcelaCaixa',l:'Parcela Caixa (pós-chaves)',t:'money',d:0,info:true,auto:v=>Math.round(v.renda*ORBE_RULES.common.incomePct*100)/100}],
+ compute(i){const teto=i.tetoCarteira||ORBE_RULES.engenharq.walletCap,liq=i.valorTabela-i.desconto,cap=i.renda*ORBE_RULES.common.incomePct,total=i.sinal+i.sinalParcelado+i.chaves+i.fgts+i.subsidio+i.financiamento,nec=liq-total,carteira=Math.min(Math.max(nec,0),teto),exced=Math.max(0,nec-teto),parc=i.qtdMensais>0?carteira/i.qtdMensais:0,fi=liq?total/liq:0,sobra=Math.max(0,-nec),okP=i.qtdMensais>0&&i.qtdMensais<=ORBE_RULES.engenharq.maxParcelas,ok=exced<=0&&okP&&sobra===0;const status={ok,titulo:sobra?'Aportes maiores que o imóvel — revisar':!okP?'Nº de parcelas fora do limite (máx. 100x)':exced?'Acima do teto — distribuir excedente entre sinal e chaves':`Carteira dentro do teto de ${money(teto)}`,checks:[{label:sobra?'Aportes não podem superar o valor do imóvel':`Carteira a parcelar ≤ ${money(teto)}`,ok:!sobra&&exced<=0},{label:`Parcelamento em até ${ORBE_RULES.engenharq.maxParcelas}x (atual: ${i.qtdMensais}x)`,ok:okP}]};return{status,highlight:[['Carteira a parcelar',carteira,'money'],[`Parcela mensal (${i.qtdMensais}x)`,parc,'money','strong'],...(exced>0?[['Distribuir entre sinal/chaves',exced,'money','strong']]:[])],rows:[['Líquido (tabela − desconto)',liq,'money'],['Total aportado',total,'money'],['Entrada necessária (além dos aportes)',nec,'money'],['Capacidade de pagamento (30%)',cap,'money'],['F.I. Real',fi,'pct'],...(sobra>0?[['Sobra de aportes',sobra,'money','alert']]:[]),...(exced>0?[['Excedente acima do teto',exced,'money','alert'],['Sinal sugerido',Math.ceil(i.sinal+exced),'money','alert']]:[]),...(!okP?[['Nº de parcelas informado',`${i.qtdMensais}x`,'text','alert']]:[])],resumo:[['Valor do imóvel',i.valorTabela,'money'],...(i.desconto>0?[['Desconto aplicado',i.desconto,'money']]:[]),['Valor do imóvel com desconto',liq,'money'],['Valor do financiamento',i.financiamento,'money'],['FGTS',i.fgts||0,'money'],...(i.subsidio>0?[['Subsídio',i.subsidio,'money']]:[]),['Sinal (ato)',i.sinal,'money'],['Sinal parcelado',i.sinalParcelado,'money'],['Chaves',i.chaves,'money'],['Entrada parcelada (carteira)',carteira,'money'],...(exced>0?[['A distribuir (sinal/chaves)',exced,'money']]:[]),['Mensais',`${i.qtdMensais}x de ${money(parc)}`,'text'],['Parcela Caixa (pós-chaves)',i.parcelaCaixa||0,'money']]};}
  },
  engemat:{nome:'Engemat',cor:'#ea580c',obs:'Entrada parcelada em 80x, com intercaladas semestrais.',products:{'villas-lisboa':{nome:'Villas de Lisboa'},'plaza-santa-lucia-2':{nome:'Plaza Santa Lúcia II'}},fields:[
- {k:'renda',l:'Renda do cliente',t:'money',d:3297.44},{k:'valorTabela',l:'Valor de tabela',t:'money',d:260000},{k:'desconto',l:'Desconto de tabela',t:'money',d:15000},{k:'sinal',l:'Sinal (ato)',t:'money',d:3000},{k:'chaves',l:'Chaves',t:'money',d:0},{k:'financiamento',l:'Financiamento aprovado',t:'money',d:190159.81},{k:'fgts',l:'FGTS',t:'money',d:4254.5},{k:'subsidio',l:'Subsídio',t:'money',d:3624},{k:'semestrais',l:'Nº de intercaladas semestrais',t:'int',d:0},{k:'valorIntercalada',l:'Valor da intercalada (semestral)',t:'money',d:0,auto:v=>Math.round(v.renda*.5*100)/100},{k:'qtdMensais',l:'Nº de parcelas mensais',t:'int',d:80},{k:'parcelaCaixa',l:'Parcela Caixa (pós-chaves)',t:'money',d:0,info:true,auto:v=>Math.round(v.renda*.3*100)/100}],
- compute(i){const liq=i.valorTabela-i.desconto,cap=i.renda*.3,inter=(i.valorIntercalada||0)*i.semestrais,total=i.sinal+i.chaves+i.fgts+i.subsidio+i.financiamento,entrada=liq-total-inter,parc=i.qtdMensais>0?entrada/i.qtdMensais:0,fi=liq?total/liq:0,ep=liq?entrada/liq:0,status=health({parcela:parc,capacidade:cap,entradaPct:ep,fi});const entradaMax=cap*i.qtdMensais,sinalMax=liq-(total-i.sinal)-inter,sinalSug=Math.min(menorSinal(liq,total-i.sinal,inter,entradaMax),sinalMax);return{status,highlight:[['Entrada parcelada',entrada,'money'],[`Parcela mensal (${i.qtdMensais}x)`,parc,'money','strong']],rows:[['Líquido (tabela − desconto)',liq,'money'],['Capacidade de pagamento (30%)',cap,'money'],['Total aportado',total,'money'],['Intercaladas semestrais',inter,'money'],['Entrada % do imóvel',ep,'pct'],['F.I. Real',fi,'pct'],...(!status.ok&&sinalSug>i.sinal?[['Sinal sugerido p/ ficar saudável',Math.ceil(sinalSug),'money','alert']]:[])],resumo:[['Valor do imóvel',i.valorTabela,'money'],...(i.desconto>0?[['Desconto aplicado',i.desconto,'money']]:[]),['Valor do imóvel com desconto',liq,'money'],['Valor do financiamento',i.financiamento,'money'],['FGTS',i.fgts||0,'money'],...(i.subsidio>0?[['Subsídio',i.subsidio,'money']]:[]),['Sinal (ato)',i.sinal,'money'],['Chaves',i.chaves,'money'],['Entrada parcelada',entrada,'money'],['Mensais',`${i.qtdMensais}x de ${money(parc)}`,'text'],['Intercaladas semestrais',i.semestrais>0?`${i.semestrais}x de ${money(i.valorIntercalada)}`:'—','text'],['Valor total das intercaladas',inter,'money'],['Parcela Caixa (pós-chaves)',i.parcelaCaixa||0,'money']]};}
+ {k:'renda',l:'Renda do cliente',t:'money',d:3297.44},{k:'valorTabela',l:'Valor de tabela',t:'money',d:260000},{k:'desconto',l:'Desconto de tabela',t:'money',d:15000},{k:'sinal',l:'Sinal (ato)',t:'money',d:3000},{k:'chaves',l:'Chaves',t:'money',d:0},{k:'financiamento',l:'Financiamento aprovado',t:'money',d:190159.81},{k:'fgts',l:'FGTS',t:'money',d:4254.5},{k:'subsidio',l:'Subsídio',t:'money',d:3624},{k:'semestrais',l:'Nº de intercaladas semestrais',t:'int',d:0},{k:'valorIntercalada',l:'Valor da intercalada (semestral)',t:'money',d:0,auto:v=>Math.round(v.renda*ORBE_RULES.engemat.intercaladaPct*100)/100},{k:'qtdMensais',l:'Nº de parcelas mensais',t:'int',d:80},{k:'parcelaCaixa',l:'Parcela Caixa (pós-chaves)',t:'money',d:0,info:true,auto:v=>Math.round(v.renda*ORBE_RULES.common.incomePct*100)/100}],
+ compute(i){const liq=i.valorTabela-i.desconto,cap=i.renda*ORBE_RULES.common.incomePct,inter=(i.valorIntercalada||0)*i.semestrais,total=i.sinal+i.chaves+i.fgts+i.subsidio+i.financiamento,entrada=liq-total-inter,parc=i.qtdMensais>0?entrada/i.qtdMensais:0,fi=liq?total/liq:0,ep=liq?entrada/liq:0,status=health({parcela:parc,capacidade:cap,entradaPct:ep,fi});const entradaMax=cap*i.qtdMensais,sinalMax=liq-(total-i.sinal)-inter,sinalSug=Math.min(menorSinal(liq,total-i.sinal,inter,entradaMax),sinalMax);return{status,highlight:[['Entrada parcelada',entrada,'money'],[`Parcela mensal (${i.qtdMensais}x)`,parc,'money','strong']],rows:[['Líquido (tabela − desconto)',liq,'money'],['Capacidade de pagamento (30%)',cap,'money'],['Total aportado',total,'money'],['Intercaladas semestrais',inter,'money'],['Entrada % do imóvel',ep,'pct'],['F.I. Real',fi,'pct'],...(!status.ok&&sinalSug>i.sinal?[['Sinal sugerido p/ ficar saudável',Math.ceil(sinalSug),'money','alert']]:[])],resumo:[['Valor do imóvel',i.valorTabela,'money'],...(i.desconto>0?[['Desconto aplicado',i.desconto,'money']]:[]),['Valor do imóvel com desconto',liq,'money'],['Valor do financiamento',i.financiamento,'money'],['FGTS',i.fgts||0,'money'],...(i.subsidio>0?[['Subsídio',i.subsidio,'money']]:[]),['Sinal (ato)',i.sinal,'money'],['Chaves',i.chaves,'money'],['Entrada parcelada',entrada,'money'],['Mensais',`${i.qtdMensais}x de ${money(parc)}`,'text'],['Intercaladas semestrais',i.semestrais>0?`${i.semestrais}x de ${money(i.valorIntercalada)}`:'—','text'],['Valor total das intercaladas',inter,'money'],['Parcela Caixa (pós-chaves)',i.parcelaCaixa||0,'money']]};}
  },
  barcelos:{nome:'Barcelos',cor:'#7c3aed',obs:'Entrada dividida com a construtora em até 60x. Carteira-base de R$ 30 mil + parcela extra de 20% da renda.',products:{barcelos:{nome:'Barcelos'}},fields:[
- {k:'rendaAprovada',l:'Renda aprovada na Caixa',t:'money',d:10235.74},{k:'valorImovel',l:'Valor do imóvel',t:'money',d:210000},{k:'avaliacaoCaixa',l:'Avaliação da Caixa',t:'money',d:220000,info:true},{k:'financiamento',l:'Valor do financiamento',t:'money',d:131192.88},{k:'fgts',l:'FGTS',t:'money',d:0},{k:'subsidio',l:'Subsídio do governo',t:'money',d:0},{k:'aVista',l:'Entrada à vista (1ª parte)',t:'money',d:15000},{k:'sinalIntercalado',l:'Sinal intercalado (2ª parte)',t:'money',d:0},{k:'intercalada',l:'Valor de cada intercalada anual',t:'money',d:10000},{k:'qtdIntercaladas',l:'Nº de intercaladas anuais',t:'int',d:2},{k:'chave',l:'Chave',t:'money',d:13807.12},{k:'qtdParcelas',l:'Nº de parcelas (até 60)',t:'int',d:60},{k:'parcelaCaixa',l:'Parcela Caixa (pós-chaves)',t:'money',d:0,info:true,auto:v=>Math.round((v.rendaAprovada||0)*.3*100)/100}],
- compute(i){const renda=i.rendaAprovada+(i.rendaInformal||0),entradaTotal=i.valorImovel-i.financiamento-i.fgts-i.subsidio,dividir=entradaTotal-i.aVista-(i.sinalIntercalado||0)-(i.intercalada*i.qtdIntercaladas)-i.chave,parc=i.qtdParcelas>0?dividir/i.qtdParcelas:0,comp=renda?parc/renda:0,base=30000,pCarteira=i.qtdParcelas>0?base/i.qtdParcelas:0,pRenda=renda*.2,limite=pCarteira+pRenda,maxP=limite*i.qtdParcelas,okP=i.qtdParcelas>0&&i.qtdParcelas<=60,ok=parc<=limite&&okP;const status={ok,titulo:!okP?'Nº de parcelas fora do limite (máx. 60x)':ok?'Parcela dentro do limite (carteira + 20% da renda)':'Parcela acima do limite — ajustar',checks:[{label:`Parcela ≤ ${money(limite)} (${money(pCarteira)} da carteira + 20% da renda)`,ok:parc<=limite},{label:`Parcelamento em até 60x (atual: ${i.qtdParcelas}x)`,ok:okP}]};return{status,highlight:[['A dividir com a construtora',dividir,'money'],[`Parcela (${i.qtdParcelas}x)`,parc,'money','strong'],['Comprometimento de renda',comp,'pct','strong']],rows:[['Renda total',renda,'money'],['Entrada em dinheiro total',entradaTotal,'money'],['Entrada à vista',i.aVista,'money'],['Intercaladas anuais',i.intercalada*i.qtdIntercaladas,'money'],['Chave',i.chave,'money'],[`Parcela da carteira (R$ 30 mil em ${i.qtdParcelas}x)`,pCarteira,'money'],['Parcela extra por renda (20%)',pRenda,'money'],['Limite de parcela (carteira + renda)',limite,'money'],[`Máximo parcelável em ${i.qtdParcelas}x`,maxP,'money'],...(!okP?[['Nº de parcelas informado',`${i.qtdParcelas}x`,'text','alert']]:[]),...(!ok?[['Excedente acima do limite',dividir-maxP,'money','alert'],['Entrada à vista sugerida',Math.ceil(i.aVista+(dividir-maxP)),'money','alert']]:[])],resumo:[['Valor do imóvel',i.valorImovel,'money'],['Avaliação da Caixa',i.avaliacaoCaixa,'money'],['Valor do financiamento',i.financiamento,'money'],['FGTS',i.fgts||0,'money'],...(i.subsidio>0?[['Subsídio',i.subsidio,'money']]:[]),['Entrada à vista (1ª parte)',i.aVista,'money'],['Sinal intercalado (2ª parte)',i.sinalIntercalado||0,'money'],['Intercaladas anuais',i.qtdIntercaladas>0?`${i.qtdIntercaladas}x de ${money(i.intercalada)}`:'—','text'],['Chave',i.chave,'money'],['A dividir com a construtora',dividir,'money'],['Mensais',`${i.qtdParcelas}x de ${money(parc)}`,'text'],['Parcela Caixa (pós-chaves)',i.parcelaCaixa||0,'money']]};}
+ {k:'rendaAprovada',l:'Renda aprovada na Caixa',t:'money',d:10235.74},{k:'valorImovel',l:'Valor do imóvel',t:'money',d:210000},{k:'avaliacaoCaixa',l:'Avaliação da Caixa',t:'money',d:220000,info:true},{k:'financiamento',l:'Valor do financiamento',t:'money',d:131192.88},{k:'fgts',l:'FGTS',t:'money',d:0},{k:'subsidio',l:'Subsídio do governo',t:'money',d:0},{k:'aVista',l:'Entrada à vista (1ª parte)',t:'money',d:15000},{k:'sinalIntercalado',l:'Sinal intercalado (2ª parte)',t:'money',d:0},{k:'intercalada',l:'Valor de cada intercalada anual',t:'money',d:10000},{k:'qtdIntercaladas',l:'Nº de intercaladas anuais',t:'int',d:2},{k:'chave',l:'Chave',t:'money',d:13807.12},{k:'qtdParcelas',l:'Nº de parcelas (até 60)',t:'int',d:60},{k:'parcelaCaixa',l:'Parcela Caixa (pós-chaves)',t:'money',d:0,info:true,auto:v=>Math.round((v.rendaAprovada||0)*ORBE_RULES.common.incomePct*100)/100}],
+ compute(i){const renda=i.rendaAprovada+(i.rendaInformal||0),entradaTotal=i.valorImovel-i.financiamento-i.fgts-i.subsidio,dividir=entradaTotal-i.aVista-(i.sinalIntercalado||0)-(i.intercalada*i.qtdIntercaladas)-i.chave,parc=i.qtdParcelas>0?dividir/i.qtdParcelas:0,comp=renda?parc/renda:0,base=30000,pCarteira=i.qtdParcelas>0?base/i.qtdParcelas:0,pRenda=renda*ORBE_RULES.barcelos.rendaExtraPct,limite=pCarteira+pRenda,maxP=limite*i.qtdParcelas,okP=i.qtdParcelas>0&&i.qtdParcelas<=ORBE_RULES.barcelos.maxParcelas,ok=parc<=limite&&okP;const status={ok,titulo:!okP?'Nº de parcelas fora do limite (máx. 60x)':ok?'Parcela dentro do limite (carteira + 20% da renda)':'Parcela acima do limite — ajustar',checks:[{label:`Parcela ≤ ${money(limite)} (${money(pCarteira)} da carteira + 20% da renda)`,ok:parc<=limite},{label:`Parcelamento em até ${ORBE_RULES.barcelos.maxParcelas}x (atual: ${i.qtdParcelas}x)`,ok:okP}]};return{status,highlight:[['A dividir com a construtora',dividir,'money'],[`Parcela (${i.qtdParcelas}x)`,parc,'money','strong'],['Comprometimento de renda',comp,'pct','strong']],rows:[['Renda total',renda,'money'],['Entrada em dinheiro total',entradaTotal,'money'],['Entrada à vista',i.aVista,'money'],['Intercaladas anuais',i.intercalada*i.qtdIntercaladas,'money'],['Chave',i.chave,'money'],[`Parcela da carteira (R$ 30 mil em ${i.qtdParcelas}x)`,pCarteira,'money'],['Parcela extra por renda (20%)',pRenda,'money'],['Limite de parcela (carteira + renda)',limite,'money'],[`Máximo parcelável em ${i.qtdParcelas}x`,maxP,'money'],...(!okP?[['Nº de parcelas informado',`${i.qtdParcelas}x`,'text','alert']]:[]),...(!ok?[['Excedente acima do limite',dividir-maxP,'money','alert'],['Entrada à vista sugerida',Math.ceil(i.aVista+(dividir-maxP)),'money','alert']]:[])],resumo:[['Valor do imóvel',i.valorImovel,'money'],['Avaliação da Caixa',i.avaliacaoCaixa,'money'],['Valor do financiamento',i.financiamento,'money'],['FGTS',i.fgts||0,'money'],...(i.subsidio>0?[['Subsídio',i.subsidio,'money']]:[]),['Entrada à vista (1ª parte)',i.aVista,'money'],['Sinal intercalado (2ª parte)',i.sinalIntercalado||0,'money'],['Intercaladas anuais',i.qtdIntercaladas>0?`${i.qtdIntercaladas}x de ${money(i.intercalada)}`:'—','text'],['Chave',i.chave,'money'],['A dividir com a construtora',dividir,'money'],['Mensais',`${i.qtdParcelas}x de ${money(parc)}`,'text'],['Parcela Caixa (pós-chaves)',i.parcelaCaixa||0,'money']]};}
  },
  mrv:{nome:'MRV',cor:'#d83b3b',obs:'Plano de pagamento baseado na calculadora MRV enviada. O valor financiado é informado e o Orbe calcula a entrada, a carteira MRV de 19% e o sinal.',products:{mrv:{nome:'Plano de pagamento'}},fields:[
   {k:'valorImovel',l:'Valor do imóvel',t:'money',d:389990},
@@ -699,7 +706,7 @@ const DATA={
   const avaliacao=Number(i.avaliacao)||0;
   const financiamento=Number(i.financiamento)||0;
   const entrada=imovel-financiamento;
-  const carteira=imovel*.19;
+  const carteira=imovel*ORBE_RULES.mrv.walletPct;
   const sinal=entrada-carteira;
   const ok=imovel>0&&financiamento>=0&&financiamento<=imovel&&sinal>=0;
   const status={
@@ -738,6 +745,59 @@ const DATA={
  }
  }
 };
+
+
+const RULES_KEY='orbe-rules-v1';
+const DEFAULT_ORBE_RULES={
+  common:{incomePct:.30,entryPct:.19,fiMin:.77},
+  telesil:{intercaladaPct:.50},
+  engenharq:{walletCap:50000,maxParcelas:100},
+  engemat:{intercaladaPct:.50,maxParcelas:80},
+  barcelos:{walletBase:30000,rendaExtraPct:.20,maxParcelas:60},
+  mrv:{walletPct:.19},
+  products:{}
+};
+Object.keys(DATA).forEach(function(companyId){
+  DEFAULT_ORBE_RULES.products[companyId]={};
+  Object.entries(DATA[companyId].products||{}).forEach(function(pair){
+    const vals={};
+    Object.entries(pair[1]||{}).forEach(function(kv){if(kv[0]!=='nome'&&typeof kv[1]==='number')vals[kv[0]]=kv[1]});
+    DEFAULT_ORBE_RULES.products[companyId][pair[0]]=vals;
+  });
+});
+function mergeRuleObject(base,extra){
+  const out=Array.isArray(base)?base.slice():{...base};
+  Object.keys(extra||{}).forEach(function(k){
+    if(extra[k]&&typeof extra[k]==='object'&&!Array.isArray(extra[k])&&base[k]&&typeof base[k]==='object')out[k]=mergeRuleObject(base[k],extra[k]);
+    else out[k]=extra[k];
+  });
+  return out;
+}
+function loadRuleConfig(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(RULES_KEY)||'{}');
+    return mergeRuleObject(DEFAULT_ORBE_RULES,saved);
+  }catch(e){return mergeRuleObject(DEFAULT_ORBE_RULES,{});}
+}
+let ORBE_RULES=loadRuleConfig();
+function applyRuleConfigToData(){
+  Object.entries(ORBE_RULES.products||{}).forEach(function(companyPair){
+    const companyId=companyPair[0],products=companyPair[1]||{};
+    Object.entries(products).forEach(function(productPair){
+      const p=DATA[companyId]?.products?.[productPair[0]];
+      if(!p)return;
+      Object.entries(productPair[1]||{}).forEach(function(kv){if(typeof kv[1]==='number'&&kv[0] in p)p[kv[0]]=kv[1];});
+    });
+  });
+  if(DATA.engenharq?.fields) DATA.engenharq.fields.find(f=>f.k==='tetoCarteira').d=ORBE_RULES.engenharq.walletCap;
+}
+applyRuleConfigToData();
+function saveRuleConfig(){
+  localStorage.setItem(RULES_KEY,JSON.stringify(ORBE_RULES));
+  applyRuleConfigToData();
+  if(activeCard){renderWorkspace(activeCard);renderSimList();}
+}
+function rulePctText(v){return (Number(v)*100).toLocaleString('pt-BR',{maximumFractionDigits:2})+'%'}
 
 const ORDER=['telesil','engenharq','engemat','barcelos','mrv'];
 let active=ORDER[0],seq=0,states={},cards=[],activeCard=null;
@@ -985,17 +1045,104 @@ function applyDensity(mode){
   document.body.classList.toggle('density-compact',mode==='compact');
   localStorage.setItem('orbe-density',mode);
 }
+
+function openRulesManager(){
+  const bg=document.getElementById('featureOverlay');
+  let companyId='telesil';
+  function numericField(label,key,value,step,kind){
+    return '<div class="rule-field"><label>'+escapeHtml(label)+'</label><div class="rule-input"><input data-rule-key="'+escapeAttr(key)+'" data-rule-kind="'+(kind||'company')+'" type="number" step="'+step+'" value="'+value+'">'+(kind==='pct'?'<span>%</span>':'')+'</div></div>';
+  }
+  function render(){
+    const c=DATA[companyId],R=ORBE_RULES;
+    let specific='';
+    if(companyId==='telesil'){
+      specific+=numericField('Intercalada como % da renda','telesil.intercaladaPct',(R.telesil.intercaladaPct*100).toLocaleString('pt-BR',{maximumFractionDigits:2}),0.01,'pct');
+    }
+    if(companyId==='engenharq'){
+      specific+=numericField('Teto da carteira','engenharq.walletCap',R.engenharq.walletCap,100,'company');
+      specific+=numericField('Máximo de parcelas','engenharq.maxParcelas',R.engenharq.maxParcelas,1,'company');
+    }
+    if(companyId==='engemat'){
+      specific+=numericField('Intercalada como % da renda','engemat.intercaladaPct',(R.engemat.intercaladaPct*100).toLocaleString('pt-BR',{maximumFractionDigits:2}),0.01,'pct');
+      specific+=numericField('Máximo de parcelas','engemat.maxParcelas',R.engemat.maxParcelas,1,'company');
+    }
+    if(companyId==='barcelos'){
+      specific+=numericField('Carteira-base','barcelos.walletBase',R.barcelos.walletBase,100,'company');
+      specific+=numericField('Parcela extra sobre renda','barcelos.rendaExtraPct',(R.barcelos.rendaExtraPct*100).toLocaleString('pt-BR',{maximumFractionDigits:2}),0.01,'pct');
+      specific+=numericField('Máximo de parcelas','barcelos.maxParcelas',R.barcelos.maxParcelas,1,'company');
+    }
+    if(companyId==='mrv'){
+      specific+=numericField('Carteira MRV (% do imóvel)','mrv.walletPct',(R.mrv.walletPct*100).toLocaleString('pt-BR',{maximumFractionDigits:2}),0.01,'pct');
+    }
+    const products=Object.entries(c.products||{}).map(function(pair){
+      const productId=pair[0],p=pair[1]||{},rp=R.products?.[companyId]?.[productId]||{};
+      const numeric=Object.keys(p).filter(function(k){return k!=='nome'&&typeof p[k]==='number';});
+      if(!numeric.length)return '';
+      return '<div class="rule-product"><div class="rule-product-head"><strong>'+escapeHtml(p.nome||productId)+'</strong><span>parâmetros do empreendimento</span></div><div class="rule-grid">'+numeric.map(function(k){
+        const v=typeof rp[k]==='number'?rp[k]:p[k];
+        const step=Number.isInteger(v)?1:.01;
+        return numericField(k,k+'|'+companyId+'|'+productId,v,step,'product');
+      }).join('')+'</div></div>';
+    }).join('');
+    bg.innerHTML='<div class="rules-shell">'+
+      '<div class="feature-head"><div><div class="eyebrow">Motor de regras</div><h2>Regras comerciais</h2><p class="subline">Atualize os parâmetros sem entrar no código. O ajuste vale para novas simulações e para o cálculo do Orbe após salvar.</p></div><div class="feature-actions"><button class="btn compact" id="rulesClose">Fechar</button></div></div>'+
+      '<div class="rules-toolbar"><label>Construtora</label><select id="rulesCompany">'+ORDER.map(function(id){return '<option value="'+id+'" '+(id===companyId?'selected':'')+'>'+escapeHtml(DATA[id].nome)+'</option>';}).join('')+'</select></div>'+
+      '<div class="rules-section"><h3>Regras gerais</h3><p>Parâmetros usados pelas validações financeiras do Orbe.</p><div class="rule-grid">'+
+        numericField('Comprometimento máximo de renda','common.incomePct',(R.common.incomePct*100).toLocaleString('pt-BR',{maximumFractionDigits:2}),0.01,'pct')+
+        numericField('Entrada máxima (%)','common.entryPct',(R.common.entryPct*100).toLocaleString('pt-BR',{maximumFractionDigits:2}),0.01,'pct')+
+        numericField('F.I. Real mínimo (%)','common.fiMin',(R.common.fiMin*100).toLocaleString('pt-BR',{maximumFractionDigits:2}),0.01,'pct')+
+      '</div></div>'+
+      '<div class="rules-section"><h3>Regras da '+escapeHtml(c.nome)+'</h3><p>Parâmetros específicos da construtora.</p><div class="rule-grid">'+(specific||'<span class="rules-muted">Sem parâmetros específicos cadastrados.</span>')+'</div></div>'+
+      (products?'<div class="rules-section"><h3>Empreendimentos</h3><p>Ajuste parcelas e demais parâmetros numéricos por produto.</p>'+products+'</div>':'')+
+      '<div class="rules-actions"><button class="btn danger" id="rulesReset">Restaurar padrões</button><button class="btn primary" id="rulesSave">Salvar regras</button></div>'+
+      '<div class="rules-foot">Os ajustes ficam salvos neste navegador. Eles não alteram tabelas oficiais da construtora; use apenas para manter o seu motor comercial atualizado.</div>'+
+    '</div>';
+    bg.onclick=function(e){if(e.target===bg)bg.hidden=true};
+    bg.querySelector('#rulesClose').onclick=function(){bg.hidden=true};
+    bg.querySelector('#rulesCompany').onchange=function(e){companyId=e.target.value;render()};
+    bg.querySelector('#rulesReset').onclick=function(){
+      ORBE_RULES=mergeRuleObject(DEFAULT_ORBE_RULES,{});
+      localStorage.removeItem(RULES_KEY);
+      applyRuleConfigToData();
+      render();
+      if(activeCard)renderWorkspace(activeCard);
+      showToast('Padrões restaurados');
+    };
+    bg.querySelector('#rulesSave').onclick=function(){
+      bg.querySelectorAll('input[data-rule-key]').forEach(function(inp){
+        const kind=inp.dataset.ruleKind,key=inp.dataset.ruleKey,n=Number(inp.value);
+        if(!Number.isFinite(n))return;
+        if(kind==='product'){
+          const parts=key.split('|'),rk=parts[0],cid=parts[1],pid=parts[2];
+          ORBE_RULES.products[cid]=ORBE_RULES.products[cid]||{};
+          ORBE_RULES.products[cid][pid]=ORBE_RULES.products[cid][pid]||{};
+          ORBE_RULES.products[cid][pid][rk]=n;
+        }else{
+          const parts=key.split('.');
+          if(parts.length===2){ORBE_RULES[parts[0]]=ORBE_RULES[parts[0]]||{};ORBE_RULES[parts[0]][parts[1]]=n;}
+        }
+      });
+      saveRuleConfig();
+      render();
+      showToast('Regras atualizadas');
+    };
+  }
+  render();
+}
 function openSettings(){
   const mode=document.body.classList.contains('light')?'light':'dark',density=localStorage.getItem('orbe-density')||'comfortable';
-  const bg=featureRoot('<div class="feature-head"><div><h2>Configurações</h2><p class="subline">Ajuste a aparência do seu espaço de trabalho.</p></div><button class="btn compact" data-feature-close>Fechar</button></div>'+
+  const bg=featureRoot('<div class="feature-head"><div><h2>Configurações</h2><p class="subline">Ajuste a aparência e as regras do seu espaço de trabalho.</p></div><button class="btn compact" data-feature-close>Fechar</button></div>'+
     '<div class="settings-grid">'+
       '<div class="settings-box"><h4>Aparência</h4><p>Escolha como o Orbe deve aparecer.</p><div class="setting-row"><button class="setting-pill '+(mode==='dark'?'active':'')+'" data-theme-choice="dark">☾ Escuro</button><button class="setting-pill '+(mode==='light'?'active':'')+'" data-theme-choice="light">☀ Claro</button></div></div>'+
       '<div class="settings-box"><h4>Densidade</h4><p>Controle a quantidade de informação na tela.</p><div class="setting-row"><button class="setting-pill '+(density==='comfortable'?'active':'')+'" data-density="comfortable">Confortável</button><button class="setting-pill '+(density==='compact'?'active':'')+'" data-density="compact">Compacta</button></div></div>'+
+      '<button class="settings-box rules-launch" id="openRulesManager"><h4>Regras comerciais</h4><p>Atualize tetos, percentuais e parâmetros dos empreendimentos sem editar o código.</p><span>Gerenciar regras →</span></button>'+
     '</div>'+
     '<div class="settings-box" style="margin-top:10px"><h4>Perfil</h4><p>Identidade atual do workspace.</p><div class="badge-mini">João Lucas · Gerente & Corretor</div></div>');
   bg.querySelectorAll('[data-theme-choice]').forEach(function(b){b.onclick=function(){applyTheme(b.dataset.themeChoice);openSettings()}});
   bg.querySelectorAll('[data-density]').forEach(function(b){b.onclick=function(){applyDensity(b.dataset.density);openSettings()}});
+  bg.querySelector('#openRulesManager').onclick=function(){openRulesManager()};
 }
+
 function openSearch(){
   const bg=featureRoot('<div class="feature-head"><div><h2>Buscar no Orbe</h2><p class="subline">Clientes, simulações e registros recentes.</p></div><button class="btn compact" data-feature-close>Fechar</button></div><div class="search-wrap"><input class="search-input" id="orbeSearchInput" autocomplete="off" placeholder="Digite um nome, empreendimento ou construtora..."><div class="search-results" id="orbeSearchResults"></div></div>');
   const input=bg.querySelector('#orbeSearchInput'),out=bg.querySelector('#orbeSearchResults');
