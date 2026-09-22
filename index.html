@@ -911,7 +911,7 @@ function buildDiscoveryScenario(companyId,productId,inputs){
   st.v.financiamento=inputs.credito;
   if(Object.prototype.hasOwnProperty.call(st.v,'renda'))st.v.renda=inputs.renda;else if(Object.prototype.hasOwnProperty.call(st.v,'rendaAprovada'))st.v.rendaAprovada=inputs.renda;
   st.v.fgts=inputs.fgts;st.v.subsidio=inputs.subsidio;
-  if(companyId==='barcelos')st.v.aVista=inputs.entrada;else st.v.sinal=inputs.entrada;
+  if(companyId==='barcelos')st.v.aVista=inputs.entrada;else st.v.sinal=inputs.entrada;if(companyId==='mrv')st.v.valorImovel=inputs.valorImovel||0;
   if(Object.prototype.hasOwnProperty.call(st.v,'parcelaCaixa'))st.v.parcelaCaixa=Math.round(inputs.renda*.3*100)/100;
   return st;
 }
@@ -923,7 +923,7 @@ function discoveryParcel(r){
 }
 
 function discoveryReasons(item,vals){
-  if(item.compatible)return ['✓ Dentro das regras cadastradas para este cenário.'];
+  if(item.blocked)return ['Para a MRV, informe o valor estimado do imóvel para o Orbe calcular o cenário.'];if(item.compatible)return ['✓ Dentro das regras cadastradas para este cenário.'];
   const reasons=[];
   (item.r.status?.checks||[]).filter(function(q){return !q.ok}).forEach(function(q){reasons.push(q.label)});
   const rows=item.r.rows||[];
@@ -959,7 +959,7 @@ function discoveryEntry(r){
 function openDiscovery(){
   const bg=document.getElementById('featureOverlay');bg.hidden=false;
   function showForm(){
-    bg.innerHTML='<div class="overlay-panel"><div class="overlay-head"><div><h3>Descobrir opção</h3><p>Informe o perfil do cliente e o Orbe cruza os empreendimentos cadastrados.</p></div><button class="btn compact" id="closeFeature">Fechar</button></div><div class="discover-intro"><b>Como funciona:</b> o crédito aprovado é usado como financiamento, FGTS e subsídio entram como recursos da compra e o valor disponível representa o aporte inicial. O Orbe testa cada produto com as regras já cadastradas.</div><div class="discover-form">'+discoverField('Crédito aprovado','credito','Ex.: 220.000')+discoverField('Renda','renda','Ex.: 6.500')+discoverField('FGTS','fgts','Ex.: 10.000')+discoverField('Subsídio','subsidio','Ex.: 5.000')+discoverField('Valor disponível para entrada','entrada','Ex.: 30.000')+'</div><div class="discover-actions"><button class="btn primary" id="runDiscovery">Encontrar opções</button></div><div id="discoverResults"></div></div>';
+    bg.innerHTML='<div class="overlay-panel"><div class="overlay-head"><div><h3>Descobrir opção</h3><p>Informe o perfil do cliente e o Orbe cruza os empreendimentos cadastrados.</p></div><button class="btn compact" id="closeFeature">Fechar</button></div><div class="discover-intro"><b>Como funciona:</b> o crédito aprovado é usado como financiamento, FGTS e subsídio entram como recursos da compra e o valor disponível representa o aporte inicial. O Orbe testa cada produto com as regras já cadastradas.</div><div class="discover-form">'+discoverField('Crédito aprovado','credito','Ex.: 220.000')+discoverField('Renda','renda','Ex.: 6.500')+discoverField('FGTS','fgts','Ex.: 10.000')+discoverField('Subsídio','subsidio','Ex.: 5.000')+discoverField('Valor disponível para entrada','entrada','Ex.: 30.000')+discoverField('Valor estimado do imóvel (MRV)','valorImovel','Opcional · Ex.: 320.000')+'</div><div class="discover-actions"><button class="btn primary" id="runDiscovery">Encontrar opções</button></div><div id="discoverResults"></div></div>';
     bg.onclick=function(e){if(e.target===bg)bg.hidden=true};bg.querySelector('#closeFeature').onclick=function(){bg.hidden=true};
     bg.querySelectorAll('input[data-discover]').forEach(function(inp){inp.addEventListener('input',function(){formatMoneyInput(inp);});});
     bg.querySelector('#runDiscovery').onclick=function(){
@@ -967,11 +967,11 @@ function openDiscovery(){
       if(!vals.credito||!vals.renda){showToast('Preencha Crédito aprovado e Renda');return;}
       vals.entrada=vals.entrada||0;vals.fgts=vals.fgts||0;vals.subsidio=vals.subsidio||0;
       const results=[];
-      ORDER.forEach(function(companyId){const c=DATA[companyId];Object.entries(c.products||{}).forEach(function(entry){const productId=entry[0],product=entry[1],st=buildDiscoveryScenario(companyId,productId,vals),r=c.compute(st.v),parcel=discoveryParcel(r),entryLeft=discoveryEntry(r),compatible=!!r.status?.ok;results.push({companyId,productId,product,st,r,parcel,entryLeft,compatible,company:c});});});
+      ORDER.forEach(function(companyId){const c=DATA[companyId];Object.entries(c.products||{}).forEach(function(entry){const productId=entry[0],product=entry[1];if(companyId==='mrv'&&!vals.valorImovel){results.push({companyId,productId,product,st:null,r:{status:{ok:false,titulo:'Informar valor do imóvel'},highlight:[],rows:[]},parcel:null,entryLeft:null,compatible:false,blocked:true,company:c});return;}const st=buildDiscoveryScenario(companyId,productId,vals),r=c.compute(st.v),parcel=discoveryParcel(r),entryLeft=discoveryEntry(r),compatible=!!r.status?.ok;results.push({companyId,productId,product,st,r,parcel,entryLeft,compatible,company:c});});});
       results.sort(function(a,b){if(a.compatible!==b.compatible)return a.compatible?-1:1;return (a.parcel?.value??Infinity)-(b.parcel?.value??Infinity);});
       const compatibleCount=results.filter(function(x){return x.compatible;}).length;
       const area=bg.querySelector('#discoverResults');
-      area.innerHTML='<div class="discover-intro"><b>'+compatibleCount+' opção(ões) compatível(is)</b> pelas regras cadastradas. As demais são alternativas para avaliação.</div><div class="discover-results">'+results.map(function(x){const parcelText=x.parcel?val(x.parcel.value,x.parcel.fmt):'—',statusText=x.compatible?'Compatível':'Revisar proposta',entryText=x.entryLeft?val(x.entryLeft.value,x.entryLeft.fmt):'—',reasons=discoveryReasons(x,vals);return '<div class="discover-result '+(x.compatible?'compatible':'near')+'"><div class="top"><div><h4>'+escapeHtml(x.product.nome)+'</h4><div class="sub">'+escapeHtml(x.company.nome)+'</div></div><span class="discover-badge '+(x.compatible?'good':'warn')+'">'+statusText+'</span></div><div class="discover-metrics"><div class="discover-metric"><div class="k">Parcela</div><div class="v">'+parcelText+'</div></div><div class="discover-metric"><div class="k">Entrada restante</div><div class="v">'+entryText+'</div></div><div class="discover-metric"><div class="k">Crédito</div><div class="v">'+money(vals.credito)+'</div></div><div class="discover-metric"><div class="k">Renda</div><div class="v">'+money(vals.renda)+'</div></div></div><div class="discover-reasons">'+reasons.map(function(reason){return '<div>• '+escapeHtml(reason)+'</div>'}).join('')+'</div><div class="action-row"><button class="btn compact primary" data-open-discovery="'+x.companyId+'|'+x.productId+'">Abrir simulação</button></div></div>';}).join('')+'</div>';
+      area.innerHTML='<div class="discover-intro"><b>'+compatibleCount+' opção(ões) compatível(is)</b> pelas regras cadastradas. As demais são alternativas para avaliação.</div><div class="discover-results">'+results.map(function(x){const parcelText=x.parcel?val(x.parcel.value,x.parcel.fmt):'—',statusText=x.compatible?'Compatível':'Revisar proposta',entryText=x.entryLeft?val(x.entryLeft.value,x.entryLeft.fmt):'—',reasons=discoveryReasons(x,vals);return '<div class="discover-result '+(x.compatible?'compatible':'near')+'"><div class="top"><div><h4>'+escapeHtml(x.product.nome)+'</h4><div class="sub">'+escapeHtml(x.company.nome)+'</div></div><span class="discover-badge '+(x.compatible?'good':'warn')+'">'+statusText+'</span></div><div class="discover-metrics"><div class="discover-metric"><div class="k">Parcela</div><div class="v">'+parcelText+'</div></div><div class="discover-metric"><div class="k">Entrada restante</div><div class="v">'+entryText+'</div></div><div class="discover-metric"><div class="k">Crédito</div><div class="v">'+money(vals.credito)+'</div></div><div class="discover-metric"><div class="k">Renda</div><div class="v">'+money(vals.renda)+'</div></div></div><div class="discover-reasons">'+reasons.map(function(reason){return '<div>• '+escapeHtml(reason)+'</div>'}).join('')+'</div><div class="action-row">'+(x.blocked?'':'<button class="btn compact primary" data-open-discovery="'+x.companyId+'|'+x.productId+'">Abrir simulação</button>')+'</div></div>';}).join('')+'</div>';
       area.querySelectorAll('[data-open-discovery]').forEach(function(btn){btn.onclick=function(){const parts=btn.dataset.openDiscovery.split('|'),base=buildDiscoveryScenario(parts[0],parts[1],vals),id='c'+(++seq);states[id]=base;cards.push(id);activeCard=id;active=parts[0];saveDrafts();bg.hidden=true;renderTabs();showSimulation(id);showToast('Opção aberta no simulador');};});
     };
   }
@@ -1151,7 +1151,7 @@ function openRulesManager(){
     };
     bg.querySelector('#rulesSave').onclick=function(){
       bg.querySelectorAll('input[data-rule-key]').forEach(function(inp){
-        const kind=inp.dataset.ruleKind,key=inp.dataset.ruleKey,n=Number(inp.value);
+        const kind=inp.dataset.ruleKind,key=inp.dataset.ruleKey,raw=Number(inp.value),n=kind==='pct'?raw/100:raw;
         if(!Number.isFinite(n))return;
         if(kind==='product'){
           const parts=key.split('|'),rk=parts[0],cid=parts[1],pid=parts[2];
