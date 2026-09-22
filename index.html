@@ -173,6 +173,67 @@ body.light .hud-card{background:rgba(255,255,255,.62);border-color:#dce8de}
 body.light .companybar,body.light .simbar{background:rgba(255,255,255,.66);border-color:#dbe7dd}
 body.light .workspace-note{color:#708178}
 body.light .panel{box-shadow:0 16px 40px rgba(49,84,57,.08)}
+/* Melhor legibilidade no tema claro: observações maiores e tipografia mais forte. */
+body.light .obs,
+body.light .workspace-note,
+body.light .ghost-note,
+body.light .hero p,
+body.light .panel-head p,
+body.light .field label,
+body.light .hint,
+body.light .footer,
+body.light .hud-meta,
+body.light .company-label,
+body.light .crumbs,
+body.light .workspace-note,
+body.light .sim-chip,
+body.light .section-title,
+body.light .result-section-title,
+body.light .helper,
+body.light .mk,
+body.light .compare-sub,
+body.light .compare-note,
+body.light .ghost-note{
+  color:#111 !important;
+  font-weight:700 !important;
+}
+body.light .obs{font-size:14px !important;line-height:1.55 !important}
+body.light .hero p{font-size:13px !important}
+body.light .panel-head p{font-size:11px !important}
+body.light .field label{font-size:10px !important}
+body.light .hint{font-size:9px !important}
+body.light .footer{font-size:10px !important}
+body.light .nav button,
+body.light .nav-label,
+body.light .logo-sub,
+body.light .workspace-note,
+body.light .live,
+body.light .counter,
+body.light .tab,
+body.light .sim-chip,
+body.light .btn,
+body.light .theme-toggle{
+  font-weight:800 !important;
+}
+body.light .field input,
+body.light .field select,
+body.light .notes-card textarea{
+  color:#111 !important;
+  font-weight:700 !important;
+}
+body.light .hud-label,
+body.light .hud-value,
+body.light .panel-head h3,
+body.light .hero h1,
+body.light .result-hero .metric .v,
+body.light .fact .v,
+body.light .compare-kpi .v,
+body.light .compare-card h4,
+body.light .history-item strong,
+body.light .kan-card strong{
+  color:#111 !important;
+  font-weight:800 !important;
+}
 @media(max-width:720px){.theme-toggle .txt{display:none}.theme-toggle{padding:8px 9px}}
 /* Keep inactive feature overlay truly hidden; otherwise backdrop-filter blurs the whole app. */
 .modal-bg[hidden]{display:none !important;}
