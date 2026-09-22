@@ -1183,22 +1183,23 @@ function openMRVSimulator(){
 function renderStartScreen(){
   const grid=document.getElementById('startGrid');
   if(!grid)return;
-  grid.innerHTML=ORDER.map(function(id){
-    const company=DATA[id];
+  const cardsHtml=ORDER.map(function(id){
+    const company=DATA[id]||{nome:id,cor:'#7da887',obs:'',products:{}};
     const products=Object.entries(company.products||{});
     const accent=company.cor||'#7da887';
-    const initial=company.nome.trim().charAt(0).toUpperCase();
-    return '<div class="start-card" data-start-company="'+id+'" tabindex="0" role="button" style="--card-accent:'+accent+';--card-accent-soft:'+accent+'20">'+
-      '<div class="start-card-head"><span class="start-card-mark">'+initial+'</span><button type="button" class="start-card-arrow" data-start-company-btn="'+id+'" aria-label="Abrir '+escapeAttr(company.nome)+'">→</button></div>'+
-      '<h3>'+escapeHtml(company.nome)+'</h3>'+
-      '<p>Escolha a construtora ou entre direto em um empreendimento.</p>'+
-      '<div class="start-card-list">'+products.map(function(pair){
-        const key=pair[0],p=pair[1];
-        return '<button type="button" class="start-project-btn" data-start-product="'+id+'|'+key+'">'+escapeHtml(p.nome)+'</button>';
-      }).join('')+'</div>'+
+    const initial=String(company.nome||id).trim().charAt(0).toUpperCase()||'?';
+    return '<div class="start-card" data-start-company="'+escapeAttr(id)+'" tabindex="0" role="button" style="--card-accent:'+accent+';--card-accent-soft:'+accent+'20">'+
+      '<div class="start-card-head"><span class="start-card-mark">'+escapeHtml(initial)+'</span><button type="button" class="start-card-arrow" data-start-company-btn="'+escapeAttr(id)+'" aria-label="Abrir '+escapeAttr(company.nome||id)+'">→</button></div>'+
+      '<h3>'+escapeHtml(company.nome||id)+'</h3>'+
+      '<p>Escolha a construtora ou entre direto no empreendimento.</p>'+
+      '<div class="start-card-list">'+(products.length?products.map(function(pair){
+        const key=pair[0],p=pair[1]||{};
+        return '<button type="button" class="start-project-btn" data-start-product="'+escapeAttr(id+'|'+key)+'">'+escapeHtml(p.nome||key)+'</button>';
+      }).join(''):'<span class="start-project">Plano de pagamento</span>')+'</div>'+
       '<div class="start-card-foot"><span class="start-count">'+products.length+' '+(products.length===1?'empreendimento':'empreendimentos')+'</span><span class="start-hint">Abrir simulador</span></div>'+
     '</div>';
   }).join('');
+  grid.innerHTML=cardsHtml;
   grid.querySelectorAll('[data-start-company-btn]').forEach(function(btn){
     btn.onclick=function(e){e.stopPropagation();enterCompany(btn.dataset.startCompanyBtn)};
   });
@@ -1206,7 +1207,7 @@ function renderStartScreen(){
     btn.onclick=function(e){
       e.stopPropagation();
       const parts=btn.dataset.startProduct.split('|');
-      enterProduct(parts[0],parts[1]);
+      enterProduct(parts[0],parts.slice(1).join('|'));
     };
   });
   grid.querySelectorAll('[data-start-company]').forEach(function(card){
