@@ -176,6 +176,7 @@ body.light .panel{box-shadow:0 16px 40px rgba(49,84,57,.08)}
 @media(max-width:720px){.theme-toggle .txt{display:none}.theme-toggle{padding:8px 9px}}
 /* Keep inactive feature overlay truly hidden; otherwise backdrop-filter blurs the whole app. */
 .modal-bg[hidden]{display:none !important;}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.compare-card{border:1px solid var(--stroke);border-radius:16px;padding:14px;background:rgba(255,255,255,.035)}.compare-card h4{margin:0;font-size:13px;font-weight:800}.compare-sub{margin-top:3px;color:var(--muted);font-size:8px}.compare-status{margin-top:9px;padding:8px 9px;border-radius:10px;font-size:8px;font-weight:800}.compare-status.ok{background:rgba(120,211,154,.08);color:#8fd5a2;border:1px solid rgba(120,211,154,.18)}.compare-status.bad{background:rgba(255,140,127,.08);color:#ff9d91;border:1px solid rgba(255,140,127,.18)}.compare-kpis{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.compare-kpi{padding:9px 10px;border:1px solid rgba(212,239,218,.08);border-radius:10px;background:rgba(255,255,255,.025)}.compare-kpi .k{font-size:7px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-weight:900}.compare-kpi .v{font-size:10px;color:#dfe9e1;font-weight:800;margin-top:3px}.compare-selects{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:13px}.compare-selects label{display:flex;flex-direction:column;gap:5px;font-size:8px;color:var(--muted);font-weight:800}.compare-selects select{height:38px;border:1px solid var(--stroke);border-radius:10px;background:rgba(255,255,255,.04);color:var(--text);padding:0 9px;font-size:10px}.compare-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:9px}.compare-table th,.compare-table td{padding:9px 8px;border-bottom:1px solid rgba(212,239,218,.07)}.compare-table th{text-align:left;color:#6f8276;font-size:8px;text-transform:uppercase;letter-spacing:.6px}.compare-table td:nth-child(2),.compare-table td:nth-child(3){font-weight:800;color:#dfe9e1;text-align:right}.compare-note{margin-top:12px;padding:10px 11px;border:1px dashed rgba(143,194,150,.14);border-radius:10px;color:#718579;font-size:8px;line-height:1.45}@media(max-width:720px){.compare-grid,.compare-selects{grid-template-columns:1fr}.compare-table{font-size:8px}}
 
 </style></head><body><div class="app">
   <aside class="sidebar">
@@ -231,7 +232,7 @@ body.light .panel{box-shadow:0 16px 40px rgba(49,84,57,.08)}
     </div>
 
     <div class="simbar"><div class="sim-list" id="simList"></div><div class="sim-actions"><button class="btn" id="clearAll">Limpar sessão</button><button class="btn soft" id="topSummary">▣ Gerar resumo</button></div></div>
-    <div class="tools-bar"><div class="tool-group"><button class="btn compact" id="saveHistory">◌ Salvar no histórico</button><button class="btn compact" id="openHistory">Histórico</button><button class="btn compact" id="openKanban">▦ Kanban</button><button class="btn compact" id="openNotes">▤ Notas</button></div><div class="ghost-note">Cada simulação pode ter cliente, observações e etapa.</div></div>
+    <div class="tools-bar"><div class="tool-group"><button class="btn compact" id="saveHistory">◌ Salvar no histórico</button><button class="btn compact" id="openHistory">Histórico</button><button class="btn compact" id="openKanban">▦ Kanban</button><button class="btn compact" id="openNotes">▤ Notas</button><button class="btn compact" id="openCompare">⇄ Comparar propostas</button></div><div class="ghost-note">Cada simulação pode ter cliente, observações e etapa.</div></div>
 
     <section class="workspace">
       <section class="panel">
@@ -323,9 +324,43 @@ function openKanban(){
     });
   });
 }
+function compareSummary(st,c){
+  const r=c.compute(st.v);
+  const summary=(r.resumo||[]).map(function(x){return {label:String(x[0]||''),value:x[1],fmt:x[2]};});
+  function find(patterns){return summary.find(function(x){return patterns.some(function(p){return x.label.toLowerCase().includes(p);});})||null;}
+  const parcel=(r.highlight||[]).find(function(x){return /parcela/i.test(String(x[0]))&&x[3]==='strong';})||(r.highlight||[]).find(function(x){return /parcela/i.test(String(x[0]));})||null;
+  return {r,imovel:find(['valor do imóvel','valor do imovel']),financiamento:find(['valor do financiamento','financiamento']),entrada:find(['entrada parcelada','a dividir com a construtora','entrada em dinheiro']),parcel:parcel,caixa:find(['parcela caixa']),fi:(r.rows||[]).find(function(x){return /f\\.i\\. real/i.test(String(x[0]));})||null};
+}
+function compareDisplay(x){return x?val(x.value,x.fmt):'—';}
+function compareCardHtml(id){
+  const st=states[id],c=DATA[st.c],s=compareSummary(st,c);
+  const product=st.product&&c.products&&c.products[st.product]?c.products[st.product].nome:c.nome;
+  const h='<div class="compare-card"><h4>'+escapeHtml(st.clientName||'Sem cliente')+'</h4><div class="compare-sub">'+escapeHtml(c.nome)+' · '+escapeHtml(product)+'</div><div class="compare-status '+(s.r.status.ok?'ok':'bad')+'">'+(s.r.status.ok?'✓':'⚠')+' '+escapeHtml(s.r.status.titulo)+'</div><div class="compare-kpis"><div class="compare-kpi"><div class="k">Valor do imóvel</div><div class="v">'+compareDisplay(s.imovel)+'</div></div><div class="compare-kpi"><div class="k">Financiamento</div><div class="v">'+compareDisplay(s.financiamento)+'</div></div><div class="compare-kpi"><div class="k">Entrada</div><div class="v">'+compareDisplay(s.entrada)+'</div></div><div class="compare-kpi"><div class="k">Parcela principal</div><div class="v">'+compareDisplay(s.parcel)+'</div></div><div class="compare-kpi"><div class="k">Parcela Caixa</div><div class="v">'+compareDisplay(s.caixa)+'</div></div><div class="compare-kpi"><div class="k">F.I. Real</div><div class="v">'+compareDisplay(s.fi)+'</div></div></div></div>';
+  return h;
+}
+function openCompare(){
+  const bg=document.getElementById('featureOverlay');
+  if(cards.length<2){showToast('Abra pelo menos 2 simulações para comparar');return;}
+  bg.hidden=false;
+  const options=cards.map(function(id){const st=states[id],c=DATA[st.c],p=st.product&&c.products&&c.products[st.product]?c.products[st.product].nome:c.nome;return {id:id,label:(st.clientName||'Sem cliente')+' — '+c.nome+' · '+p};});
+  let left=options[0].id,right=options[1].id;
+  function render(){
+    const a=states[left],b=states[right],sa=compareSummary(a,DATA[a.c]),sb=compareSummary(b,DATA[b.c]);
+    const rows=[['Valor do imóvel',sa.imovel,sb.imovel],['Financiamento',sa.financiamento,sb.financiamento],['Entrada',sa.entrada,sb.entrada],['Parcela principal',sa.parcel,sb.parcel],['Parcela Caixa',sa.caixa,sb.caixa],['F.I. Real',sa.fi,sb.fi]];
+    const optionHtml=options.map(function(o){return '<option value="'+o.id+'" '+(o.id===left?'selected':'')+'>'+escapeHtml(o.label)+'</option>';}).join('');
+    const optionHtmlB=options.map(function(o){return '<option value="'+o.id+'" '+(o.id===right?'selected':'')+'>'+escapeHtml(o.label)+'</option>';}).join('');
+    const tableHtml=rows.map(function(row){return '<tr><td>'+escapeHtml(row[0])+'</td><td>'+compareDisplay(row[1])+'</td><td>'+compareDisplay(row[2])+'</td></tr>';}).join('');
+    bg.innerHTML='<div class="overlay-panel"><div class="overlay-head"><div><h3>Comparar propostas</h3><p>Veja duas condições lado a lado antes de apresentar ao cliente.</p></div><button class="btn compact" id="closeFeature">Fechar</button></div><div class="compare-selects"><label>Proposta A<select id="compareA">'+optionHtml+'</select></label><label>Proposta B<select id="compareB">'+optionHtmlB+'</select></label></div><div class="compare-grid">'+compareCardHtml(left)+compareCardHtml(right)+'</div><table class="compare-table"><thead><tr><th>Indicador</th><th>'+escapeHtml(states[left].clientName||'Proposta A')+'</th><th>'+escapeHtml(states[right].clientName||'Proposta B')+'</th></tr></thead><tbody>'+tableHtml+'</tbody></table><div class="compare-note">A comparação usa os cálculos atuais das duas simulações. As condições são estimativas e devem ser conferidas antes da formalização.</div></div>';
+    bg.onclick=function(e){if(e.target===bg)bg.hidden=true;};
+    bg.querySelector('#closeFeature').onclick=function(){bg.hidden=true;};
+    bg.querySelector('#compareA').onchange=function(e){left=e.target.value;if(left===right){const alt=options.find(function(o){return o.id!==left;});if(alt)right=alt.id;}render();};
+    bg.querySelector('#compareB').onchange=function(e){right=e.target.value;if(left===right){const alt=options.find(function(o){return o.id!==right;});if(alt)left=alt.id;}render();};
+  }
+  render();
+}
 function makeOverviewToast(msg){showToast(msg)}
 
-document.getElementById('saveHistory').onclick=()=>activeCard&&saveToHistory(activeCard);document.getElementById('openHistory').onclick=()=>openHistory();document.getElementById('openKanban').onclick=()=>openKanban();document.getElementById('openNotes').onclick=()=>openNotes();document.getElementById('navHistory').onclick=()=>openHistory();document.getElementById('navNotes').onclick=()=>openNotes();document.querySelectorAll('[data-nav=\"kanban\"]').forEach(b=>b.onclick=()=>openKanban());document.querySelectorAll('[data-nav=\"overview\"], [data-nav=\"clients\"], [data-nav=\"settings\"]').forEach(b=>b.onclick=()=>showToast('Módulo em evolução'));document.getElementById('newSimulation').onclick=addCard;document.getElementById('topSummary').onclick=()=>activeCard&&modal(activeCard);document.getElementById('panelSummary').onclick=()=>activeCard&&modal(activeCard);document.getElementById('clearCurrent').onclick=()=>{if(activeCard)resetCard(activeCard)};document.getElementById('clearAll').onclick=()=>cards.slice().forEach(resetCard);renderTabs();select(active);
+document.getElementById('saveHistory').onclick=()=>activeCard&&saveToHistory(activeCard);document.getElementById('openCompare').onclick=()=>openCompare();document.getElementById('openHistory').onclick=()=>openHistory();document.getElementById('openKanban').onclick=()=>openKanban();document.getElementById('openNotes').onclick=()=>openNotes();document.getElementById('navHistory').onclick=()=>openHistory();document.getElementById('navNotes').onclick=()=>openNotes();document.querySelectorAll('[data-nav=\"kanban\"]').forEach(b=>b.onclick=()=>openKanban());document.querySelectorAll('[data-nav=\"overview\"], [data-nav=\"clients\"], [data-nav=\"settings\"]').forEach(b=>b.onclick=()=>showToast('Módulo em evolução'));document.getElementById('newSimulation').onclick=addCard;document.getElementById('topSummary').onclick=()=>activeCard&&modal(activeCard);document.getElementById('panelSummary').onclick=()=>activeCard&&modal(activeCard);document.getElementById('clearCurrent').onclick=()=>{if(activeCard)resetCard(activeCard)};document.getElementById('clearAll').onclick=()=>cards.slice().forEach(resetCard);renderTabs();select(active);
 
 let deferredInstallPrompt=null;
 const installBtn=document.getElementById('installApp');
