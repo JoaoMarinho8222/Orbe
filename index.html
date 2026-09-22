@@ -468,6 +468,14 @@ body.company-active .sim-chip.active{
   border-color:var(--brand-line);background:var(--brand-soft);
 }
 body.company-active .dot{box-shadow:0 0 9px color-mix(in srgb,var(--brand) 70%,transparent)}
+/* mobile constructor tabs */
+@media (max-width:760px){
+  .company-label{display:none}
+  .companybar{padding:5px 6px;gap:3px}
+  .tabs{gap:2px;min-width:0;width:100%;justify-content:space-between}
+  .tab{padding:7px 8px;font-size:9px;letter-spacing:-.1px;flex:0 0 auto}
+}
+
 body.company-active .panel-icon{background:var(--brand-soft);border-color:var(--brand-line);color:var(--brand-2)}
 body.company-active .section-title{color:var(--brand-2)}
 body.company-active .section-number{background:var(--brand-soft);border-color:var(--brand-line);color:var(--brand-2)}
