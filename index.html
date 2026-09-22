@@ -489,6 +489,27 @@ body.light.company-active .tab.active{
 }
 body.light.company-active .btn.soft{color:color-mix(in srgb,var(--brand) 70%,#17271d)}
 
+
+/* ORBE — base mais escura e verde mais sóbrio */
+body{
+  background:
+    radial-gradient(circle at 82% 8%,rgba(72,103,78,.09),transparent 22%),
+    radial-gradient(circle at 10% 82%,rgba(43,68,49,.08),transparent 26%),
+    linear-gradient(135deg,#040906 0%,#08110b 50%,#0c1710 100%);
+}
+body.company-barcelos{
+  --brand:#526d4d;
+  --brand-2:#7f9b77;
+  --brand-soft:rgba(82,109,77,.065);
+  --brand-line:rgba(127,155,119,.22);
+  --brand-glow:rgba(82,109,77,.08);
+}
+body.company-active.company-barcelos:after{
+  opacity:.75;
+}
+body.light{
+  background:linear-gradient(135deg,#e8f0e9 0%,#f4f8f4 58%,#dce8de 100%);
+}
 </style></head><body>
 <div class="start-screen" id="startScreen">
   <div class="start-shell">
