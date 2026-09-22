@@ -446,6 +446,9 @@ body.company-engemat{
 body.company-barcelos{
   --brand:#78986f;--brand-2:#a5c29a;--brand-soft:rgba(120,152,111,.09);--brand-line:rgba(120,152,111,.25);--brand-glow:rgba(120,152,111,.12);
 }
+body.company-mrv{
+  --brand:#d83b3b;--brand-2:#ef7777;--brand-soft:rgba(216,59,59,.075);--brand-line:rgba(216,59,59,.24);--brand-glow:rgba(216,59,59,.11);
+}
 body.company-active .live i{background:var(--brand);box-shadow:0 0 10px var(--brand)}
 body.company-active .live{border-color:var(--brand-line)}
 body.company-active .eyebrow{color:var(--brand-2);border-color:var(--brand-line);background:var(--brand-soft)}
@@ -677,10 +680,57 @@ const DATA={
  barcelos:{nome:'Barcelos',cor:'#7c3aed',obs:'Entrada dividida com a construtora em até 60x. Carteira-base de R$ 30 mil + parcela extra de 20% da renda.',products:{barcelos:{nome:'Barcelos'}},fields:[
  {k:'rendaAprovada',l:'Renda aprovada na Caixa',t:'money',d:10235.74},{k:'valorImovel',l:'Valor do imóvel',t:'money',d:210000},{k:'avaliacaoCaixa',l:'Avaliação da Caixa',t:'money',d:220000,info:true},{k:'financiamento',l:'Valor do financiamento',t:'money',d:131192.88},{k:'fgts',l:'FGTS',t:'money',d:0},{k:'subsidio',l:'Subsídio do governo',t:'money',d:0},{k:'aVista',l:'Entrada à vista (1ª parte)',t:'money',d:15000},{k:'sinalIntercalado',l:'Sinal intercalado (2ª parte)',t:'money',d:0},{k:'intercalada',l:'Valor de cada intercalada anual',t:'money',d:10000},{k:'qtdIntercaladas',l:'Nº de intercaladas anuais',t:'int',d:2},{k:'chave',l:'Chave',t:'money',d:13807.12},{k:'qtdParcelas',l:'Nº de parcelas (até 60)',t:'int',d:60},{k:'parcelaCaixa',l:'Parcela Caixa (pós-chaves)',t:'money',d:0,info:true,auto:v=>Math.round((v.rendaAprovada||0)*.3*100)/100}],
  compute(i){const renda=i.rendaAprovada+(i.rendaInformal||0),entradaTotal=i.valorImovel-i.financiamento-i.fgts-i.subsidio,dividir=entradaTotal-i.aVista-(i.sinalIntercalado||0)-(i.intercalada*i.qtdIntercaladas)-i.chave,parc=i.qtdParcelas>0?dividir/i.qtdParcelas:0,comp=renda?parc/renda:0,base=30000,pCarteira=i.qtdParcelas>0?base/i.qtdParcelas:0,pRenda=renda*.2,limite=pCarteira+pRenda,maxP=limite*i.qtdParcelas,okP=i.qtdParcelas>0&&i.qtdParcelas<=60,ok=parc<=limite&&okP;const status={ok,titulo:!okP?'Nº de parcelas fora do limite (máx. 60x)':ok?'Parcela dentro do limite (carteira + 20% da renda)':'Parcela acima do limite — ajustar',checks:[{label:`Parcela ≤ ${money(limite)} (${money(pCarteira)} da carteira + 20% da renda)`,ok:parc<=limite},{label:`Parcelamento em até 60x (atual: ${i.qtdParcelas}x)`,ok:okP}]};return{status,highlight:[['A dividir com a construtora',dividir,'money'],[`Parcela (${i.qtdParcelas}x)`,parc,'money','strong'],['Comprometimento de renda',comp,'pct','strong']],rows:[['Renda total',renda,'money'],['Entrada em dinheiro total',entradaTotal,'money'],['Entrada à vista',i.aVista,'money'],['Intercaladas anuais',i.intercalada*i.qtdIntercaladas,'money'],['Chave',i.chave,'money'],[`Parcela da carteira (R$ 30 mil em ${i.qtdParcelas}x)`,pCarteira,'money'],['Parcela extra por renda (20%)',pRenda,'money'],['Limite de parcela (carteira + renda)',limite,'money'],[`Máximo parcelável em ${i.qtdParcelas}x`,maxP,'money'],...(!okP?[['Nº de parcelas informado',`${i.qtdParcelas}x`,'text','alert']]:[]),...(!ok?[['Excedente acima do limite',dividir-maxP,'money','alert'],['Entrada à vista sugerida',Math.ceil(i.aVista+(dividir-maxP)),'money','alert']]:[])],resumo:[['Valor do imóvel',i.valorImovel,'money'],['Avaliação da Caixa',i.avaliacaoCaixa,'money'],['Valor do financiamento',i.financiamento,'money'],['FGTS',i.fgts||0,'money'],...(i.subsidio>0?[['Subsídio',i.subsidio,'money']]:[]),['Entrada à vista (1ª parte)',i.aVista,'money'],['Sinal intercalado (2ª parte)',i.sinalIntercalado||0,'money'],['Intercaladas anuais',i.qtdIntercaladas>0?`${i.qtdIntercaladas}x de ${money(i.intercalada)}`:'—','text'],['Chave',i.chave,'money'],['A dividir com a construtora',dividir,'money'],['Mensais',`${i.qtdParcelas}x de ${money(parc)}`,'text'],['Parcela Caixa (pós-chaves)',i.parcelaCaixa||0,'money']]};}
+ },
+ mrv:{nome:'MRV',cor:'#d83b3b',obs:'Plano de pagamento baseado na calculadora MRV enviada. O valor financiado é informado e o Orbe calcula a entrada, a carteira MRV de 19% e o sinal.',products:{mrv:{nome:'Plano de pagamento'}},fields:[
+  {k:'valorImovel',l:'Valor do imóvel',t:'money',d:389990},
+  {k:'avaliacao',l:'Valor da avaliação',t:'money',d:437800,info:true},
+  {k:'financiamento',l:'Valor financiado',t:'money',d:243778.11}
+ ],
+ compute(i){
+  const imovel=Number(i.valorImovel)||0;
+  const avaliacao=Number(i.avaliacao)||0;
+  const financiamento=Number(i.financiamento)||0;
+  const entrada=imovel-financiamento;
+  const carteira=imovel*.19;
+  const sinal=entrada-carteira;
+  const ok=imovel>0&&financiamento>=0&&financiamento<=imovel&&sinal>=0;
+  const status={
+    ok,
+    titulo: ok?'Plano MRV calculado':'Ajustar valores da proposta',
+    checks:[
+      {label:'Financiamento ≤ valor do imóvel',ok:financiamento<=imovel},
+      {label:'Carteira MRV = 19% do valor do imóvel',ok:imovel>0},
+      {label:'Sinal resultante não pode ser negativo',ok:sinal>=0}
+    ]
+  };
+  return{
+    status,
+    highlight:[
+      ['Valor do sinal',sinal,'money','strong'],
+      ['Parcelamento MRV',carteira,'money','strong']
+    ],
+    rows:[
+      ['Valor do imóvel',imovel,'money'],
+      ['Valor da avaliação',avaliacao,'money'],
+      ['Valor financiado',financiamento,'money'],
+      ['Entrada à vista',entrada,'money'],
+      ['Carteira MRV (19%)',carteira,'money'],
+      ['Valor do sinal',sinal,'money'],
+      ['Carteira / imóvel',.19,'pct']
+    ],
+    resumo:[
+      ['Valor do imóvel',imovel,'money'],
+      ['Valor da avaliação',avaliacao,'money'],
+      ['Valor financiado',financiamento,'money'],
+      ['Entrada à vista',entrada,'money'],
+      ['Parcelamento MRV',carteira,'money'],
+      ['Valor do sinal',sinal,'money']
+    ]
+  };
  }
 };
 
-const ORDER=['telesil','engenharq','engemat','barcelos'];
+const ORDER=['telesil','engenharq','engemat','barcelos','mrv'];
 let active=ORDER[0],seq=0,states={},cards=[],activeCard=null;
 function auto(st,c){c.fields.forEach(f=>{if(f.auto&&!st.t[f.k])st.v[f.k]=f.auto(st.v)})}
 function formatMoneyInput(el){const old=el.value;const s=old.replace(/[^\d,]/g,'');const i=s.indexOf(',');let ip=i>=0?s.slice(0,i):s,dp=i>=0?s.slice(i+1).replace(/,/g,'').slice(0,2):'';ip=ip.replace(/^0+(?=\d)/,'');el.value=(ip?Number(ip).toLocaleString('pt-BR'):'')+(i>=0?',':'')+dp}
@@ -693,7 +743,7 @@ function companyThemeClass(id){
 }
 function applyCompanyTheme(id){
   const body=document.body;
-  body.classList.remove('company-active','company-telesil','company-engenharq','company-engemat','company-barcelos');
+  body.classList.remove('company-active','company-telesil','company-engenharq','company-engemat','company-barcelos','company-mrv');
   const cls=companyThemeClass(id);
   if(id){body.classList.add('company-active',cls);}
 }
@@ -1141,16 +1191,6 @@ function renderStartScreen(){
       '<div class="start-card-foot"><span class="start-count">'+products.length+' '+(products.length===1?'empreendimento':'empreendimentos')+'</span><span class="start-hint">Abrir simulador</span></div>'+
     '</div>';
   }).join('');
-
-  grid.insertAdjacentHTML('beforeend',
-    '<div class="start-card mrv-card" data-start-mrv tabindex="0" role="button">'+
-      '<div class="start-card-head"><span class="start-card-mark" style="background:var(--card-accent-soft);color:var(--card-accent);border-color:rgba(216,59,59,.24)">M</span><button type="button" class="start-card-arrow" data-start-mrv-btn aria-label="Abrir Simulador MRV">→</button></div>'+
-      '<h3>MRV</h3>'+
-      '<p>Calcule rapidamente o plano de pagamento com a lógica da planilha MRV que você me enviou.</p>'+
-      '<div class="start-card-list"><button type="button" class="start-project-btn" data-start-mrv-open>Plano de pagamento</button></div>'+
-      '<div class="start-card-foot"><span class="start-count">Carteira MRV · 19%</span><span class="start-hint">Abrir simulador</span></div>'+
-    '</div>'
-  );
   grid.querySelectorAll('[data-start-company-btn]').forEach(function(btn){
     btn.onclick=function(e){e.stopPropagation();enterCompany(btn.dataset.startCompanyBtn)};
   });
@@ -1161,27 +1201,6 @@ function renderStartScreen(){
       enterProduct(parts[0],parts[1]);
     };
   });
-  const mrvCard=grid.querySelector('[data-start-mrv]');
-  if(mrvCard){
-    mrvCard.onclick=function(e){
-      if(e.target.closest('button'))return;
-      openMRVSimulator();
-    };
-    mrvCard.onkeydown=function(e){
-      if((e.key==='Enter'||e.key===' ')&&!e.target.closest('button')){
-        e.preventDefault();
-        openMRVSimulator();
-      }
-    };
-  }
-  grid.querySelectorAll('[data-start-mrv-btn],[data-start-mrv-open]').forEach(function(btn){
-    btn.onclick=function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      openMRVSimulator();
-    };
-  });
-
   grid.querySelectorAll('[data-start-company]').forEach(function(card){
     card.onclick=function(e){
       if(e.target.closest('button'))return;
