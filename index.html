@@ -328,7 +328,103 @@ body.light .mobile-nav button{color:#678072}body.light .mobile-nav button.active
 body.light .search-input{background:#fbfdfb;color:#203026;border-color:#d6e3d9}
 body.light .pipeline-bar{background:#e8efe9}
 
-</style></head><body><div class="app">
+
+
+/* ORBE START — seleção de construtora */
+.start-screen{
+  position:fixed;inset:0;z-index:500;display:grid;place-items:center;overflow:auto;
+  padding:28px;
+  background:
+    radial-gradient(circle at 84% 12%,rgba(119,180,130,.11),transparent 24%),
+    radial-gradient(circle at 12% 88%,rgba(73,122,88,.09),transparent 28%),
+    linear-gradient(135deg,#07100b 0%,#0a1510 48%,#102018 100%);
+}
+.start-screen[hidden]{display:none!important}
+.start-screen:before{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.035;
+  background-image:linear-gradient(rgba(181,220,190,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(181,220,190,.14) 1px,transparent 1px);
+  background-size:46px 46px;
+  mask-image:linear-gradient(to bottom,rgba(0,0,0,.7),transparent 86%);
+}
+.start-shell{position:relative;z-index:1;width:min(1180px,100%)}
+.start-top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:42px}
+.start-brand{display:flex;align-items:center;gap:12px}
+.start-brand-mark{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#d8efdb,#78a981 52%,#365d3e);color:#0d1b11;font-family:var(--display);font-size:19px;font-weight:900;box-shadow:0 14px 35px rgba(104,161,113,.16)}
+.start-brand-name{font-family:var(--display);font-size:21px;font-weight:800;letter-spacing:-.04em}
+.start-brand-sub{margin-top:2px;color:#819387;font-size:9px}
+.start-status{display:flex;align-items:center;gap:7px;padding:8px 10px;border:1px solid var(--stroke);background:rgba(255,255,255,.025);border-radius:999px;color:#9aae9f;font-size:9px;font-weight:800}
+.start-status i{width:6px;height:6px;border-radius:50%;background:#72d08e;box-shadow:0 0 10px rgba(114,208,142,.7)}
+.start-copy{max-width:820px;margin-bottom:24px}
+.start-eyebrow{display:inline-flex;align-items:center;gap:7px;color:#9cba9f;font-size:9px;text-transform:uppercase;letter-spacing:.14em;font-weight:900}
+.start-eyebrow:before{content:"";width:18px;height:1px;background:#86ad8b}
+.start-title{margin:10px 0 0;font-family:var(--font);font-size:clamp(38px,5vw,64px);line-height:.98;letter-spacing:-.065em;font-weight:800}
+.start-title em{font-style:normal;color:#9bc7a0}
+.start-sub{margin:13px 0 0;color:#88998e;font-size:12px;line-height:1.55;max-width:620px}
+.start-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.start-card{
+  position:relative;overflow:hidden;text-align:left;min-height:235px;padding:18px;
+  border:1px solid var(--stroke);border-radius:20px;background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018));
+  color:var(--text);transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease,background .22s ease;
+}
+.start-card:before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:var(--card-accent,#79aa80);opacity:.7}
+.start-card:after{content:"";position:absolute;width:120px;height:120px;right:-42px;bottom:-42px;border-radius:50%;background:radial-gradient(circle,var(--card-accent-soft,rgba(121,170,128,.11)),transparent 68%)}
+.start-card:hover{transform:translateY(-4px);border-color:rgba(164,214,170,.25);box-shadow:0 20px 48px rgba(0,0,0,.23);background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.025))}
+.start-card:focus-visible{outline:none;border-color:rgba(164,214,170,.5);box-shadow:0 0 0 4px rgba(121,184,131,.11)}
+.start-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.start-card-mark{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);font-family:var(--display);font-size:14px;font-weight:900;color:#dce9df}
+.start-card-arrow{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(255,255,255,.11);background:rgba(255,255,255,.035);font-size:14px;transition:transform .22s ease}
+.start-card:hover .start-card-arrow{transform:translateX(3px)}
+.start-card h3{margin:17px 0 0;font-family:var(--font);font-size:17px;letter-spacing:-.03em}
+.start-card p{margin:5px 0 0;color:#8b9b90;font-size:9px;line-height:1.45}
+.start-card-list{margin:15px 0 0;display:flex;flex-wrap:wrap;gap:5px}
+.start-project{display:inline-flex;align-items:center;padding:5px 7px;border:1px solid rgba(214,240,218,.08);border-radius:999px;background:rgba(255,255,255,.022);color:#a7b9ac;font-size:7px;font-weight:800}
+.start-card-foot{margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.start-count{font-size:8px;color:#72857a;font-weight:800}
+.start-hint{font-size:8px;color:#9db7a1;font-weight:800}
+.start-footer{margin-top:18px;color:#617268;font-size:8px}
+body.light .start-screen{
+  background:
+    radial-gradient(circle at 84% 12%,rgba(119,180,130,.12),transparent 24%),
+    linear-gradient(135deg,#eff7f0 0%,#f9fbf9 60%,#e3efe5 100%);
+}
+body.light .start-brand-name,body.light .start-title{color:#17271d}
+body.light .start-sub,body.light .start-card p{color:#687a6e}
+body.light .start-status{background:rgba(255,255,255,.75);border-color:#d7e5da;color:#54685b}
+body.light .start-card{color:#1a2b20;background:rgba(255,255,255,.86);border-color:#dbe7de;box-shadow:0 12px 32px rgba(35,70,41,.06)}
+body.light .start-card:hover{background:#fff;border-color:#bcd5c2;box-shadow:0 18px 42px rgba(35,70,41,.10)}
+body.light .start-card p{color:#718178}
+body.light .start-project{color:#4f6658;border-color:#dfE9e1;background:#f7fbf8}
+body.light .start-card-mark{color:#365840;background:#f0f6f1;border-color:#dfe9e1}
+body.light .start-card-arrow{background:#f5f9f6;border-color:#dce7df;color:#31553a}
+@media(max-width:980px){.start-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){
+  .start-screen{padding:18px 13px 82px}
+  .start-top{margin-bottom:30px}.start-status{display:none}
+  .start-title{font-size:40px}.start-sub{font-size:10px}
+  .start-grid{grid-template-columns:1fr}.start-card{min-height:0;padding:16px}
+  .start-card-list{margin-top:11px}.start-footer{display:none}
+}
+
+</style></head><body>
+<div class="start-screen" id="startScreen">
+  <div class="start-shell">
+    <div class="start-top">
+      <div class="start-brand">
+        <div class="start-brand-mark">O</div>
+        <div><div class="start-brand-name">Orbe</div><div class="start-brand-sub">Sales Intelligence</div></div>
+      </div>
+      <div class="start-status"><i></i> Motor de cálculo ativo</div>
+    </div>
+    <div class="start-copy">
+      <div class="start-eyebrow">Central de simulação</div>
+      <h1 class="start-title">O que vamos <em>simular</em> hoje?</h1>
+      <p class="start-sub">Escolha a construtora para abrir o simulador com as condições e empreendimentos já cadastrados no Orbe.</p>
+    </div>
+    <div class="start-grid" id="startGrid"></div>
+    <div class="start-footer">Selecione uma opção para começar. Você pode trocar de construtora a qualquer momento.</div>
+  </div>
+</div>
+<div class="app">
   <aside class="sidebar">
     <div class="logo-wrap">
       <div class="logo-orb">O</div>
@@ -336,7 +432,7 @@ body.light .pipeline-bar{background:#e8efe9}
     </div>
     <div class="nav-label">Workspace</div>
     <nav class="nav">
-      <button type="button" data-nav="overview"><span class="icon">⌂</span><span class="txt">Visão geral</span></button>
+      <button type="button" data-nav="overview"><span class="icon">⌂</span><span class="txt">Início</span></button>
       <button class="active" type="button" data-nav="simulator"><span class="icon">◈</span><span class="txt">Simulador</span></button>
       <button type="button" data-nav="kanban"><span class="icon">▦</span><span class="txt">Kanban</span></button>
       <button type="button" data-nav="clients"><span class="icon">◎</span><span class="txt">Clientes</span></button>
@@ -725,7 +821,7 @@ function openPresentation(){
 function syncDesignEvents(){
   const search=document.getElementById('commandButton'),quick=document.getElementById('quickActions'),present=document.getElementById('openPresentation');
   if(search)search.onclick=openSearch;if(quick)quick.onclick=openQuickActions;if(present)present.onclick=openPresentation;
-  document.querySelectorAll('[data-nav="overview"]').forEach(function(b){b.onclick=openDashboard});
+  document.querySelectorAll('[data-nav="overview"]').forEach(function(b){b.onclick=openStartScreen});
   document.querySelectorAll('[data-nav="clients"]').forEach(function(b){b.onclick=openClients});
   document.querySelectorAll('[data-nav="settings"]').forEach(function(b){b.onclick=openSettings});
   document.querySelectorAll('[data-nav="quick"]').forEach(function(b){b.onclick=openQuickActions});
@@ -733,7 +829,7 @@ function syncDesignEvents(){
     b.onclick=function(){
       const v=b.dataset.mobileNav;
       document.querySelectorAll('[data-mobile-nav]').forEach(function(x){x.classList.toggle('active',x===b)});
-      if(v==='dashboard')openDashboard();
+      if(v==='dashboard')openStartScreen();
       if(v==='simulator'){window.scrollTo({top:0,behavior:'smooth'});}
       if(v==='quick')openQuickActions();
       if(v==='kanban')openKanban();
@@ -744,11 +840,47 @@ function syncDesignEvents(){
 const oldRenderWorkspace=renderWorkspace;
 renderWorkspace=function(id){oldRenderWorkspace(id);setTimeout(function(){animateNumbers(document.getElementById('resultPanel'));},15)};
 applyDensity(localStorage.getItem('orbe-density')||'comfortable');
+renderStartScreen();
 syncDesignEvents();
 window.addEventListener('keydown',function(e){
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openSearch();}
   if(e.key==='Escape'){const bg=document.getElementById('featureOverlay');if(bg&&!bg.hidden)bg.hidden=true;}
 });
 setTimeout(function(){animateNumbers(document);},80);
+
+
+
+function renderStartScreen(){
+  const grid=document.getElementById('startGrid');
+  if(!grid)return;
+  grid.innerHTML=ORDER.map(function(id){
+    const company=DATA[id];
+    const products=Object.values(company.products||{});
+    const accent=company.cor||'#7da887';
+    const initial=company.nome.trim().charAt(0).toUpperCase();
+    return '<button type="button" class="start-card" data-start-company="'+id+'" style="--card-accent:'+accent+';--card-accent-soft:'+accent+'20">'+
+      '<div class="start-card-head"><span class="start-card-mark">'+initial+'</span><span class="start-card-arrow">→</span></div>'+
+      '<h3>'+escapeHtml(company.nome)+'</h3>'+
+      '<p>Simulação comercial com as condições cadastradas.</p>'+
+      '<div class="start-card-list">'+products.slice(0,5).map(function(p){return '<span class="start-project">'+escapeHtml(p.nome)+'</span>';}).join('')+
+      (products.length>5?'<span class="start-project">+'+(products.length-5)+' outros</span>':'')+'</div>'+
+      '<div class="start-card-foot"><span class="start-count">'+products.length+' '+(products.length===1?'empreendimento':'empreendimentos')+'</span><span class="start-hint">Abrir simulador</span></div>'+
+    '</button>';
+  }).join('');
+  grid.querySelectorAll('[data-start-company]').forEach(function(btn){
+    btn.onclick=function(){
+      const id=btn.dataset.startCompany;
+      select(id);
+      document.getElementById('startScreen').hidden=true;
+      window.scrollTo({top:0,behavior:'smooth'});
+    };
+  });
+}
+function openStartScreen(){
+  const screen=document.getElementById('startScreen');
+  if(!screen)return;
+  screen.hidden=false;
+  renderStartScreen();
+}
 
 </script></body></html>
