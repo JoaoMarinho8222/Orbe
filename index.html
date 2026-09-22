@@ -242,6 +242,15 @@ body.light .kan-card strong{
 @media(max-width:720px){.theme-toggle .txt{display:none}.theme-toggle{padding:8px 9px}}
 /* Keep inactive feature overlay truly hidden; otherwise backdrop-filter blurs the whole app. */
 .modal-bg[hidden]{display:none !important;}
+.discover-intro{margin-top:13px;padding:11px 12px;border:1px solid rgba(143,194,150,.14);border-radius:11px;background:rgba(143,194,150,.04);font-size:9px;line-height:1.5;color:var(--muted)}
+.discover-form{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}.discover-form .field.full{grid-column:1/-1}
+.discover-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:14px}.discover-results{display:grid;gap:9px;margin-top:15px}
+.discover-result{border:1px solid var(--stroke);border-radius:14px;padding:12px;background:rgba(255,255,255,.025)}.discover-result.compatible{border-color:rgba(120,211,154,.22);background:rgba(120,211,154,.045)}.discover-result.near{border-color:rgba(233,186,98,.18);background:rgba(233,186,98,.035)}
+.discover-result .top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.discover-result h4{margin:0;font-size:12px}.discover-result .sub{margin-top:3px;color:var(--muted);font-size:8px}
+.discover-badge{padding:5px 7px;border-radius:999px;font-size:7px;font-weight:900;border:1px solid var(--stroke);white-space:nowrap}.discover-badge.good{color:#8fd5a2;background:rgba(120,211,154,.08);border-color:rgba(120,211,154,.18)}.discover-badge.warn{color:#e9ba62;background:rgba(233,186,98,.06);border-color:rgba(233,186,98,.18)}
+.discover-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}.discover-metric{padding:8px 9px;border:1px solid rgba(212,239,218,.07);border-radius:9px;background:rgba(255,255,255,.018)}.discover-metric .k{font-size:7px;color:var(--muted);text-transform:uppercase;letter-spacing:.55px;font-weight:900}.discover-metric .v{margin-top:3px;font-size:10px;color:#dfe9e1;font-weight:800}.discover-result .action-row{display:flex;justify-content:flex-end;margin-top:9px}
+body.light .discover-intro{color:#111;background:#f4f8f5;border-color:#d9e7dc;font-weight:700}.light .discover-result{background:#fff;border-color:#dce8de}.light .discover-result.compatible{background:#f2f8f3;border-color:#b9d7be}.light .discover-result.near{background:#fffaf0;border-color:#ead39b}.light .discover-result h4,.light .discover-result .sub,.light .discover-metric .v{color:#111}.light .discover-metric{background:#fbfdfb;border-color:#e0e9e2}
+@media(max-width:720px){.discover-form,.discover-metrics{grid-template-columns:1fr 1fr}.discover-result .top{flex-direction:column}}
 .compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.compare-card{border:1px solid var(--stroke);border-radius:16px;padding:14px;background:rgba(255,255,255,.035)}.compare-card h4{margin:0;font-size:13px;font-weight:800}.compare-sub{margin-top:3px;color:var(--muted);font-size:8px}.compare-status{margin-top:9px;padding:8px 9px;border-radius:10px;font-size:8px;font-weight:800}.compare-status.ok{background:rgba(120,211,154,.08);color:#8fd5a2;border:1px solid rgba(120,211,154,.18)}.compare-status.bad{background:rgba(255,140,127,.08);color:#ff9d91;border:1px solid rgba(255,140,127,.18)}.compare-kpis{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.compare-kpi{padding:9px 10px;border:1px solid rgba(212,239,218,.08);border-radius:10px;background:rgba(255,255,255,.025)}.compare-kpi .k{font-size:7px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-weight:900}.compare-kpi .v{font-size:10px;color:#dfe9e1;font-weight:800;margin-top:3px}.compare-selects{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:13px}.compare-selects label{display:flex;flex-direction:column;gap:5px;font-size:8px;color:var(--muted);font-weight:800}.compare-selects select{height:38px;border:1px solid var(--stroke);border-radius:10px;background:rgba(255,255,255,.04);color:var(--text);padding:0 9px;font-size:10px}.compare-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:9px}.compare-table th,.compare-table td{padding:9px 8px;border-bottom:1px solid rgba(212,239,218,.07)}.compare-table th{text-align:left;color:#6f8276;font-size:8px;text-transform:uppercase;letter-spacing:.6px}.compare-table td:nth-child(2),.compare-table td:nth-child(3){font-weight:800;color:#dfe9e1;text-align:right}.compare-note{margin-top:12px;padding:10px 11px;border:1px dashed rgba(143,194,150,.14);border-radius:10px;color:#718579;font-size:8px;line-height:1.45}@media(max-width:720px){.compare-grid,.compare-selects{grid-template-columns:1fr}.compare-table{font-size:8px}}
 
 </style></head><body><div class="app">
@@ -280,6 +289,7 @@ body.light .kan-card strong{
         <p id="obs"></p>
       </div>
       <div class="hero-cta">
+        <button class="btn soft" id="discoverOption">⌕ Descobrir opção</button>
         <button class="btn" id="clearCurrent">↺ Limpar atual</button>
         <button class="btn primary" id="newSimulation">＋ Nova simulação</button>
       </div>
@@ -424,9 +434,54 @@ function openCompare(){
   }
   render();
 }
+function discoverField(label,key,placeholder){
+  return '<div class="field"><label>'+label+'</label><div class="input"><span class="prefix">R$</span><input data-discover="'+key+'" type="text" inputmode="decimal" placeholder="'+placeholder+'"></div></div>';
+}
+function buildDiscoveryScenario(companyId,productId,inputs){
+  const c=DATA[companyId],st={c:companyId,v:{},t:{},product:productId||null,clientName:'',notes:'',stage:'Novo'};
+  c.fields.forEach(f=>st.v[f.k]=f.d);
+  if(c.products&&st.product)productApply(st,c);
+  st.v.financiamento=inputs.credito;
+  if(Object.prototype.hasOwnProperty.call(st.v,'renda'))st.v.renda=inputs.renda;else if(Object.prototype.hasOwnProperty.call(st.v,'rendaAprovada'))st.v.rendaAprovada=inputs.renda;
+  st.v.fgts=inputs.fgts;st.v.subsidio=inputs.subsidio;
+  if(companyId==='barcelos')st.v.aVista=inputs.entrada;else st.v.sinal=inputs.entrada;
+  if(Object.prototype.hasOwnProperty.call(st.v,'parcelaCaixa'))st.v.parcelaCaixa=Math.round(inputs.renda*.3*100)/100;
+  return st;
+}
+function discoveryParcel(r){
+  const strong=(r.highlight||[]).find(function(x){return x[3]==='strong';});
+  if(strong)return{value:strong[1],fmt:strong[2]};
+  const any=(r.highlight||[]).find(function(x){return /parcela/i.test(String(x[0]));});
+  return any?{value:any[1],fmt:any[2]}:null;
+}
+function discoveryEntry(r){
+  const row=(r.rows||[]).find(function(x){return /entrada parcelada|entrada necessária|a dividir com a construtora|a dividir/i.test(String(x[0]));});
+  return row?{value:row[1],fmt:row[2]}:null;
+}
+function openDiscovery(){
+  const bg=document.getElementById('featureOverlay');bg.hidden=false;
+  function showForm(){
+    bg.innerHTML='<div class="overlay-panel"><div class="overlay-head"><div><h3>Descobrir opção</h3><p>Informe o perfil do cliente e o Orbe cruza os empreendimentos cadastrados.</p></div><button class="btn compact" id="closeFeature">Fechar</button></div><div class="discover-intro"><b>Como funciona:</b> o crédito aprovado é usado como financiamento, FGTS e subsídio entram como recursos da compra e o valor disponível representa o aporte inicial. O Orbe testa cada produto com as regras já cadastradas.</div><div class="discover-form">'+discoverField('Crédito aprovado','credito','Ex.: 220.000')+discoverField('Renda','renda','Ex.: 6.500')+discoverField('FGTS','fgts','Ex.: 10.000')+discoverField('Subsídio','subsidio','Ex.: 5.000')+discoverField('Valor disponível para entrada','entrada','Ex.: 30.000')+discoverField('Parcela que aceita pagar','parcela','Ex.: 1.200')+'</div><div class="discover-actions"><button class="btn primary" id="runDiscovery">Encontrar opções</button></div><div id="discoverResults"></div></div>';
+    bg.onclick=function(e){if(e.target===bg)bg.hidden=true};bg.querySelector('#closeFeature').onclick=function(){bg.hidden=true};
+    bg.querySelectorAll('input[data-discover]').forEach(function(inp){inp.addEventListener('input',function(){formatMoneyInput(inp);});});
+    bg.querySelector('#runDiscovery').onclick=function(){
+      const vals={};bg.querySelectorAll('input[data-discover]').forEach(function(inp){vals[inp.dataset.discover]=parseBR(inp.value);});
+      if(!vals.credito||!vals.renda||!vals.parcela){showToast('Preencha Crédito aprovado, Renda e Parcela');return;}
+      vals.entrada=vals.entrada||0;vals.fgts=vals.fgts||0;vals.subsidio=vals.subsidio||0;
+      const results=[];
+      ORDER.forEach(function(companyId){const c=DATA[companyId];Object.entries(c.products||{}).forEach(function(entry){const productId=entry[0],product=entry[1],st=buildDiscoveryScenario(companyId,productId,vals),r=c.compute(st.v),parcel=discoveryParcel(r),entryLeft=discoveryEntry(r),parcelValue=parcel?Number(parcel.value):Infinity,compatible=Number.isFinite(parcelValue)&&parcelValue<=vals.parcela,delta=Number.isFinite(parcelValue)?parcelValue-vals.parcela:Infinity;results.push({companyId,productId,product,st,r,parcel,entryLeft,compatible,delta,company:c});});});
+      results.sort(function(a,b){if(a.compatible!==b.compatible)return a.compatible?-1:1;if(a.compatible&&b.compatible)return a.parcel.value-b.parcel.value;return a.delta-b.delta;});
+      const compatibleCount=results.filter(function(x){return x.compatible;}).length;
+      const area=bg.querySelector('#discoverResults');
+      area.innerHTML='<div class="discover-intro"><b>'+compatibleCount+' opção(ões) compatível(is)</b> com a parcela informada. As demais aparecem como alternativas próximas do limite.</div><div class="discover-results">'+results.map(function(x){const parcelText=x.parcel?val(x.parcel.value,x.parcel.fmt):'—',diff=x.parcel?x.parcel.value-vals.parcela:null,statusText=x.compatible?'Compatível':(diff!==null?'Acima da parcela em '+money(Math.max(diff,0)):'Revisar'),entryText=x.entryLeft?val(x.entryLeft.value,x.entryLeft.fmt):'—';return '<div class="discover-result '+(x.compatible?'compatible':'near')+'"><div class="top"><div><h4>'+escapeHtml(x.product.nome)+'</h4><div class="sub">'+escapeHtml(x.company.nome)+'</div></div><span class="discover-badge '+(x.compatible?'good':'warn')+'">'+statusText+'</span></div><div class="discover-metrics"><div class="discover-metric"><div class="k">Parcela</div><div class="v">'+parcelText+'</div></div><div class="discover-metric"><div class="k">Entrada restante</div><div class="v">'+entryText+'</div></div><div class="discover-metric"><div class="k">Crédito</div><div class="v">'+money(vals.credito)+'</div></div><div class="discover-metric"><div class="k">Renda</div><div class="v">'+money(vals.renda)+'</div></div></div><div class="action-row"><button class="btn compact primary" data-open-discovery="'+x.companyId+'|'+x.productId+'">Abrir simulação</button></div></div>';}).join('')+'</div>';
+      area.querySelectorAll('[data-open-discovery]').forEach(function(btn){btn.onclick=function(){const parts=btn.dataset.openDiscovery.split('|'),base=buildDiscoveryScenario(parts[0],parts[1],vals),id='c'+(++seq);states[id]=base;cards.push(id);activeCard=id;active=parts[0];saveDrafts();bg.hidden=true;renderTabs();showSimulation(id);showToast('Opção aberta no simulador');};});
+    };
+  }
+  showForm();
+}
 function makeOverviewToast(msg){showToast(msg)}
 
-document.getElementById('saveHistory').onclick=()=>activeCard&&saveToHistory(activeCard);document.getElementById('openCompare').onclick=()=>openCompare();document.getElementById('openHistory').onclick=()=>openHistory();document.getElementById('openKanban').onclick=()=>openKanban();document.getElementById('openNotes').onclick=()=>openNotes();document.getElementById('navHistory').onclick=()=>openHistory();document.getElementById('navNotes').onclick=()=>openNotes();document.querySelectorAll('[data-nav=\"kanban\"]').forEach(b=>b.onclick=()=>openKanban());document.querySelectorAll('[data-nav=\"overview\"], [data-nav=\"clients\"], [data-nav=\"settings\"]').forEach(b=>b.onclick=()=>showToast('Módulo em evolução'));document.getElementById('newSimulation').onclick=addCard;document.getElementById('topSummary').onclick=()=>activeCard&&modal(activeCard);document.getElementById('panelSummary').onclick=()=>activeCard&&modal(activeCard);document.getElementById('clearCurrent').onclick=()=>{if(activeCard)resetCard(activeCard)};document.getElementById('clearAll').onclick=()=>cards.slice().forEach(resetCard);renderTabs();select(active);
+document.getElementById('saveHistory').onclick=()=>activeCard&&saveToHistory(activeCard);document.getElementById('discoverOption').onclick=()=>openDiscovery();document.getElementById('openCompare').onclick=()=>openCompare();document.getElementById('openHistory').onclick=()=>openHistory();document.getElementById('openKanban').onclick=()=>openKanban();document.getElementById('openNotes').onclick=()=>openNotes();document.getElementById('navHistory').onclick=()=>openHistory();document.getElementById('navNotes').onclick=()=>openNotes();document.querySelectorAll('[data-nav=\"kanban\"]').forEach(b=>b.onclick=()=>openKanban());document.querySelectorAll('[data-nav=\"overview\"], [data-nav=\"clients\"], [data-nav=\"settings\"]').forEach(b=>b.onclick=()=>showToast('Módulo em evolução'));document.getElementById('newSimulation').onclick=addCard;document.getElementById('topSummary').onclick=()=>activeCard&&modal(activeCard);document.getElementById('panelSummary').onclick=()=>activeCard&&modal(activeCard);document.getElementById('clearCurrent').onclick=()=>{if(activeCard)resetCard(activeCard)};document.getElementById('clearAll').onclick=()=>cards.slice().forEach(resetCard);renderTabs();select(active);
 
 let deferredInstallPrompt=null;
 const installBtn=document.getElementById('installApp');
