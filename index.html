@@ -253,6 +253,81 @@ body.light .discover-intro{color:#111;background:#f4f8f5;border-color:#d9e7dc;fo
 @media(max-width:720px){.discover-form,.discover-metrics{grid-template-columns:1fr 1fr}.discover-result .top{flex-direction:column}}
 .compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.compare-card{border:1px solid var(--stroke);border-radius:16px;padding:14px;background:rgba(255,255,255,.035)}.compare-card h4{margin:0;font-size:13px;font-weight:800}.compare-sub{margin-top:3px;color:var(--muted);font-size:8px}.compare-status{margin-top:9px;padding:8px 9px;border-radius:10px;font-size:8px;font-weight:800}.compare-status.ok{background:rgba(120,211,154,.08);color:#8fd5a2;border:1px solid rgba(120,211,154,.18)}.compare-status.bad{background:rgba(255,140,127,.08);color:#ff9d91;border:1px solid rgba(255,140,127,.18)}.compare-kpis{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.compare-kpi{padding:9px 10px;border:1px solid rgba(212,239,218,.08);border-radius:10px;background:rgba(255,255,255,.025)}.compare-kpi .k{font-size:7px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-weight:900}.compare-kpi .v{font-size:10px;color:#dfe9e1;font-weight:800;margin-top:3px}.compare-selects{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:13px}.compare-selects label{display:flex;flex-direction:column;gap:5px;font-size:8px;color:var(--muted);font-weight:800}.compare-selects select{height:38px;border:1px solid var(--stroke);border-radius:10px;background:rgba(255,255,255,.04);color:var(--text);padding:0 9px;font-size:10px}.compare-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:9px}.compare-table th,.compare-table td{padding:9px 8px;border-bottom:1px solid rgba(212,239,218,.07)}.compare-table th{text-align:left;color:#6f8276;font-size:8px;text-transform:uppercase;letter-spacing:.6px}.compare-table td:nth-child(2),.compare-table td:nth-child(3){font-weight:800;color:#dfe9e1;text-align:right}.compare-note{margin-top:12px;padding:10px 11px;border:1px dashed rgba(143,194,150,.14);border-radius:10px;color:#718579;font-size:8px;line-height:1.45}@media(max-width:720px){.compare-grid,.compare-selects{grid-template-columns:1fr}.compare-table{font-size:8px}}
 
+
+
+/* ORBE PRODUCT DESIGN SYSTEM v2 */
+.command-trigger{
+  display:inline-flex;align-items:center;gap:8px;padding:8px 11px;border:1px solid var(--line);
+  background:rgba(255,255,255,.045);color:inherit;border-radius:999px;font-size:10px;font-weight:800;
+  transition:transform .2s ease,background .2s ease,border-color .2s ease;box-shadow:none
+}
+.command-trigger:hover{transform:translateY(-1px);background:rgba(255,255,255,.075);border-color:rgba(140,194,150,.28)}
+.command-trigger kbd{padding:2px 5px;border:1px solid currentColor;border-radius:5px;opacity:.55;font-size:8px;font-family:var(--font)}
+.quick-btn{border:1px solid var(--line);background:rgba(255,255,255,.03);color:inherit;border-radius:12px;padding:9px 11px;font-size:9px;font-weight:800;transition:.2s}
+.quick-btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.065)}
+.panel,.hud-card,.sim-chip,.history-item,.compare-card,.discover-result,.kan-card{transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+.panel:hover{box-shadow:0 22px 58px rgba(23,45,29,.14)}
+.hud-card:hover,.history-item:hover,.compare-card:hover{transform:translateY(-2px)}
+.sim-chip:hover{transform:translateY(-1px)}
+.btn:active,.quick-btn:active,.command-trigger:active{transform:translateY(0) scale(.985)}
+.number-pop{animation:orbeNumberPop .34s cubic-bezier(.2,.75,.25,1)}
+.fade-up{animation:orbeFadeUp .32s ease both}
+@keyframes orbeNumberPop{0%{opacity:.45;transform:translateY(3px) scale(.98)}100%{opacity:1;transform:none}}
+@keyframes orbeFadeUp{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:none}}
+.feature-shell{width:min(1180px,100%);max-height:90vh;overflow:auto;border:1px solid var(--stroke-strong);background:linear-gradient(155deg,#132219,#0b150f);border-radius:24px;box-shadow:0 35px 110px rgba(0,0,0,.55);padding:20px}
+.feature-shell h2{margin:0;font-family:var(--display);font-size:24px;letter-spacing:-.04em}
+.feature-shell .subline{margin:5px 0 0;color:var(--muted);font-size:9px;line-height:1.5}
+.feature-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.feature-actions{display:flex;gap:7px;flex-wrap:wrap}
+.dashboard-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+.dashboard-stat{padding:14px;border:1px solid var(--stroke);background:rgba(255,255,255,.03);border-radius:15px}
+.dashboard-stat .k{font-size:8px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:900}
+.dashboard-stat .v{margin-top:4px;font-family:var(--display);font-size:22px;font-weight:800;letter-spacing:-.04em}
+.dashboard-stat .s{margin-top:4px;color:var(--muted);font-size:8px}
+.dashboard-main{display:grid;grid-template-columns:1.25fr .75fr;gap:12px;margin-top:12px}
+.design-card{border:1px solid var(--stroke);background:rgba(255,255,255,.025);border-radius:16px;padding:14px}
+.design-card h3{margin:0;font-size:11px;font-family:var(--font)}
+.design-card p{margin:4px 0 0;color:var(--muted);font-size:8px}
+.recent-list{display:grid;gap:7px;margin-top:11px}
+.recent-row{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:10px;border:1px solid rgba(212,239,218,.07);border-radius:11px;background:rgba(255,255,255,.018);cursor:pointer}
+.recent-row:hover{background:rgba(255,255,255,.045);border-color:rgba(146,204,153,.16)}
+.recent-row strong{display:block;font-size:10px}.recent-row span{display:block;margin-top:3px;font-size:8px;color:var(--muted)}
+.badge-mini{display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border:1px solid var(--stroke);border-radius:999px;font-size:7px;font-weight:900;color:#a7c1ad;white-space:nowrap}
+.badge-mini.good{color:#7ed19a;background:rgba(120,211,154,.07);border-color:rgba(120,211,154,.18)}
+.badge-mini.warn{color:#e9ba62;background:rgba(233,186,98,.06);border-color:rgba(233,186,98,.18)}
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}
+.quick-action{padding:12px;border:1px solid var(--stroke);border-radius:12px;background:rgba(255,255,255,.02);text-align:left;color:inherit;transition:.2s}
+.quick-action:hover{transform:translateY(-2px);background:rgba(255,255,255,.05);border-color:rgba(146,204,153,.18)}
+.quick-action b{display:block;font-size:10px}.quick-action span{display:block;margin-top:4px;color:var(--muted);font-size:8px;line-height:1.4}
+.pipeline{display:grid;gap:7px;margin-top:11px}.pipeline-row{display:grid;grid-template-columns:118px 1fr auto;align-items:center;gap:9px}.pipeline-row span{font-size:8px;color:var(--muted)}.pipeline-bar{height:7px;border-radius:999px;background:rgba(255,255,255,.055);overflow:hidden}.pipeline-bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#4f7f5b,#9bcda2)}.pipeline-row b{font-size:8px}
+.client-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:14px}
+.client-card{padding:13px;border:1px solid var(--stroke);border-radius:14px;background:rgba(255,255,255,.025)}
+.client-card strong{font-size:11px}.client-card span{display:block;color:var(--muted);font-size:8px;margin-top:4px}.client-card .client-stage{margin-top:8px}
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}.settings-box{padding:14px;border:1px solid var(--stroke);border-radius:14px;background:rgba(255,255,255,.025)}.settings-box h4{margin:0;font-size:10px}.settings-box p{margin:4px 0 10px;color:var(--muted);font-size:8px}.setting-row{display:flex;gap:7px;flex-wrap:wrap}.setting-pill{border:1px solid var(--stroke);background:rgba(255,255,255,.025);color:inherit;border-radius:999px;padding:7px 10px;font-size:8px;font-weight:800}.setting-pill.active{background:var(--soft-accent);border-color:rgba(120,180,130,.28)}
+.search-wrap{display:grid;gap:10px;margin-top:14px}.search-input{height:46px;width:100%;border:1px solid var(--stroke-strong);border-radius:13px;background:rgba(255,255,255,.045);color:inherit;padding:0 14px;outline:none;font-size:12px}.search-input:focus{border-color:rgba(150,211,160,.35);box-shadow:0 0 0 4px rgba(110,175,121,.08)}
+.search-results{display:grid;gap:7px}.search-result{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 12px;border:1px solid var(--stroke);border-radius:12px;background:rgba(255,255,255,.025)}.search-result:hover{background:rgba(255,255,255,.055)}.search-result b{font-size:10px}.search-result span{display:block;margin-top:3px;color:var(--muted);font-size:8px}.search-result button{flex-shrink:0}
+.presentation-shell{width:min(980px,100%);border:1px solid #dbe7dd;border-radius:26px;background:#ffffff;color:#17291e;box-shadow:0 35px 100px rgba(0,0,0,.32);overflow:hidden}
+.presentation-top{padding:20px 22px 14px;display:flex;justify-content:space-between;gap:15px;border-bottom:1px solid #e6eee8}.presentation-brand{font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:900;color:#54705a}.presentation-top h2{margin:6px 0 0;font-family:var(--font);font-size:27px;letter-spacing:-.05em}.presentation-top p{margin:4px 0 0;color:#748279;font-size:9px}
+.presentation-body{padding:18px 22px 22px}.presentation-hero{display:grid;grid-template-columns:1.15fr .85fr;gap:10px}.presentation-main{padding:18px;border-radius:17px;background:linear-gradient(145deg,#31583b,#527f5c);color:#fff}.presentation-main .eyebrow{color:#d5ecd8;border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.07)}.presentation-main .big{font-family:var(--display);font-size:34px;font-weight:800;letter-spacing:-.055em;margin-top:16px}.presentation-main .small{margin-top:5px;font-size:9px;color:#d7eadb}.presentation-side{display:grid;gap:8px}.presentation-kpi{padding:13px;border:1px solid #e0e9e2;border-radius:13px;background:#f8fbf8}.presentation-kpi .k{font-size:8px;text-transform:uppercase;letter-spacing:.7px;color:#748279;font-weight:900}.presentation-kpi .v{margin-top:4px;font-size:15px;font-weight:800}.presentation-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.presentation-note{margin-top:10px;padding:11px 12px;border-radius:12px;background:#f2f7f3;border:1px solid #dfe9e1;color:#53635a;font-size:9px;line-height:1.45}.presentation-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:15px}
+.empty-state{padding:28px 18px;text-align:center;border:1px dashed rgba(142,184,149,.18);border-radius:14px;color:var(--muted)}.empty-state strong{display:block;color:inherit;font-size:11px}.empty-state span{display:block;margin-top:5px;font-size:8px;line-height:1.45}
+.density-compact .panel-body{padding:12px}.density-compact .field input,.density-compact .field select{height:35px}.density-compact .grid{gap:7px}.density-compact .form-section+.form-section{margin-top:12px;padding-top:12px}.density-compact .hud-card{padding:11px}
+.mobile-nav{display:none}
+@media(max-width:900px){.dashboard-grid{grid-template-columns:1fr 1fr}.dashboard-main{grid-template-columns:1fr}.client-grid{grid-template-columns:1fr 1fr}.presentation-hero{grid-template-columns:1fr}}
+@media(max-width:720px){
+  .mobile-nav{position:fixed;left:8px;right:8px;bottom:8px;z-index:300;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;padding:5px;border:1px solid rgba(207,231,213,.18);background:rgba(11,21,16,.91);backdrop-filter:blur(16px);border-radius:17px;box-shadow:0 20px 60px rgba(0,0,0,.28)}
+  .mobile-nav button{border:0;background:transparent;color:#91a69a;border-radius:12px;padding:7px 3px;display:grid;gap:3px;place-items:center;font-size:8px;font-weight:800}
+  .mobile-nav button.active{background:rgba(122,180,131,.12);color:#e6f1e8}
+  .mobile-nav .mi{width:25px;height:25px;border-radius:8px;display:grid;place-items:center;border:1px solid rgba(208,231,213,.12);background:rgba(255,255,255,.025);font-size:11px}
+  .sidebar{display:none!important}.main{padding-bottom:92px}.dashboard-grid,.client-grid,.settings-grid,.presentation-grid{grid-template-columns:1fr}.feature-shell{padding:14px;border-radius:18px}.feature-head{flex-direction:column}.feature-actions{width:100%}.feature-actions .btn{flex:1}.recent-row{grid-template-columns:1fr}.pipeline-row{grid-template-columns:96px 1fr auto}.presentation-top{padding:16px}.presentation-top h2{font-size:23px}.presentation-body{padding:13px}.presentation-main .big{font-size:28px}
+}
+body.light .feature-shell{background:linear-gradient(155deg,#ffffff,#f3f7f4);border-color:#d9e6dc;box-shadow:0 28px 80px rgba(33,67,41,.16)}
+body.light .dashboard-stat,body.light .design-card,body.light .recent-row,body.light .quick-action,body.light .client-card,body.light .settings-box,body.light .search-result{background:#fff;border-color:#dce7df}
+body.light .command-trigger,body.light .quick-btn{background:#fff;color:#294233}
+body.light .mobile-nav{background:rgba(249,252,250,.94);border-color:#d6e4d9;box-shadow:0 16px 50px rgba(38,73,44,.14)}
+body.light .mobile-nav button{color:#678072}body.light .mobile-nav button.active{background:#edf5ef;color:#31583b}
+body.light .search-input{background:#fbfdfb;color:#203026;border-color:#d6e3d9}
+body.light .pipeline-bar{background:#e8efe9}
+
 </style></head><body><div class="app">
   <aside class="sidebar">
     <div class="logo-wrap">
@@ -279,7 +354,7 @@ body.light .discover-intro{color:#111;background:#f4f8f5;border-color:#d9e7dc;fo
   <section class="main">
     <div class="topbar">
       <div class="crumbs"><span>ORBE</span><b>/</b><span>WORKSPACE</span><b>/</b><span>SIMULADOR</span></div>
-      <div class="top-actions"><button class="btn" id="installApp" type="button" hidden>＋ Instalar</button><button class="theme-toggle" id="themeToggle" type="button" title="Alternar tema"><span class="dot" id="themeIcon">☾</span><span class="txt" id="themeLabel">Escuro</span></button><div class="live"><i></i><span>Motor de cálculo ativo</span></div><div class="counter" id="counter">1 simulação aberta</div></div>
+      <div class="top-actions"><button class="command-trigger" id="commandButton" type="button" title="Buscar no Orbe"><span>⌕</span><span class="cmd-label">Buscar</span><kbd>Ctrl K</kbd></button><button class="btn" id="installApp" type="button" hidden>＋ Instalar</button><button class="theme-toggle" id="themeToggle" type="button" title="Alternar tema"><span class="dot" id="themeIcon">☾</span><span class="txt" id="themeLabel">Escuro</span></button><div class="live"><i></i><span>Motor de cálculo ativo</span></div><div class="counter" id="counter">1 simulação aberta</div></div>
     </div>
 
     <section class="hero">
@@ -308,7 +383,7 @@ body.light .discover-intro{color:#111;background:#f4f8f5;border-color:#d9e7dc;fo
     </div>
 
     <div class="simbar"><div class="sim-list" id="simList"></div><div class="sim-actions"><button class="btn" id="clearAll">Limpar sessão</button><button class="btn soft" id="topSummary">▣ Gerar resumo</button></div></div>
-    <div class="tools-bar"><div class="tool-group"><button class="btn compact" id="saveHistory">◌ Salvar no histórico</button><button class="btn compact" id="openHistory">Histórico</button><button class="btn compact" id="openKanban">▦ Kanban</button><button class="btn compact" id="openNotes">▤ Notas</button><button class="btn compact" id="openCompare">⇄ Comparar propostas</button></div><div class="ghost-note">Cada simulação pode ter cliente, observações e etapa.</div></div>
+    <div class="tools-bar"><div class="tool-group"><button class="btn compact" id="saveHistory">◌ Salvar no histórico</button><button class="btn compact" id="openHistory">Histórico</button><button class="btn compact" id="openKanban">▦ Kanban</button><button class="btn compact" id="openNotes">▤ Notas</button><button class="btn compact" id="openCompare">⇄ Comparar propostas</button><button class="btn compact" id="openPresentation">◐ Apresentar</button><button class="quick-btn" id="quickActions" type="button">＋ Ações rápidas</button></div><div class="ghost-note">Cada simulação pode ter cliente, observações e etapa.</div></div>
 
     <section class="workspace">
       <section class="panel">
@@ -323,7 +398,14 @@ body.light .discover-intro{color:#111;background:#f4f8f5;border-color:#d9e7dc;fo
     <div class="footer">Orbe • ferramenta de simulação comercial. Os resultados são estimativos e devem ser conferidos com as condições vigentes antes da formalização.</div>
 
     <div id="featureOverlay" class="modal-bg" hidden></div>
-  </section>
+  <div class="mobile-nav" id="mobileNav">
+  <button type="button" data-mobile-nav="dashboard"><span class="mi">⌂</span><span>Início</span></button>
+  <button type="button" data-mobile-nav="simulator" class="active"><span class="mi">◈</span><span>Simular</span></button>
+  <button type="button" data-mobile-nav="quick"><span class="mi">＋</span><span>Ações</span></button>
+  <button type="button" data-mobile-nav="kanban"><span class="mi">▦</span><span>Kanban</span></button>
+  <button type="button" data-mobile-nav="history"><span class="mi">◌</span><span>Histórico</span></button>
+</div>
+</section>
 </div>
 <script>const money=n=>Number.isFinite(n)?n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'—';
 const pct=n=>Number.isFinite(n)?(n*100).toLocaleString('pt-BR',{maximumFractionDigits:1})+'%':'—';
@@ -496,4 +578,177 @@ const themeLabel=document.getElementById('themeLabel');
 function applyTheme(mode){const light=mode==='light';document.body.classList.toggle('light',light);themeIcon.textContent=light?'☀':'☾';themeLabel.textContent=light?'Claro':'Escuro';document.querySelector('meta[name="theme-color"]')?.setAttribute('content',light?'#eef6ef':'#0b1510');localStorage.setItem('orbe-theme',mode)}
 applyTheme(localStorage.getItem('orbe-theme')||'dark');
 themeToggle.onclick=()=>applyTheme(document.body.classList.contains('light')?'dark':'light');
+
+
+/* ORBE PRODUCT DESIGN — v2 interactions */
+function featureRoot(html, cls){
+  const bg=document.getElementById('featureOverlay');
+  bg.hidden=false;
+  bg.innerHTML='<div class="'+(cls||'feature-shell')+'">'+html+'</div>';
+  bg.onclick=function(e){if(e.target===bg)bg.hidden=true;};
+  const close=bg.querySelector('[data-feature-close]');
+  if(close) close.onclick=function(){bg.hidden=true;};
+  return bg;
+}
+function animateNumbers(root){
+  (root||document).querySelectorAll('.hud-value,.metric .v,.compare-kpi .v,.presentation-kpi .v,.dashboard-stat .v').forEach(function(el){
+    el.classList.remove('number-pop'); void el.offsetWidth; el.classList.add('number-pop');
+  });
+}
+function openQuickActions(){
+  const bg=featureRoot(
+    '<div class="feature-head"><div><h2>Ações rápidas</h2><p class="subline">Comece a próxima tarefa sem procurar menus.</p></div><div class="feature-actions"><button class="btn compact" data-feature-close>Fechar</button></div></div>'+
+    '<div class="quick-grid">'+
+      '<button class="quick-action" data-q="new"><b>＋ Nova simulação</b><span>Abra um novo cenário comercial.</span></button>'+
+      '<button class="quick-action" data-q="discover"><b>⌕ Descobrir opção</b><span>Encontre empreendimentos pelo perfil.</span></button>'+
+      '<button class="quick-action" data-q="compare"><b>⇄ Comparar propostas</b><span>Coloque duas condições lado a lado.</span></button>'+
+      '<button class="quick-action" data-q="presentation"><b>◐ Apresentar proposta</b><span>Entre no modo visual para o cliente.</span></button>'+
+      '<button class="quick-action" data-q="kanban"><b>▦ Abrir Kanban</b><span>Veja o funil por etapa.</span></button>'+
+      '<button class="quick-action" data-q="history"><b>◌ Ver histórico</b><span>Retome uma simulação salva.</span></button>'+
+    '</div>'
+  );
+  bg.querySelectorAll('[data-q]').forEach(function(b){b.onclick=function(){
+    bg.hidden=true;
+    const q=b.dataset.q;
+    if(q==='new')addCard();
+    if(q==='discover')openDiscovery();
+    if(q==='compare')openCompare();
+    if(q==='presentation')openPresentation();
+    if(q==='kanban')openKanban();
+    if(q==='history')openHistory();
+  }});
+}
+function buildRecentRows(){
+  const hist=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');
+  const current=cards.map(function(id){
+    const st=states[id],ct=DATA[st.c],p=st.product&&ct.products?.[st.product]?.nome||ct.nome;
+    return {kind:'current',id:id,client:st.clientName||'Sem cliente',meta:ct.nome+' · '+p,stage:st.stage||'Novo',date:'Sessão atual'};
+  });
+  return current.concat(hist.slice(0,8).map(function(h){return {kind:'history',hist:h,client:h.clientName||'Sem cliente',meta:h.company+' · '+h.product,stage:h.stage||'Novo',date:new Date(h.savedAt).toLocaleDateString('pt-BR')};}));
+}
+function openDashboard(){
+  const rows=buildRecentRows();
+  const counts={};STAGES.forEach(function(s){counts[s]=0});
+  cards.forEach(function(id){counts[states[id].stage||'Novo']++});
+  const totalCurrent=cards.length, proposals=counts['Proposta enviada']||0, negotiating=counts['Negociação']||0, closed=counts['Fechado']||0;
+  const recentHtml=rows.length?rows.slice(0,7).map(function(x,idx){
+    return '<div class="recent-row fade-up" data-recent-idx="'+idx+'"><div><strong>'+escapeHtml(x.client)+'</strong><span>'+escapeHtml(x.meta)+' · '+escapeHtml(x.date)+'</span></div><span class="badge-mini '+(x.stage==='Fechado'?'good':x.stage==='Negociação'||x.stage==='Proposta enviada'?'warn':'')+'">'+escapeHtml(x.stage)+'</span><button class="btn compact" data-recent-open="'+idx+'">Abrir</button></div>';
+  }).join(''):'<div class="empty-state"><strong>Nenhuma atividade recente</strong><span>Crie uma simulação para começar a acompanhar sua operação.</span></div>';
+  const pipeline=STAGES.map(function(s){const n=counts[s]||0;const width=totalCurrent?Math.max(5,Math.round(n/totalCurrent*100)):5;return '<div class="pipeline-row"><span>'+escapeHtml(s)+'</span><div class="pipeline-bar"><i style="width:'+width+'%"></i></div><b>'+n+'</b></div>';}).join('');
+  const bg=featureRoot(
+    '<div class="feature-head"><div><div class="eyebrow">Central de comando</div><h2>Seu Orbe, em um só lugar.</h2><p class="subline">Visão rápida da operação, retomada das últimas propostas e acesso às principais ações.</p></div><div class="feature-actions"><button class="btn compact primary" data-dashboard-new>＋ Nova simulação</button><button class="btn compact" data-feature-close>Fechar</button></div></div>'+
+    '<div class="dashboard-grid">'+
+      '<div class="dashboard-stat"><div class="k">Simulações abertas</div><div class="v">'+totalCurrent+'</div><div class="s">Sessão atual</div></div>'+
+      '<div class="dashboard-stat"><div class="k">Propostas enviadas</div><div class="v">'+proposals+'</div><div class="s">Etapa comercial</div></div>'+
+      '<div class="dashboard-stat"><div class="k">Em negociação</div><div class="v">'+negotiating+'</div><div class="s">Acompanhamento ativo</div></div>'+
+      '<div class="dashboard-stat"><div class="k">Fechadas</div><div class="v">'+closed+'</div><div class="s">Registradas na sessão</div></div>'+
+    '</div>'+
+    '<div class="dashboard-main">'+
+      '<div class="design-card"><h3>Continuar de onde você parou</h3><p>Últimas simulações e registros.</p><div class="recent-list">'+recentHtml+'</div></div>'+
+      '<div class="design-card"><h3>Funil atual</h3><p>Distribuição das simulações abertas.</p><div class="pipeline">'+pipeline+'</div><div class="quick-grid" style="margin-top:15px"><button class="quick-action" data-dash="discover"><b>⌕ Descobrir opção</b><span>Comece pelo perfil do cliente.</span></button><button class="quick-action" data-dash="kanban"><b>▦ Ver Kanban</b><span>Organize as etapas.</span></button></div></div>'+
+    '</div>'
+  );
+  bg.querySelector('[data-dashboard-new]').onclick=function(){bg.hidden=true;addCard()};
+  bg.querySelectorAll('[data-dash]').forEach(function(b){b.onclick=function(){bg.hidden=true;b.dataset.dash==='discover'?openDiscovery():openKanban()}});
+  bg.querySelectorAll('[data-recent-open]').forEach(function(b){
+    b.onclick=function(){
+      const x=rows[Number(b.dataset.recentOpen)];
+      bg.hidden=true;
+      if(x.kind==='current'){showSimulation(x.id);}
+      else{loadHistory(x.hist);}
+    };
+  });
+  animateNumbers(bg);
+}
+function openClients(){
+  const rows=buildRecentRows().reduce(function(acc,x){const key=x.client||'Sem cliente';if(!acc[key])acc[key]={client:key,meta:[],stage:x.stage};acc[key].meta.push(x.meta);acc[key].stage=x.stage;return acc},{});
+  const clients=Object.values(rows);
+  const html=clients.length?clients.map(function(x){return '<div class="client-card fade-up"><strong>'+escapeHtml(x.client)+'</strong><span>'+escapeHtml([...new Set(x.meta)].join(' · '))+'</span><div class="client-stage"><span class="badge-mini '+(x.stage==='Fechado'?'good':x.stage==='Negociação'||x.stage==='Proposta enviada'?'warn':'')+'">'+escapeHtml(x.stage)+'</span></div></div>';}).join(''):'<div class="empty-state" style="grid-column:1/-1"><strong>Nenhum cliente registrado</strong><span>Identifique o cliente em uma simulação para ele aparecer aqui.</span></div>';
+  featureRoot('<div class="feature-head"><div><h2>Clientes</h2><p class="subline">Visão consolidada dos clientes encontrados nas simulações e no histórico local.</p></div><button class="btn compact" data-feature-close>Fechar</button></div><div class="client-grid">'+html+'</div>');
+}
+function applyDensity(mode){
+  document.body.classList.toggle('density-compact',mode==='compact');
+  localStorage.setItem('orbe-density',mode);
+}
+function openSettings(){
+  const mode=document.body.classList.contains('light')?'light':'dark',density=localStorage.getItem('orbe-density')||'comfortable';
+  const bg=featureRoot('<div class="feature-head"><div><h2>Configurações</h2><p class="subline">Ajuste a aparência do seu espaço de trabalho.</p></div><button class="btn compact" data-feature-close>Fechar</button></div>'+
+    '<div class="settings-grid">'+
+      '<div class="settings-box"><h4>Aparência</h4><p>Escolha como o Orbe deve aparecer.</p><div class="setting-row"><button class="setting-pill '+(mode==='dark'?'active':'')+'" data-theme-choice="dark">☾ Escuro</button><button class="setting-pill '+(mode==='light'?'active':'')+'" data-theme-choice="light">☀ Claro</button></div></div>'+
+      '<div class="settings-box"><h4>Densidade</h4><p>Controle a quantidade de informação na tela.</p><div class="setting-row"><button class="setting-pill '+(density==='comfortable'?'active':'')+'" data-density="comfortable">Confortável</button><button class="setting-pill '+(density==='compact'?'active':'')+'" data-density="compact">Compacta</button></div></div>'+
+    '</div>'+
+    '<div class="settings-box" style="margin-top:10px"><h4>Perfil</h4><p>Identidade atual do workspace.</p><div class="badge-mini">João Lucas · Gerente & Corretor</div></div>');
+  bg.querySelectorAll('[data-theme-choice]').forEach(function(b){b.onclick=function(){applyTheme(b.dataset.themeChoice);openSettings()}});
+  bg.querySelectorAll('[data-density]').forEach(function(b){b.onclick=function(){applyDensity(b.dataset.density);openSettings()}});
+}
+function openSearch(){
+  const bg=featureRoot('<div class="feature-head"><div><h2>Buscar no Orbe</h2><p class="subline">Clientes, simulações e registros recentes.</p></div><button class="btn compact" data-feature-close>Fechar</button></div><div class="search-wrap"><input class="search-input" id="orbeSearchInput" autocomplete="off" placeholder="Digite um nome, empreendimento ou construtora..."><div class="search-results" id="orbeSearchResults"></div></div>');
+  const input=bg.querySelector('#orbeSearchInput'),out=bg.querySelector('#orbeSearchResults');
+  function render(q){
+    q=(q||'').trim().toLowerCase();
+    const source=buildRecentRows();
+    const found=q?source.filter(function(x){return [x.client,x.meta,x.stage,x.date].join(' ').toLowerCase().includes(q)}):source.slice(0,8);
+    out.innerHTML=found.length?found.map(function(x,i){return '<div class="search-result"><div><b>'+escapeHtml(x.client)+'</b><span>'+escapeHtml(x.meta)+' · '+escapeHtml(x.stage)+'</span></div><button class="btn compact" data-search-open="'+i+'">Abrir</button></div>';}).join(''):'<div class="empty-state"><strong>Nada encontrado</strong><span>Tente outro termo.</span></div>';
+    out.querySelectorAll('[data-search-open]').forEach(function(b){b.onclick=function(){const x=found[Number(b.dataset.searchOpen)];bg.hidden=true;x.kind==='current'?showSimulation(x.id):loadHistory(x.hist)}});
+  }
+  input.oninput=function(){render(input.value)};render('');setTimeout(function(){input.focus()},30);
+}
+function openPresentation(){
+  if(!activeCard){showToast('Abra uma simulação primeiro');return;}
+  const st=states[activeCard],c=DATA[st.c],r=c.compute(st.v),summary=r.resumo||[],product=st.product&&c.products?.[st.product]?.nome||c.nome;
+  const parcel=(r.highlight||[]).find(function(x){return /parcela/i.test(String(x[0]))&&x[3]==='strong'})||(r.highlight||[]).find(function(x){return /parcela/i.test(String(x[0]))});
+  const financiamento=summary.find(function(x){return /financiamento/i.test(String(x[0]))});
+  const entrada=summary.find(function(x){return /entrada parcelada|a dividir com a construtora|entrada à vista/i.test(String(x[0]))});
+  const bg=document.getElementById('featureOverlay');bg.hidden=false;
+  bg.innerHTML='<div class="presentation-shell">'+
+    '<div class="presentation-top"><div><div class="presentation-brand">Orbe · Apresentação</div><h2>'+escapeHtml(product)+'</h2><p>'+escapeHtml(c.nome)+' · '+escapeHtml(st.clientName||'Proposta personalizada')+'</p></div><button class="btn compact" id="closePresentation">Fechar</button></div>'+
+    '<div class="presentation-body"><div class="presentation-hero">'+
+      '<div class="presentation-main"><div class="eyebrow">Condição atual</div><div class="big">'+(parcel?val(parcel[1],parcel[2]):'Consulte a proposta')+'</div><div class="small">'+(r.status.ok?'Condição compatível com as regras cadastradas.':'Condição em revisão — ajuste a proposta antes da formalização.')+'</div></div>'+
+      '<div class="presentation-side">'+
+        '<div class="presentation-kpi"><div class="k">Valor do imóvel</div><div class="v">'+(summary.find(function(x){return /valor do imóvel|valor do imovel/i.test(String(x[0]));})?val(summary.find(function(x){return /valor do imóvel|valor do imovel/i.test(String(x[0]));})[1],summary.find(function(x){return /valor do imóvel|valor do imovel/i.test(String(x[0]));})[2]):'—')+'</div></div>'+
+        '<div class="presentation-kpi"><div class="k">Financiamento</div><div class="v">'+(financiamento?val(financiamento[1],financiamento[2]):'—')+'</div></div>'+
+        '<div class="presentation-kpi"><div class="k">Entrada</div><div class="v">'+(entrada?val(entrada[1],entrada[2]):'—')+'</div></div>'+
+      '</div></div>'+
+      '<div class="presentation-grid">'+
+        '<div class="presentation-kpi"><div class="k">Renda</div><div class="v">'+((st.v.renda||st.v.rendaAprovada)?money(st.v.renda||st.v.rendaAprovada):'—')+'</div></div>'+
+        '<div class="presentation-kpi"><div class="k">FGTS</div><div class="v">'+money(st.v.fgts||0)+'</div></div>'+
+        '<div class="presentation-kpi"><div class="k">Subsídio</div><div class="v">'+money(st.v.subsidio||0)+'</div></div>'+
+      '</div>'+
+      '<div class="presentation-note">Os números exibidos são baseados nas condições cadastradas no Orbe e servem para apresentação comercial. Confira as condições vigentes antes da formalização.</div>'+
+      '<div class="presentation-actions"><button class="btn" id="presentationBack">Voltar</button><button class="btn primary" id="presentationPrint">🖨️ Imprimir / PDF</button></div>'+
+    '</div></div>';
+  bg.onclick=function(e){if(e.target===bg)bg.hidden=true};
+  bg.querySelector('#closePresentation').onclick=function(){bg.hidden=true};
+  bg.querySelector('#presentationBack').onclick=function(){bg.hidden=true};
+  bg.querySelector('#presentationPrint').onclick=function(){window.print()};
+}
+function syncDesignEvents(){
+  const search=document.getElementById('commandButton'),quick=document.getElementById('quickActions'),present=document.getElementById('openPresentation');
+  if(search)search.onclick=openSearch;if(quick)quick.onclick=openQuickActions;if(present)present.onclick=openPresentation;
+  document.querySelectorAll('[data-nav="overview"]').forEach(function(b){b.onclick=openDashboard});
+  document.querySelectorAll('[data-nav="clients"]').forEach(function(b){b.onclick=openClients});
+  document.querySelectorAll('[data-nav="settings"]').forEach(function(b){b.onclick=openSettings});
+  document.querySelectorAll('[data-nav="quick"]').forEach(function(b){b.onclick=openQuickActions});
+  document.querySelectorAll('[data-mobile-nav]').forEach(function(b){
+    b.onclick=function(){
+      const v=b.dataset.mobileNav;
+      document.querySelectorAll('[data-mobile-nav]').forEach(function(x){x.classList.toggle('active',x===b)});
+      if(v==='dashboard')openDashboard();
+      if(v==='simulator'){window.scrollTo({top:0,behavior:'smooth'});}
+      if(v==='quick')openQuickActions();
+      if(v==='kanban')openKanban();
+      if(v==='history')openHistory();
+    };
+  });
+}
+const oldRenderWorkspace=renderWorkspace;
+renderWorkspace=function(id){oldRenderWorkspace(id);setTimeout(function(){animateNumbers(document.getElementById('resultPanel'));},15)};
+applyDensity(localStorage.getItem('orbe-density')||'comfortable');
+syncDesignEvents();
+window.addEventListener('keydown',function(e){
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openSearch();}
+  if(e.key==='Escape'){const bg=document.getElementById('featureOverlay');if(bg&&!bg.hidden)bg.hidden=true;}
+});
+setTimeout(function(){animateNumbers(document);},80);
+
 </script></body></html>
