@@ -415,6 +415,80 @@ body.light .start-card-arrow{background:#f5f9f6;border-color:#dce7df;color:#3155
 .start-project-btn:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(121,184,131,.11)}
 body.light .start-project-btn{color:#4f6658;background:#f7fbf8;border-color:#dfe9e1}
 body.light .start-project-btn:hover{background:#eef6f0;border-color:#bdd5c2;color:#31553a}
+
+
+/* ORBE — ambientes por construtora */
+body{
+  --brand:#7da887;
+  --brand-2:#9bc7a0;
+  --brand-soft:rgba(125,168,135,.10);
+  --brand-line:rgba(155,199,160,.22);
+  --brand-glow:rgba(125,168,135,.13);
+  transition:background .45s ease, --brand .45s ease;
+}
+body:after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:.0;
+  background:
+    radial-gradient(circle at 78% 15%,var(--brand-glow),transparent 27%),
+    radial-gradient(circle at 12% 82%,var(--brand-soft),transparent 28%);
+  transition:opacity .45s ease,background .45s ease;
+}
+body.company-active:after{opacity:1}
+body.company-telesil{
+  --brand:#ef7d1a;--brand-2:#ffb05f;--brand-soft:rgba(239,125,26,.085);--brand-line:rgba(239,125,26,.28);--brand-glow:rgba(239,125,26,.13);
+}
+body.company-engenharq{
+  --brand:#c92b2b;--brand-2:#ed7777;--brand-soft:rgba(201,43,43,.065);--brand-line:rgba(201,43,43,.25);--brand-glow:rgba(201,43,43,.11);
+}
+body.company-engemat{
+  --brand:#3e78ff;--brand-2:#f28b25;--brand-soft:rgba(62,120,255,.07);--brand-line:rgba(62,120,255,.25);--brand-glow:rgba(62,120,255,.11);
+}
+body.company-barcelos{
+  --brand:#78986f;--brand-2:#a5c29a;--brand-soft:rgba(120,152,111,.09);--brand-line:rgba(120,152,111,.25);--brand-glow:rgba(120,152,111,.12);
+}
+body.company-active .live i{background:var(--brand);box-shadow:0 0 10px var(--brand)}
+body.company-active .live{border-color:var(--brand-line)}
+body.company-active .eyebrow{color:var(--brand-2);border-color:var(--brand-line);background:var(--brand-soft)}
+body.company-active .eyebrow:before{background:var(--brand-2);box-shadow:0 0 10px var(--brand-glow)}
+body.company-active .btn.primary{
+  background:linear-gradient(135deg,var(--brand-2),var(--brand) 60%,color-mix(in srgb,var(--brand) 72%,#122118));
+  border-color:var(--brand);
+  box-shadow:0 12px 26px var(--brand-glow);
+}
+body.company-active .btn.soft{background:var(--brand-soft);border-color:var(--brand-line);color:var(--brand-2)}
+body.company-active .tab.active{
+  color:#fff;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--brand) 82%,#ffffff 8%),var(--brand));
+  box-shadow:0 6px 18px var(--brand-glow),inset 0 1px 0 rgba(255,255,255,.20);
+}
+body.company-active .sim-chip.active{
+  border-color:var(--brand-line);background:var(--brand-soft);
+}
+body.company-active .dot{box-shadow:0 0 9px color-mix(in srgb,var(--brand) 70%,transparent)}
+body.company-active .panel-icon{background:var(--brand-soft);border-color:var(--brand-line);color:var(--brand-2)}
+body.company-active .section-title{color:var(--brand-2)}
+body.company-active .section-number{background:var(--brand-soft);border-color:var(--brand-line);color:var(--brand-2)}
+body.company-active .counter{border-color:var(--brand-line);background:var(--brand-soft);color:var(--brand-2)}
+body.company-active .product-select{border-color:var(--brand-line);background:var(--brand-soft)}
+body.company-active .field input:focus,body.company-active .field select:focus{border-color:color-mix(in srgb,var(--brand) 70%,#ffffff 10%);box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 14%,transparent)}
+body.company-active .result-hero .metric.primary{
+  background:linear-gradient(145deg,color-mix(in srgb,var(--brand) 55%,#162c1d),color-mix(in srgb,var(--brand) 73%,#0f2115));
+  border-color:var(--brand);
+}
+body.light.company-active:after{
+  background:
+    radial-gradient(circle at 82% 10%,color-mix(in srgb,var(--brand) 14%,transparent),transparent 25%),
+    radial-gradient(circle at 10% 84%,var(--brand-soft),transparent 29%);
+}
+body.light.company-active .btn.primary{
+  color:#fff;
+}
+body.light.company-active .tab.active{
+  color:#fff;
+  background:linear-gradient(135deg,var(--brand),color-mix(in srgb,var(--brand) 82%,#1a2b20));
+}
+body.light.company-active .btn.soft{color:color-mix(in srgb,var(--brand) 70%,#17271d)}
+
 </style></head><body>
 <div class="start-screen" id="startScreen">
   <div class="start-shell">
@@ -547,7 +621,16 @@ function productApply(st,c){const p=c.products?.[st.product];if(!p)return;for(co
 function renderTabs(){const t=document.getElementById('tabs');t.innerHTML='';ORDER.forEach(id=>{const c=DATA[id],b=document.createElement('button');b.className='tab'+(id===active?' active':'');b.textContent=c.nome;b.style.setProperty('--tab',c.cor);b.onclick=()=>select(id);t.appendChild(b)})}
 function updateCounter(){const n=cards.length;document.getElementById('counter').textContent=`${n} ${n===1?'simulação aberta':'simulações abertas'}`;}
 function renderSimList(){const box=document.getElementById('simList');box.innerHTML='';cards.forEach((id,idx)=>{const st=states[id],c=DATA[st.c],b=document.createElement('button');b.className='sim-chip'+(id===activeCard?' active':'');const nm=st.clientName||`Simulação ${idx+1}`;const stage=st.stage||'Novo';b.innerHTML=`<span class="dot" style="--chip:${c.cor}"></span><span class="sim-meta"><span class="client">${escapeHtml(nm)}</span><span class="project">· ${c.nome}</span><span class="chip-stage">${escapeHtml(stage)}</span></span>`;b.onclick=()=>showSimulation(id);box.appendChild(b)});updateCounter()}
-function select(id){active=id;cards=[];activeCard=null;renderTabs();const c=DATA[id];document.getElementById('heading').textContent='Calculadora '+c.nome;document.getElementById('obs').textContent=c.obs||'';addCard()}
+function companyThemeClass(id){
+  return 'company-'+String(id||'').replace(/[^a-z0-9_-]/gi,'');
+}
+function applyCompanyTheme(id){
+  const body=document.body;
+  body.classList.remove('company-active','company-telesil','company-engenharq','company-engemat','company-barcelos');
+  const cls=companyThemeClass(id);
+  if(id){body.classList.add('company-active',cls);}
+}
+function select(id){active=id;cards=[];activeCard=null;applyCompanyTheme(id);renderTabs();const c=DATA[id];document.getElementById('heading').textContent='Calculadora '+c.nome;document.getElementById('obs').textContent=c.obs||'';addCard()}
 function addCard(){const id='c'+(++seq),c=DATA[active];const st={c:active,v:{},t:{},product:Object.keys(c.products||{})[0]||null};c.fields.forEach(f=>st.v[f.k]=f.d);auto(st,c);productApply(st,c);states[id]=st;cards.push(id);activeCard=id;saveDrafts();renderTabs();renderSimList();renderWorkspace(id)}
 function showSimulation(id){activeCard=id;const st=states[id];if(!st)return;active=st.c;renderTabs();document.getElementById('heading').textContent='Calculadora '+DATA[st.c].nome;document.getElementById('obs').textContent=DATA[st.c].obs||'';renderSimList();renderWorkspace(id)}
 function fieldGroup(f){if(f.k==='renda'||f.k==='rendaAprovada')return 'Cliente';if(['valorTabela','valorImovel','desconto','descontoMcem','avaliacaoCaixa'].includes(f.k))return 'Negócio';return 'Pagamento'}
