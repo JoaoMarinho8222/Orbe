@@ -1161,6 +1161,27 @@ function renderStartScreen(){
       enterProduct(parts[0],parts[1]);
     };
   });
+  const mrvCard=grid.querySelector('[data-start-mrv]');
+  if(mrvCard){
+    mrvCard.onclick=function(e){
+      if(e.target.closest('button'))return;
+      openMRVSimulator();
+    };
+    mrvCard.onkeydown=function(e){
+      if((e.key==='Enter'||e.key===' ')&&!e.target.closest('button')){
+        e.preventDefault();
+        openMRVSimulator();
+      }
+    };
+  }
+  grid.querySelectorAll('[data-start-mrv-btn],[data-start-mrv-open]').forEach(function(btn){
+    btn.onclick=function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      openMRVSimulator();
+    };
+  });
+
   grid.querySelectorAll('[data-start-company]').forEach(function(card){
     card.onclick=function(e){
       if(e.target.closest('button'))return;
