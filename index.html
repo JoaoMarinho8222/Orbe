@@ -1,0 +1,341 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#07110d"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Orbe"><meta name="mobile-web-app-capable" content="yes"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./icons/icon-192.png"><title>Orbe — Sales Intelligence</title><style>@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+:root{
+  --bg:#06100b;
+  --bg-2:#0b1710;
+  --panel:#0e1b13;
+  --panel-2:#122119;
+  --glass:rgba(255,255,255,.055);
+  --glass-strong:rgba(255,255,255,.085);
+  --stroke:rgba(214,244,224,.105);
+  --stroke-strong:rgba(214,244,224,.18);
+  --text:#f3f8f3;
+  --muted:#93a59a;
+  --muted-2:#66786c;
+  --moss:#86b78f;
+  --moss-2:#5e9168;
+  --moss-deep:#244c31;
+  --lime:#b9e7a8;
+  --good:#78d39a;
+  --good-bg:rgba(89,198,129,.11);
+  --bad:#ff8c7f;
+  --bad-bg:rgba(255,110,96,.10);
+  --warn:#e9ba62;
+  --shadow:0 28px 80px rgba(0,0,0,.34);
+  --shadow-soft:0 14px 40px rgba(0,0,0,.22);
+  --radius:20px;
+  --font:'Manrope',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+  --display:'Space Grotesk',var(--font);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;color:var(--text);font-family:var(--font);background:
+ radial-gradient(circle at 82% 8%,rgba(119,180,130,.13),transparent 22%),
+ radial-gradient(circle at 10% 82%,rgba(73,122,88,.12),transparent 26%),
+ linear-gradient(135deg,#050c08 0%,#09130d 42%,#102018 100%);
+ -webkit-font-smoothing:antialiased;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.16;background-image:linear-gradient(rgba(181,220,190,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(181,220,190,.07) 1px,transparent 1px);background-size:40px 40px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.85),transparent 84%)}
+button,input,select{font:inherit}button{cursor:pointer}
+
+/* Shell */
+.app{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;padding:22px 16px;border-right:1px solid var(--stroke);background:linear-gradient(180deg,rgba(9,20,13,.93),rgba(5,12,8,.96));backdrop-filter:blur(18px);display:flex;flex-direction:column;z-index:10}
+.logo-wrap{display:flex;align-items:center;gap:12px;padding:4px 8px 22px}
+.logo-orb{position:relative;width:42px;height:42px;border-radius:14px;background:linear-gradient(145deg,#dff2e1 0%,#83b98b 46%,#2b5736 100%);box-shadow:0 10px 30px rgba(124,193,133,.22),inset 0 1px 0 rgba(255,255,255,.7);display:grid;place-items:center;color:#0a1a0e;font-family:var(--display);font-weight:800;font-size:19px;overflow:hidden}
+.logo-orb:before,.logo-orb:after{content:"";position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,.55);transform:rotate(-22deg)}
+.logo-orb:before{width:30px;height:14px}.logo-orb:after{width:14px;height:30px}
+.logo-type{font-family:var(--display);font-size:21px;letter-spacing:-.6px;font-weight:700}.logo-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.nav-label{padding:14px 10px 8px;color:#607267;text-transform:uppercase;letter-spacing:1px;font-size:9px;font-weight:800}
+.nav{display:grid;gap:5px}.nav button{position:relative;width:100%;border:1px solid transparent;background:transparent;color:#7e9283;padding:11px 12px;border-radius:12px;text-align:left;display:flex;align-items:center;gap:10px;font-size:12px;font-weight:700;transition:.18s}.nav button:hover{background:rgba(255,255,255,.035);color:#c4d4c7}.nav button.active{background:linear-gradient(135deg,rgba(118,181,129,.17),rgba(118,181,129,.06));border-color:rgba(140,203,148,.14);color:#ecf6ed;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02)}.nav button.active:before{content:"";position:absolute;left:-1px;top:8px;bottom:8px;width:2px;background:#a8dcae;border-radius:3px;box-shadow:0 0 12px rgba(168,220,174,.6)}
+.icon{width:20px;height:20px;border:1px solid rgba(201,232,207,.16);border-radius:7px;display:grid;place-items:center;font-size:10px;color:#a7c4ac;background:rgba(255,255,255,.025)}
+.sidebar-bottom{margin-top:auto}.profile{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--stroke);background:rgba(255,255,255,.025);border-radius:14px}.avatar{width:32px;height:32px;border-radius:11px;background:linear-gradient(145deg,#cceecf,#4f7d5a);display:grid;place-items:center;color:#112117;font-size:11px;font-weight:900}.profile strong{display:block;font-size:11px}.profile span{display:block;font-size:9px;color:var(--muted)}
+
+/* Main topbar */
+.main{min-width:0;padding:20px 28px 42px}.topbar{max-width:1560px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:6px 0 18px}.crumbs{display:flex;align-items:center;gap:9px;color:#829589;font-size:10px;font-weight:800}.crumbs b{color:#c6d5ca}.top-actions{display:flex;align-items:center;gap:8px}.live{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border:1px solid var(--stroke);background:rgba(255,255,255,.03);border-radius:999px;font-size:9px;color:#91a496;font-weight:800}.live i{width:6px;height:6px;border-radius:50%;background:#73d091;box-shadow:0 0 10px #73d091;display:inline-block}
+
+/* Page hero */
+.hero{max-width:1560px;margin:0 auto 18px;position:relative;display:flex;justify-content:space-between;align-items:end;gap:22px}.hero-main{max-width:820px}.eyebrow{display:inline-flex;align-items:center;gap:7px;padding:5px 8px;border:1px solid rgba(143,196,151,.13);border-radius:999px;background:rgba(128,181,136,.05);color:#a5c5aa;font-size:9px;text-transform:uppercase;letter-spacing:1.1px;font-weight:800}.eyebrow:before{content:"";width:5px;height:5px;border-radius:50%;background:#a4d9ac;box-shadow:0 0 10px rgba(164,217,172,.8)}.hero h1{margin:10px 0 0;font-family:var(--display);font-size:34px;letter-spacing:-1.2px;line-height:1.05}.hero p{margin:8px 0 0;color:var(--muted);font-size:12px;line-height:1.55;max-width:700px}.hero-cta{display:flex;gap:8px;align-items:center}.btn{border:1px solid var(--stroke-strong);background:rgba(255,255,255,.045);color:#dce9df;padding:10px 13px;border-radius:11px;font-size:11px;font-weight:800;transition:.18s;box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}.btn:hover{transform:translateY(-1px);border-color:rgba(164,210,170,.28);background:rgba(255,255,255,.065)}.btn.primary{border-color:rgba(154,214,162,.26);color:#0a180d;background:linear-gradient(135deg,#d3efd4,#83bb8b 52%,#5b9865);box-shadow:0 12px 26px rgba(92,152,101,.18),inset 0 1px 0 rgba(255,255,255,.65)}.btn.soft{background:rgba(141,189,149,.07);border-color:rgba(141,189,149,.15);color:#a9c8af}.btn.danger{color:#ff9a8e;border-color:rgba(255,126,116,.15)}
+
+/* Overview HUD */
+.hud{max-width:1560px;margin:0 auto 18px;display:grid;grid-template-columns:1.1fr .9fr .9fr .9fr;gap:10px}.hud-card{position:relative;overflow:hidden;border:1px solid var(--stroke);background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.025));border-radius:16px;padding:14px 15px;box-shadow:var(--shadow-soft)}.hud-card:after{content:"";position:absolute;width:80px;height:80px;border-radius:50%;right:-25px;top:-25px;background:radial-gradient(circle,rgba(153,214,159,.16),transparent 68%)}.hud-label{font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:#72867a;font-weight:800}.hud-value{font-family:var(--display);font-size:21px;font-weight:700;margin-top:4px;letter-spacing:-.7px}.hud-meta{font-size:9px;color:#74867a;margin-top:4px}.spark{display:flex;gap:2px;height:18px;align-items:end;margin-top:7px}.spark span{width:5px;border-radius:4px 4px 1px 1px;background:linear-gradient(to top,#4b8558,#a9d7ad)}
+
+/* Workspace header */
+.workspace-head{max-width:1560px;margin:0 auto 12px;display:flex;align-items:center;justify-content:space-between;gap:16px}.companybar{display:flex;align-items:center;gap:8px;padding:7px;background:rgba(10,25,16,.72);border:1px solid var(--stroke);border-radius:13px;box-shadow:var(--shadow-soft);backdrop-filter:blur(14px);overflow:auto}.company-label{font-size:8px;text-transform:uppercase;letter-spacing:1px;color:#687b6f;font-weight:900;padding:0 6px;white-space:nowrap}.tabs{display:flex;gap:5px;min-width:max-content}.tab{border:1px solid transparent;background:transparent;color:#7d9182;padding:8px 11px;border-radius:9px;font-size:10px;font-weight:800;transition:.18s}.tab:hover{color:#d3e1d6;background:rgba(255,255,255,.035)}.tab.active{color:#0a160d;background:linear-gradient(135deg,#d5efd8,#85b98b);box-shadow:0 5px 16px rgba(93,149,101,.18)}.workspace-note{font-size:9px;color:#72857a;white-space:nowrap}.workspace-note b{color:#a9c7ae}
+
+/* Simulation strip */
+.simbar{max-width:1560px;margin:0 auto 14px;display:flex;align-items:center;gap:9px}.sim-list{display:flex;gap:6px;overflow:auto;flex:1;padding-bottom:1px}.sim-chip{display:flex;align-items:center;gap:7px;padding:8px 10px;border:1px solid var(--stroke);background:rgba(255,255,255,.03);color:#718478;border-radius:9px;font-size:9px;font-weight:800;white-space:nowrap;transition:.18s}.sim-chip:hover{color:#bfd2c4;background:rgba(255,255,255,.05)}.sim-chip.active{color:#e7f1e9;border-color:rgba(151,213,160,.24);background:rgba(121,178,129,.10)}.dot{width:6px;height:6px;border-radius:50%;background:var(--chip,#719077);box-shadow:0 0 8px color-mix(in srgb,var(--chip,#719077) 60%,transparent)}.sim-actions{display:flex;gap:6px;flex-shrink:0}.sim-actions .btn{padding:8px 10px;font-size:9px}
+
+/* Workspace */
+.workspace{max-width:1560px;margin:0 auto;display:grid;grid-template-columns:minmax(420px,.93fr) minmax(520px,1.27fr);gap:12px;align-items:start}.panel{position:relative;overflow:hidden;border:1px solid var(--stroke);background:linear-gradient(155deg,rgba(18,34,25,.92),rgba(11,23,16,.94));border-radius:18px;box-shadow:var(--shadow)}.panel:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(120deg,rgba(182,224,188,.04),transparent 28%,transparent 72%,rgba(119,180,128,.035));opacity:.9}.panel-head{position:relative;z-index:1;padding:15px 16px;border-bottom:1px solid var(--stroke);display:flex;align-items:center;justify-content:space-between;gap:12px}.panel-title{display:flex;align-items:center;gap:10px}.panel-icon{width:30px;height:30px;border-radius:10px;background:rgba(145,201,151,.08);border:1px solid rgba(145,201,151,.15);display:grid;place-items:center;color:#acd1b1;font-size:11px}.panel-head h3{margin:0;font-family:var(--display);font-size:14px;letter-spacing:-.2px}.panel-head p{margin:3px 0 0;font-size:9px;color:#74877b}.counter{padding:6px 9px;border:1px solid rgba(146,204,153,.14);background:rgba(146,204,153,.05);border-radius:999px;font-size:8px;color:#9ab79f;font-weight:800}.panel-body{position:relative;z-index:1;padding:16px}
+
+/* Form */
+.product-select{padding:10px;border:1px solid rgba(141,193,148,.12);background:rgba(141,193,148,.04);border-radius:13px;margin-bottom:12px}.form-section+.form-section{margin-top:17px;padding-top:16px;border-top:1px solid rgba(212,240,218,.07)}.section-title{display:flex;align-items:center;gap:8px;margin-bottom:10px;color:#95b89c;font-size:9px;text-transform:uppercase;letter-spacing:.9px;font-weight:900}.section-number{width:21px;height:21px;border-radius:7px;background:rgba(143,198,150,.08);border:1px solid rgba(143,198,150,.12);display:grid;place-items:center;color:#a2c5a8;font-size:8px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.field{display:flex;flex-direction:column;gap:4px}.field.full{grid-column:1/-1}.field label{font-size:9px;color:#718478;font-weight:800}.input{position:relative}.input .prefix{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:9px;color:#65776a;pointer-events:none}.field input,.field select{width:100%;height:39px;border:1px solid rgba(212,239,218,.10);border-radius:10px;padding:0 10px;background:rgba(255,255,255,.035);color:#e8f1ea;font-size:11px;outline:none;transition:.18s}.field.money input{padding-left:26px}.field input::placeholder{color:#53675a}.field input:focus,.field select:focus{border-color:rgba(164,220,171,.40);box-shadow:0 0 0 3px rgba(121,184,131,.10),0 0 20px rgba(121,184,131,.05)}.field.info input{background:rgba(255,255,255,.022);color:#91a398}.field select option{background:#0c1b12;color:#eef7ef}.hint{font-size:8px;color:#63766a;line-height:1.35}.form-footer{display:flex;gap:7px;margin-top:16px}.form-footer .btn{flex:1}
+
+/* Result */
+.result-shell{position:sticky;top:15px}.result-topline{display:flex;align-items:center;gap:10px}.result-topline .state-dot{width:7px;height:7px;border-radius:50%;background:#77d195;box-shadow:0 0 10px #77d195}.status{padding:11px 12px;border-radius:12px;border:1px solid;font-weight:800;font-size:9px;line-height:1.45}.status.ok{background:var(--good-bg);color:#88d49f;border-color:rgba(120,211,154,.22)}.status.bad{background:var(--bad-bg);color:#ff9d91;border-color:rgba(255,140,127,.22)}.checks{margin:7px 0 0;padding:0;list-style:none;font-size:8px;color:#789080;display:grid;gap:3px;font-weight:700}.checks li.ok:before{content:'✓ ';color:#81d49b}.checks li:not(.ok):before{content:'✕ ';color:#ff8d81}
+.health{display:grid;grid-template-columns:118px 1fr;gap:14px;align-items:center;padding:13px;margin-top:10px;border:1px solid var(--stroke);background:rgba(255,255,255,.025);border-radius:14px}.ring{width:96px;height:96px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#81d298 var(--score),rgba(255,255,255,.07) 0);position:relative}.ring:after{content:"";position:absolute;inset:8px;border-radius:50%;background:#0d1b12;border:1px solid rgba(255,255,255,.06)}.ring b{position:relative;z-index:1;font-family:var(--display);font-size:22px}.health-copy .label{font-size:8px;text-transform:uppercase;letter-spacing:1px;color:#718377;font-weight:900}.health-copy h4{margin:3px 0 3px;font-family:var(--display);font-size:14px}.health-copy p{margin:0;color:#73867a;font-size:9px;line-height:1.45}.health-bar{height:5px;border-radius:5px;background:rgba(255,255,255,.07);overflow:hidden;margin-top:9px}.health-bar span{display:block;height:100%;width:var(--score);background:linear-gradient(90deg,#4c8c59,#9ed8a6);box-shadow:0 0 12px rgba(139,207,149,.32);border-radius:5px}
+.result-hero{display:grid;grid-template-columns:1.15fr .85fr;gap:8px;margin-top:10px}.metric{padding:13px;border-radius:13px;border:1px solid var(--stroke);background:linear-gradient(145deg,rgba(255,255,255,.048),rgba(255,255,255,.022))}.metric.primary{background:linear-gradient(140deg,#183621,#0f2516 55%,#102216);border-color:rgba(140,208,148,.17);box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 10px 28px rgba(0,0,0,.16)}.metric .k{font-size:8px;text-transform:uppercase;letter-spacing:.65px;color:#75897b;font-weight:900}.metric .v{font-family:var(--display);font-size:22px;font-weight:700;letter-spacing:-.6px;margin-top:4px}.metric.primary .k{color:#90b99a}.metric.primary .v{color:#d8f1dc}.result-section{margin-top:14px}.result-section-title{display:flex;align-items:center;justify-content:space-between;font-size:8px;text-transform:uppercase;letter-spacing:.9px;color:#6f8276;font-weight:900;margin:0 0 7px}.result-section-title:after{content:"";height:1px;flex:1;margin-left:9px;background:rgba(212,239,218,.07)}.facts{display:grid;grid-template-columns:1fr 1fr;gap:6px}.fact{padding:9px 10px;border:1px solid rgba(213,239,219,.075);border-radius:10px;background:rgba(255,255,255,.022)}.fact .k{font-size:8px;color:#6c7e71;font-weight:800}.fact .v{font-size:10px;font-weight:800;margin-top:2px;color:#dbe8de}.facts .alert{border-color:rgba(231,186,98,.18);background:rgba(231,186,98,.045)}.facts .alert .k,.facts .alert .v{color:#e8bc67}.helper{margin-top:11px;padding:10px 11px;border-radius:10px;background:rgba(143,194,150,.04);border:1px dashed rgba(143,194,150,.14);color:#6f8275;font-size:8px;line-height:1.45}.summary-wide{width:100%;margin-top:10px}
+
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(2,8,5,.75);backdrop-filter:blur(14px);display:grid;place-items:center;padding:18px;z-index:60}.modal{width:min(620px,100%);max-height:90vh;overflow:auto;border:1px solid var(--stroke-strong);background:linear-gradient(150deg,#122017,#0a150e);border-radius:20px;box-shadow:0 35px 100px rgba(0,0,0,.5);padding:18px}.modal h3{margin:0;color:#e7f2e9;font-family:var(--display);font-size:21px}.modal .sub{font-size:9px;color:#8ea394;font-weight:800;margin-top:4px}.mrows{display:flex;flex-direction:column;margin-top:14px}.mrow{display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid rgba(214,240,218,.07);font-size:10px}.mk{color:#7a8d80;font-weight:700}.mv{color:#dce9df;font-weight:800;text-align:right;white-space:pre-line}.mact{display:flex;justify-content:flex-end;gap:8px;margin-top:15px}
+.footer{max-width:1560px;margin:18px auto 0;text-align:center;color:#5d7064;font-size:8px;line-height:1.5;padding:8px}
+
+
+/* CRM tools */
+.sim-meta{display:flex;align-items:center;gap:7px;max-width:240px}.sim-meta .client{color:#dbe8de;font-weight:800;overflow:hidden;text-overflow:ellipsis}.sim-meta .project{color:#708277;font-weight:700}.chip-stage{font-size:7px;padding:3px 5px;border-radius:999px;border:1px solid var(--stroke);color:#9db5a2;background:rgba(255,255,255,.025)}
+.tools-bar{max-width:1560px;margin:0 auto 12px;display:flex;justify-content:space-between;align-items:center;gap:8px}.tool-group{display:flex;gap:7px;flex-wrap:wrap}.btn.compact{padding:8px 10px;font-size:9px}.ghost-note{font-size:9px;color:#6f8276}.notes-card{padding:12px;border:1px solid var(--stroke);background:rgba(255,255,255,.022);border-radius:13px;margin-top:12px}.notes-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}.notes-head strong{font-size:9px;text-transform:uppercase;letter-spacing:.9px;color:#8eaa95}.notes-card textarea{width:100%;min-height:105px;resize:vertical;border:1px solid rgba(212,239,218,.10);border-radius:10px;padding:10px;background:rgba(255,255,255,.035);color:var(--text);font-size:10px;outline:none}.notes-card textarea:focus{border-color:rgba(164,220,171,.40);box-shadow:0 0 0 3px rgba(121,184,131,.08)}
+.overlay-panel{width:min(1040px,100%);max-height:88vh;overflow:auto;border:1px solid var(--stroke-strong);background:linear-gradient(155deg,#132219,#0b150f);border-radius:22px;box-shadow:0 35px 100px rgba(0,0,0,.55);padding:18px}.overlay-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.overlay-head h3{margin:0;font-family:var(--display);font-size:20px}.overlay-head p{margin:4px 0 0;color:var(--muted);font-size:9px}.overlay-list{display:grid;gap:8px;margin-top:15px}.history-item{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;padding:12px;border:1px solid var(--stroke);border-radius:13px;background:rgba(255,255,255,.025)}.history-item strong{font-size:11px}.history-item small{display:block;color:var(--muted);font-size:8px;margin-top:3px}.kanban{display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:10px;margin-top:16px}.kan-col{min-height:360px;padding:10px;border:1px solid var(--stroke);background:rgba(255,255,255,.022);border-radius:14px}.kan-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.kan-head strong{font-size:9px}.kan-count{font-size:8px;color:var(--muted)}.kan-drop{min-height:300px;display:grid;gap:7px;align-content:start}.kan-card{padding:10px;border-radius:11px;border:1px solid rgba(212,239,218,.08);background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.02));cursor:grab}.kan-card:active{cursor:grabbing}.kan-card strong{font-size:10px;display:block}.kan-card span{font-size:8px;color:var(--muted);display:block;margin-top:3px}.kan-card em{display:inline-block;font-style:normal;font-size:7px;color:#a8c7ae;margin-top:7px;padding:3px 5px;border-radius:999px;background:rgba(137,191,145,.08);border:1px solid rgba(137,191,145,.11)}.empty{padding:14px;color:#67796d;font-size:8px;text-align:center;border:1px dashed rgba(212,239,218,.08);border-radius:9px}.note-toolbar{display:flex;gap:6px}.history-empty{padding:18px;text-align:center;color:var(--muted);font-size:9px}
+body.light .overlay-panel{background:linear-gradient(155deg,#ffffff,#f1f6f2);box-shadow:0 28px 70px rgba(40,72,48,.18)}body.light .kan-col{background:rgba(40,80,48,.025)}body.light .kan-card,.light .history-item{background:#fff;border-color:#d8e5da}body.light .notes-card{background:#fff}.light .notes-card textarea{background:#f7fbf8;border-color:#d5e2d7;color:#22352a}.light .kan-card strong,.light .history-item strong{color:#1c3023}
+@media(max-width:900px){.kanban{grid-template-columns:repeat(2,minmax(180px,1fr))}.history-item{grid-template-columns:1fr}.tools-bar{align-items:flex-start;flex-direction:column}}
+@media(max-width:560px){.kanban{grid-template-columns:1fr}.sim-meta{max-width:180px}}
+
+@media(max-width:1180px){.app{grid-template-columns:88px minmax(0,1fr)}.sidebar{padding:18px 10px}.logo-wrap{justify-content:center}.logo-type,.logo-sub,.nav-label,.nav button span.txt,.profile > div:not(.avatar){display:none}.nav button{justify-content:center;padding:11px}.profile{justify-content:center}.main{padding:18px 18px 32px}.hud{grid-template-columns:1fr 1fr}.workspace{grid-template-columns:1fr}.result-shell{position:static}.hero{align-items:start;flex-direction:column}.hero-cta{width:100%}}
+@media(max-width:720px){.app{grid-template-columns:1fr}.sidebar{position:fixed;left:0;right:0;bottom:0;top:auto;height:auto;padding:7px 10px;border-right:0;border-top:1px solid var(--stroke);background:rgba(7,16,10,.93);z-index:100}.logo-wrap,.sidebar-bottom{display:none}.nav-label{display:none}.nav{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}.nav button,.nav button.active{border:0;justify-content:center;padding:9px 5px;background:transparent;box-shadow:none}.nav button.active:before{display:none}.nav button .icon{width:28px;height:28px}.nav button span.txt{display:block;font-size:8px;color:inherit}.main{padding:13px 11px 72px}.topbar{padding:3px 0 12px}.crumbs{font-size:8px}.top-actions .live{display:none}.hero h1{font-size:28px}.hero p{font-size:10px}.hero-cta{display:grid;grid-template-columns:1fr;width:100%}.hud{grid-template-columns:1fr 1fr;gap:7px}.hud-card{padding:11px}.hud-value{font-size:18px}.workspace-head{align-items:start;flex-direction:column}.workspace-note{display:none}.companybar{width:100%}.simbar{align-items:stretch;flex-direction:column}.sim-actions{display:grid;grid-template-columns:1fr 1fr}.workspace{grid-template-columns:1fr}.panel-body{padding:12px}.grid,.result-hero,.facts,.health{grid-template-columns:1fr}.health{justify-items:start}.health .ring{margin:auto}.health-copy{width:100%}.form-footer{flex-direction:column}.form-footer .btn{width:100%}.result-shell .panel-head{align-items:flex-start}.result-shell .panel-head .btn{padding:8px 9px;font-size:8px}}
+@media print{body *{visibility:hidden}.modal-bg,.modal-bg *{visibility:visible}.modal-bg{position:absolute;background:#fff;padding:0}.modal{box-shadow:none;border:0;width:100%;max-height:none;background:#fff;color:#111}.modal h3,.modal .sub,.mv{color:#111}.mact{display:none}}
+
+/* ORBE PREMIUM — executivo: tecnologia discreta, sem estética gamer */
+:root{
+  --bg:#0b1510; --bg-2:#102117; --panel:#ffffff; --panel-soft:rgba(255,255,255,.92);
+  --page-text:#15251b; --text:#eef5ef; --muted:#8ea094; --muted-2:#66776d;
+  --line:rgba(197,221,202,.14); --line-light:#dfe9e1; --accent:#5f8f69; --accent-2:#8fbf98;
+  --accent-deep:#294d34; --soft-accent:rgba(95,143,105,.11); --shadow-premium:0 18px 50px rgba(23,45,29,.12);
+  --glow:none;
+}
+body{background:linear-gradient(135deg,#0a130e 0%,#102116 56%,#173020 100%);}
+body:before{opacity:.055;mask-image:linear-gradient(to bottom,rgba(0,0,0,.3),transparent 75%)}
+.sidebar{background:rgba(10,20,14,.9);border-right:1px solid rgba(214,235,219,.10);box-shadow:10px 0 40px rgba(0,0,0,.10)}
+.logo-orb{box-shadow:none;background:linear-gradient(145deg,#b9d4bf,#5e8d68);color:#17301e}
+.nav button{border-radius:12px;transition:background .2s ease,color .2s ease,transform .2s ease}
+.nav button.active{background:rgba(124,170,133,.12);box-shadow:inset 0 0 0 1px rgba(146,190,153,.15)}
+.nav button:hover{transform:translateX(2px)}
+.topbar{border-bottom:1px solid var(--line)}
+.top-actions{gap:8px}
+.counter,.live{border-radius:999px}
+.theme-toggle{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:inherit;padding:8px 11px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.theme-toggle .dot{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.10);font-size:9px}
+.hero{padding-top:28px;padding-bottom:24px}
+.eyebrow{letter-spacing:.12em}
+.hero h1{font-family:var(--font);font-weight:800;letter-spacing:-.05em}
+.hero p{max-width:720px}
+.hud{gap:12px;margin-bottom:22px}
+.hud-card{background:rgba(255,255,255,.035);border:1px solid var(--line);box-shadow:none;border-radius:16px}
+.hud-value{font-family:var(--font);font-weight:750}
+.spark{opacity:.35}
+.workspace-head{margin-bottom:12px}
+.companybar,.simbar{background:rgba(255,255,255,.025);border:1px solid var(--line);box-shadow:none;border-radius:16px}
+.tabs .tab{border-radius:10px;border:1px solid transparent}
+.tabs .tab.active{box-shadow:inset 0 -2px 0 var(--tab),0 4px 16px rgba(0,0,0,.08)}
+.workspace-note{color:var(--muted)}
+.panel{border-radius:18px;border:1px solid #dbe6dd;background:rgba(255,255,255,.94);box-shadow:var(--shadow-premium);color:#142219}
+.panel-head{border-bottom:1px solid #e6eee8}
+.panel-head h3{color:#17271d;font-family:var(--font);letter-spacing:-.02em}
+.panel-head p{color:#7a897f}
+.panel-icon{background:#f0f6f1;border-color:#dce8de;color:#537b5d;box-shadow:none}
+.panel-body{background:#fff}
+.form-section{border-bottom:1px solid #e9f0eb}
+.section-title{color:#38543f}
+.section-number{background:#edf5ef;color:#53795c;border:1px solid #dbe8de}
+.field label{color:#607168}
+.field input,.field select{background:#fbfdfb;border-color:#dce7df;color:#223429;box-shadow:none}
+.field input:focus,.field select:focus{outline:none;border-color:#7ba483;box-shadow:0 0 0 3px rgba(95,143,105,.10)}
+.field.info input{background:#f3f7f4;color:#6e7f74}
+.result-shell .panel-head{background:linear-gradient(180deg,#fbfdfb,#f6faf7)}
+.status.ok{background:#eef8f0;color:#2e6840;border-color:#b8d8bd}
+.status.bad{background:#fff6f4;color:#a44d3e;border-color:#efc6be}
+.result-hero .metric{background:#f5f9f5;border-color:#dce8de;box-shadow:none}
+.result-hero .metric.primary{background:linear-gradient(145deg,#31583b,#527f5c);border-color:#31583b;color:#fff}
+.result-hero .metric.primary .k,.result-hero .metric.primary .v{color:#fff}
+.result-section{border-top:1px solid #e8eee9}
+.fact{background:#f9fcfa;border-color:#e2ebe4}
+.helper{background:#f2f7f3;border-color:#dfe9e1;color:#66776d}
+.btn{border-color:#d8e3da;background:#fff;color:#294233;border-radius:11px;box-shadow:none}
+.btn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(32,64,41,.08)}
+.btn.primary{background:#41684c;border-color:#41684c;color:white}
+.btn.soft{background:#eef5ef;color:#365840;border-color:#d8e6da}
+.product-select{background:#f4f8f5;border-color:#dbe7de}
+.sim-chip{background:#fff;border-color:#dce7df;color:#53665a}
+.sim-chip.active{background:#eff7f0;border-color:#a8c8ae;color:#2f5e38}
+.footer{color:#90a198}
+.modal-bg{background:rgba(4,12,7,.46);backdrop-filter:blur(7px)}
+.modal{background:#fff;border-color:#dce7df;color:#17271d;box-shadow:0 30px 80px rgba(8,23,13,.20)}
+.mrow{border-bottom-color:#e7eee8}.mk{color:#708078}.mv{color:#23382a}
+/* tema claro */
+body.light{color:#203026;background:linear-gradient(135deg,#edf6ef 0%,#f7faf7 58%,#e0efe3 100%)}
+body.light:before{opacity:.025}
+body.light .sidebar{background:rgba(248,252,249,.94);border-right-color:#d8e5da;box-shadow:8px 0 30px rgba(33,67,41,.05)}
+body.light .logo-orb{background:linear-gradient(145deg,#dceedd,#87aa8f);color:#294a32}
+body.light .nav-label,.body.light .logo-sub{color:#7b8c80}
+body.light .nav button{color:#506357}
+body.light .nav button.active{background:#e7f1e9;box-shadow:inset 0 0 0 1px #d2e2d5}
+body.light .topbar{border-bottom-color:#dbe7dd}
+body.light .live,body.light .counter,body.light .theme-toggle{background:#f6faf7;border-color:#d8e5da;color:#4f6555}
+body.light .theme-toggle .dot{background:#e8f2e9}
+body.light .hud-card{background:rgba(255,255,255,.62);border-color:#dce8de}
+body.light .companybar,body.light .simbar{background:rgba(255,255,255,.66);border-color:#dbe7dd}
+body.light .workspace-note{color:#708178}
+body.light .panel{box-shadow:0 16px 40px rgba(49,84,57,.08)}
+@media(max-width:720px){.theme-toggle .txt{display:none}.theme-toggle{padding:8px 9px}}
+
+</style></head><body><div class="app">
+  <aside class="sidebar">
+    <div class="logo-wrap">
+      <div class="logo-orb">O</div>
+      <div><div class="logo-type">Orbe</div><div class="logo-sub">Sales Intelligence</div></div>
+    </div>
+    <div class="nav-label">Workspace</div>
+    <nav class="nav">
+      <button type="button" data-nav="overview"><span class="icon">⌂</span><span class="txt">Visão geral</span></button>
+      <button class="active" type="button" data-nav="simulator"><span class="icon">◈</span><span class="txt">Simulador</span></button>
+      <button type="button" data-nav="kanban"><span class="icon">▦</span><span class="txt">Kanban</span></button>
+      <button type="button" data-nav="clients"><span class="icon">◎</span><span class="txt">Clientes</span></button>
+    </nav>
+    <div class="nav-label">Sistema</div>
+    <nav class="nav">
+      <button type="button" id="navHistory"><span class="icon">◌</span><span class="txt">Histórico</span></button>
+      <button type="button" id="navNotes"><span class="icon">▤</span><span class="txt">Notas</span></button>
+      <button type="button" data-nav="settings"><span class="icon">⚙</span><span class="txt">Configurações</span></button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="profile"><div class="avatar">JL</div><div><strong>João Lucas</strong><span>Gerente & Corretor</span></div></div>
+    </div>
+  </aside>
+  <section class="main">
+    <div class="topbar">
+      <div class="crumbs"><span>ORBE</span><b>/</b><span>WORKSPACE</span><b>/</b><span>SIMULADOR</span></div>
+      <div class="top-actions"><button class="btn" id="installApp" type="button" hidden>＋ Instalar</button><button class="theme-toggle" id="themeToggle" type="button" title="Alternar tema"><span class="dot" id="themeIcon">☾</span><span class="txt" id="themeLabel">Escuro</span></button><div class="live"><i></i><span>Motor de cálculo ativo</span></div><div class="counter" id="counter">1 simulação aberta</div></div>
+    </div>
+
+    <section class="hero">
+      <div class="hero-main">
+        <div class="eyebrow">Central inteligente de propostas</div>
+        <h1 id="heading">Calculadora</h1>
+        <p id="obs"></p>
+      </div>
+      <div class="hero-cta">
+        <button class="btn" id="clearCurrent">↺ Limpar atual</button>
+        <button class="btn primary" id="newSimulation">＋ Nova simulação</button>
+      </div>
+    </section>
+
+    <section class="hud">
+      <div class="hud-card"><div class="hud-label">Modo</div><div class="hud-value" id="hudMode">Simulação ao vivo</div><div class="hud-meta">Resultados recalculados a cada alteração</div></div>
+      <div class="hud-card"><div class="hud-label">Construtoras</div><div class="hud-value">04</div><div class="hud-meta">Motores de regra ativos</div></div>
+      <div class="hud-card"><div class="hud-label">Simulações abertas</div><div class="hud-value" id="hudSimulations">01</div><div class="hud-meta">Sessão atual</div></div>
+      <div class="hud-card"><div class="hud-label">Status</div><div class="hud-value" style="color:#9edda8">Online</div><div class="spark"><span style="height:6px"></span><span style="height:10px"></span><span style="height:8px"></span><span style="height:14px"></span><span style="height:11px"></span><span style="height:17px"></span><span style="height:13px"></span><span style="height:18px"></span></div></div>
+    </section>
+
+    <div class="workspace-head">
+      <div class="companybar"><div class="company-label">Construtora</div><nav class="tabs" id="tabs"></nav></div>
+      <div class="workspace-note"><b>Fluxo:</b> produto → dados → análise → proposta</div>
+    </div>
+
+    <div class="simbar"><div class="sim-list" id="simList"></div><div class="sim-actions"><button class="btn" id="clearAll">Limpar sessão</button><button class="btn soft" id="topSummary">▣ Gerar resumo</button></div></div>
+    <div class="tools-bar"><div class="tool-group"><button class="btn compact" id="saveHistory">◌ Salvar no histórico</button><button class="btn compact" id="openHistory">Histórico</button><button class="btn compact" id="openKanban">▦ Kanban</button><button class="btn compact" id="openNotes">▤ Notas</button></div><div class="ghost-note">Cada simulação pode ter cliente, observações e etapa.</div></div>
+
+    <section class="workspace">
+      <section class="panel">
+        <div class="panel-head"><div class="panel-title"><div class="panel-icon">⌁</div><div><h3>Dados da proposta</h3><p>Alimente a condição e acompanhe o efeito em tempo real.</p></div></div><div class="counter" id="productBadge">—</div></div>
+        <div class="panel-body" id="formPanel"></div>
+      </section>
+      <section class="panel result-shell">
+        <div class="panel-head"><div class="panel-title"><div class="panel-icon">◉</div><div><h3>Orbe Intelligence</h3><p>Leitura da saúde financeira da proposta.</p></div></div><button class="btn soft" id="panelSummary">▣ Proposta</button></div>
+        <div class="panel-body" id="resultPanel"></div>
+      </section>
+    </section>
+    <div class="footer">Orbe • ferramenta de simulação comercial. Os resultados são estimativos e devem ser conferidos com as condições vigentes antes da formalização.</div>
+
+    <div id="featureOverlay" class="modal-bg" hidden></div>
+  </section>
+</div>
+<script>const money=n=>Number.isFinite(n)?n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'—';
+const pct=n=>Number.isFinite(n)?(n*100).toLocaleString('pt-BR',{maximumFractionDigits:1})+'%':'—';
+const val=(v,f)=>f==='pct'?pct(v):f==='text'?v:money(v);
+const parseBR=s=>{if(typeof s!=='string')return Number(s)||0;s=s.replace(/[^\d,.-]/g,'');if(!s)return 0;if(s.includes(','))s=s.replace(/\./g,'').replace(',','.');else{const p=(s.match(/\./g)||[]).length;if(p>1)s=s.replace(/\./g,'');else if(p===1&&/\.\d{3}$/.test(s))s=s.replace('.','')}const n=parseFloat(s);return Number.isNaN(n)?0:n};
+const fmtInput=n=>!Number.isFinite(n)||n===0?'':Number.isInteger(n)?n.toLocaleString('pt-BR'):n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+function health({parcela,capacidade,entradaPct,fi}){const a=parcela<capacidade,b=entradaPct<.19,c=fi>=.77;return{ok:a&&b&&c,titulo:a&&b&&c?'Agora Sim! Negociação saudável':'Precisa ajustar a proposta',checks:[{label:'Maior parcela mensal da entrada < 30% da renda',ok:a},{label:'Entrada parcelada < 19% do imóvel',ok:b},{label:'F.I. Real ≥ 77%',ok:c}]}}
+function menorSinal(liquido,fix,inter,entradaMax){return Math.max(.77*liquido-fix,.81*liquido-fix-inter,liquido-fix-inter-entradaMax)}
+const DATA={
+ telesil:{nome:'Telesil',cor:'#2563eb',obs:'Entrada dividida em dois blocos pagos em sequência. Percentual e número de parcelas variam por produto.',products:{'grand-diamond':{nome:'Grand Diamond',q80:28,q20:24,pct80:67},'grand-via':{nome:'Grand Via',q80:31,q20:24,pct80:80},splendido:{nome:'Splendido',q80:35,q20:24,pct80:80},'reserva-aldeprime':{nome:'Reserva Aldeprime',q80:26,q20:28,pct80:70},custom:{nome:'Outro (manual)',q80:35,q20:24,pct80:80}},fields:[
+ {k:'renda',l:'Renda do cliente',t:'money',d:7627.29},{k:'valorTabela',l:'Valor de tabela',t:'money',d:275990.39},{k:'desconto',l:'Desconto de tabela',t:'money',d:0},{k:'descontoMcem',l:'Desconto MCEM',t:'money',d:0},{k:'sinal',l:'Sinal (ato)',t:'money',d:50000},{k:'sinalIntercalado',l:'Sinal intercalado (2ª parte)',t:'money',d:0},{k:'financiamento',l:'Financiamento aprovado',t:'money',d:208000},{k:'fgts',l:'FGTS',t:'money',d:0},{k:'subsidio',l:'Subsídio',t:'money',d:0},{k:'semestrais',l:'Nº de semestrais',t:'int',d:0},{k:'valorIntercalada',l:'Valor da intercalada (semestral)',t:'money',d:0,auto:v=>Math.round(v.renda*.5*100)/100},{k:'parcelaCaixa',l:'Parcela Caixa (pós-chaves)',t:'money',d:0,info:true,auto:v=>Math.round(v.renda*.3*100)/100},{k:'q80',l:'Parcelas do 1º bloco',t:'int',d:35},{k:'q20',l:'Parcelas do 2º bloco',t:'int',d:24}],
+ compute(i){const c=this;const liq=i.valorTabela-i.desconto;const cap=i.renda*.3;const f80=(i.pct80||80)/100,f20=1-f80;const inter=(i.valorIntercalada||0)*i.semestrais;const total=i.sinal+(i.sinalIntercalado||0)+i.fgts+i.subsidio+i.financiamento;const entrada=liq-total-inter;const mcemAbate=Math.min(i.descontoMcem||0,Math.max(entrada,0));const efet=entrada-mcemAbate;const b80r=entrada*f80,b20r=entrada*f20,ab20=Math.min(mcemAbate,b20r),ab80=mcemAbate-ab20,b80=Math.max(b80r-ab80,0),b20=Math.max(b20r-ab20,0);const p80=i.q80>0?b80/i.q80:0,p20=i.q20>0?b20/i.q20:0,maxp=Math.max(p80,p20);const fi=liq?(total+mcemAbate)/liq:0,ep=liq?efet/liq:0;const status=health({parcela:maxp,capacidade:cap,entradaPct:ep,fi});const k=Math.max(i.q80>0?f80/i.q80:Infinity,i.q20>0?f20/i.q20:Infinity);const entradaMax=cap/k;const fix=(total-i.sinal)+mcemAbate;const sinalMax=liq-fix-inter;const sinalSug=Math.min(menorSinal(liq,fix,inter,entradaMax),sinalMax);return{status,highlight:[['Entrada parcelada',efet,'money'],[`1ª fase — ${Math.round(f80*100)}% (${i.q80}x)`,p80,'money'],...(b20>.005?[[`2ª fase — ${Math.round(f20*100)}% (${i.q20}x)`,p20,'money']]:[]),...(i.semestrais>0?[['Intercalada (semestral)',i.valorIntercalada,'money']]:[]),['Maior parcela mensal',maxp,'money','strong']],rows:[['Líquido (tabela − desconto)',liq,'money'],['Capacidade de pagamento (30%)',cap,'money'],['Total aportado',total,'money'],['Total das intercaladas',inter,'money'],...(mcemAbate>0?[['Entrada parcelada (bruta)',entrada,'money'],['Desconto MCEM aplicado',mcemAbate,'money']]:[]),...(mcemAbate>0&&b20<=0.005?[['2ª fase quitada pelo MCEM','Sim','text']]:[]),['Entrada % do imóvel',ep,'pct'],['F.I. Real',fi,'pct'],...(!status.ok&&sinalSug>i.sinal?[['Sinal sugerido p/ ficar saudável',Math.ceil(sinalSug),'money','alert']]:[])] ,resumo:[['Valor do imóvel',i.valorTabela,'money'],...(i.desconto>0?[['Desconto aplicado',i.desconto,'money']]:[]),['Valor do imóvel com desconto',liq,'money'],['Valor do financiamento',i.financiamento,'money'],['FGTS',i.fgts||0,'money'],...(i.subsidio>0?[['Subsídio',i.subsidio,'money']]:[]),['Sinal (ato)',i.sinal,'money'],['Sinal intercalado',i.sinalIntercalado||0,'money'],...(mcemAbate>0?[['Entrada parcelada (bruta)',entrada,'money'],['Desconto MCEM',mcemAbate,'money']]:[]),['Entrada parcelada (após MCEM)',efet,'money'],['Mensais',b20>.005?`1ª fase (${Math.round(f80*100)}%): ${i.q80}x de ${money(p80)}\n2ª fase (${Math.round(f20*100)}%): ${i.q20}x de ${money(p20)}`:`1ª fase (${Math.round(f80*100)}%): ${i.q80}x de ${money(p80)}`,'text'],['Intercaladas semestrais',i.semestrais>0?`${i.semestrais}x de ${money(i.valorIntercalada)}`:'—','text'],['Valor total das intercaladas',inter,'money'],['Parcela Caixa (pós-chaves)',i.parcelaCaixa||0,'money']]};}
+ },
+ engenharq:{nome:'Engenharq',cor:'#16a34a',obs:'Carteira parcelável em até R$ 50 mil e até 100x. O que exceder o teto precisa ser distribuído entre sinal e chaves.',products:{castanheiras:{nome:'Castanheiras'},jacarandas:{nome:'Jacarandás'},jequitibas:{nome:'Jequitibás'},coqueirais:{nome:'Coqueirais'},figueiras:{nome:'Figueiras'},laranjeiras:{nome:'Laranjeiras'}},fields:[
+ {k:'renda',l:'Renda do cliente',t:'money',d:6300},{k:'valorTabela',l:'Valor de tabela',t:'money',d:296300},{k:'desconto',l:'Desconto de tabela',t:'money',d:15000},{k:'sinal',l:'Sinal (ato)',t:'money',d:10000},{k:'sinalParcelado',l:'Sinal parcelado',t:'money',d:0},{k:'chaves',l:'Chaves',t:'money',d:11300},{k:'financiamento',l:'Financiamento aprovado',t:'money',d:200000},{k:'fgts',l:'FGTS',t:'money',d:0},{k:'subsidio',l:'Subsídio',t:'money',d:0},{k:'tetoCarteira',l:'Teto da carteira (parcelável)',t:'money',d:50000,h:'Padrão R$ 50 mil; ajuste em campanhas.'},{k:'qtdMensais',l:'Nº de parcelas (até 100)',t:'int',d:100},{k:'parcelaCaixa',l:'Parcela Caixa (pós-chaves)',t:'money',d:0,info:true,auto:v=>Math.round(v.renda*.3*100)/100}],
+ compute(i){const teto=i.tetoCarteira||50000,liq=i.valorTabela-i.desconto,cap=i.renda*.3,total=i.sinal+i.sinalParcelado+i.chaves+i.fgts+i.subsidio+i.financiamento,nec=liq-total,carteira=Math.min(Math.max(nec,0),teto),exced=Math.max(0,nec-teto),parc=i.qtdMensais>0?carteira/i.qtdMensais:0,fi=liq?total/liq:0,sobra=Math.max(0,-nec),okP=i.qtdMensais>0&&i.qtdMensais<=100,ok=exced<=0&&okP&&sobra===0;const status={ok,titulo:sobra?'Aportes maiores que o imóvel — revisar':!okP?'Nº de parcelas fora do limite (máx. 100x)':exced?'Acima do teto — distribuir excedente entre sinal e chaves':`Carteira dentro do teto de ${money(teto)}`,checks:[{label:sobra?'Aportes não podem superar o valor do imóvel':`Carteira a parcelar ≤ ${money(teto)}`,ok:!sobra&&exced<=0},{label:`Parcelamento em até 100x (atual: ${i.qtdMensais}x)`,ok:okP}]};return{status,highlight:[['Carteira a parcelar',carteira,'money'],[`Parcela mensal (${i.qtdMensais}x)`,parc,'money','strong'],...(exced>0?[['Distribuir entre sinal/chaves',exced,'money','strong']]:[])],rows:[['Líquido (tabela − desconto)',liq,'money'],['Total aportado',total,'money'],['Entrada necessária (além dos aportes)',nec,'money'],['Capacidade de pagamento (30%)',cap,'money'],['F.I. Real',fi,'pct'],...(sobra>0?[['Sobra de aportes',sobra,'money','alert']]:[]),...(exced>0?[['Excedente acima do teto',exced,'money','alert'],['Sinal sugerido',Math.ceil(i.sinal+exced),'money','alert']]:[]),...(!okP?[['Nº de parcelas informado',`${i.qtdMensais}x`,'text','alert']]:[])],resumo:[['Valor do imóvel',i.valorTabela,'money'],...(i.desconto>0?[['Desconto aplicado',i.desconto,'money']]:[]),['Valor do imóvel com desconto',liq,'money'],['Valor do financiamento',i.financiamento,'money'],['FGTS',i.fgts||0,'money'],...(i.subsidio>0?[['Subsídio',i.subsidio,'money']]:[]),['Sinal (ato)',i.sinal,'money'],['Sinal parcelado',i.sinalParcelado,'money'],['Chaves',i.chaves,'money'],['Entrada parcelada (carteira)',carteira,'money'],...(exced>0?[['A distribuir (sinal/chaves)',exced,'money']]:[]),['Mensais',`${i.qtdMensais}x de ${money(parc)}`,'text'],['Parcela Caixa (pós-chaves)',i.parcelaCaixa||0,'money']]};}
+ },
+ engemat:{nome:'Engemat',cor:'#ea580c',obs:'Entrada parcelada em 80x, com intercaladas semestrais.',products:{'villas-lisboa':{nome:'Villas de Lisboa'},'plaza-santa-lucia-2':{nome:'Plaza Santa Lúcia II'}},fields:[
+ {k:'renda',l:'Renda do cliente',t:'money',d:3297.44},{k:'valorTabela',l:'Valor de tabela',t:'money',d:260000},{k:'desconto',l:'Desconto de tabela',t:'money',d:15000},{k:'sinal',l:'Sinal (ato)',t:'money',d:3000},{k:'chaves',l:'Chaves',t:'money',d:0},{k:'financiamento',l:'Financiamento aprovado',t:'money',d:190159.81},{k:'fgts',l:'FGTS',t:'money',d:4254.5},{k:'subsidio',l:'Subsídio',t:'money',d:3624},{k:'semestrais',l:'Nº de intercaladas semestrais',t:'int',d:0},{k:'valorIntercalada',l:'Valor da intercalada (semestral)',t:'money',d:0,auto:v=>Math.round(v.renda*.5*100)/100},{k:'qtdMensais',l:'Nº de parcelas mensais',t:'int',d:80},{k:'parcelaCaixa',l:'Parcela Caixa (pós-chaves)',t:'money',d:0,info:true,auto:v=>Math.round(v.renda*.3*100)/100}],
+ compute(i){const liq=i.valorTabela-i.desconto,cap=i.renda*.3,inter=(i.valorIntercalada||0)*i.semestrais,total=i.sinal+i.chaves+i.fgts+i.subsidio+i.financiamento,entrada=liq-total-inter,parc=i.qtdMensais>0?entrada/i.qtdMensais:0,fi=liq?total/liq:0,ep=liq?entrada/liq:0,status=health({parcela:parc,capacidade:cap,entradaPct:ep,fi});const entradaMax=cap*i.qtdMensais,sinalMax=liq-(total-i.sinal)-inter,sinalSug=Math.min(menorSinal(liq,total-i.sinal,inter,entradaMax),sinalMax);return{status,highlight:[['Entrada parcelada',entrada,'money'],[`Parcela mensal (${i.qtdMensais}x)`,parc,'money','strong']],rows:[['Líquido (tabela − desconto)',liq,'money'],['Capacidade de pagamento (30%)',cap,'money'],['Total aportado',total,'money'],['Intercaladas semestrais',inter,'money'],['Entrada % do imóvel',ep,'pct'],['F.I. Real',fi,'pct'],...(!status.ok&&sinalSug>i.sinal?[['Sinal sugerido p/ ficar saudável',Math.ceil(sinalSug),'money','alert']]:[])],resumo:[['Valor do imóvel',i.valorTabela,'money'],...(i.desconto>0?[['Desconto aplicado',i.desconto,'money']]:[]),['Valor do imóvel com desconto',liq,'money'],['Valor do financiamento',i.financiamento,'money'],['FGTS',i.fgts||0,'money'],...(i.subsidio>0?[['Subsídio',i.subsidio,'money']]:[]),['Sinal (ato)',i.sinal,'money'],['Chaves',i.chaves,'money'],['Entrada parcelada',entrada,'money'],['Mensais',`${i.qtdMensais}x de ${money(parc)}`,'text'],['Intercaladas semestrais',i.semestrais>0?`${i.semestrais}x de ${money(i.valorIntercalada)}`:'—','text'],['Valor total das intercaladas',inter,'money'],['Parcela Caixa (pós-chaves)',i.parcelaCaixa||0,'money']]};}
+ },
+ barcelos:{nome:'Barcelos',cor:'#7c3aed',obs:'Entrada dividida com a construtora em até 60x. Carteira-base de R$ 30 mil + parcela extra de 20% da renda.',products:{barcelos:{nome:'Barcelos'}},fields:[
+ {k:'rendaAprovada',l:'Renda aprovada na Caixa',t:'money',d:10235.74},{k:'valorImovel',l:'Valor do imóvel',t:'money',d:210000},{k:'avaliacaoCaixa',l:'Avaliação da Caixa',t:'money',d:220000,info:true},{k:'financiamento',l:'Valor do financiamento',t:'money',d:131192.88},{k:'fgts',l:'FGTS',t:'money',d:0},{k:'subsidio',l:'Subsídio do governo',t:'money',d:0},{k:'aVista',l:'Entrada à vista (1ª parte)',t:'money',d:15000},{k:'sinalIntercalado',l:'Sinal intercalado (2ª parte)',t:'money',d:0},{k:'intercalada',l:'Valor de cada intercalada anual',t:'money',d:10000},{k:'qtdIntercaladas',l:'Nº de intercaladas anuais',t:'int',d:2},{k:'chave',l:'Chave',t:'money',d:13807.12},{k:'qtdParcelas',l:'Nº de parcelas (até 60)',t:'int',d:60},{k:'parcelaCaixa',l:'Parcela Caixa (pós-chaves)',t:'money',d:0,info:true,auto:v=>Math.round((v.rendaAprovada||0)*.3*100)/100}],
+ compute(i){const renda=i.rendaAprovada+(i.rendaInformal||0),entradaTotal=i.valorImovel-i.financiamento-i.fgts-i.subsidio,dividir=entradaTotal-i.aVista-(i.sinalIntercalado||0)-(i.intercalada*i.qtdIntercaladas)-i.chave,parc=i.qtdParcelas>0?dividir/i.qtdParcelas:0,comp=renda?parc/renda:0,base=30000,pCarteira=i.qtdParcelas>0?base/i.qtdParcelas:0,pRenda=renda*.2,limite=pCarteira+pRenda,maxP=limite*i.qtdParcelas,okP=i.qtdParcelas>0&&i.qtdParcelas<=60,ok=parc<=limite&&okP;const status={ok,titulo:!okP?'Nº de parcelas fora do limite (máx. 60x)':ok?'Parcela dentro do limite (carteira + 20% da renda)':'Parcela acima do limite — ajustar',checks:[{label:`Parcela ≤ ${money(limite)} (${money(pCarteira)} da carteira + 20% da renda)`,ok:parc<=limite},{label:`Parcelamento em até 60x (atual: ${i.qtdParcelas}x)`,ok:okP}]};return{status,highlight:[['A dividir com a construtora',dividir,'money'],[`Parcela (${i.qtdParcelas}x)`,parc,'money','strong'],['Comprometimento de renda',comp,'pct','strong']],rows:[['Renda total',renda,'money'],['Entrada em dinheiro total',entradaTotal,'money'],['Entrada à vista',i.aVista,'money'],['Intercaladas anuais',i.intercalada*i.qtdIntercaladas,'money'],['Chave',i.chave,'money'],[`Parcela da carteira (R$ 30 mil em ${i.qtdParcelas}x)`,pCarteira,'money'],['Parcela extra por renda (20%)',pRenda,'money'],['Limite de parcela (carteira + renda)',limite,'money'],[`Máximo parcelável em ${i.qtdParcelas}x`,maxP,'money'],...(!okP?[['Nº de parcelas informado',`${i.qtdParcelas}x`,'text','alert']]:[]),...(!ok?[['Excedente acima do limite',dividir-maxP,'money','alert'],['Entrada à vista sugerida',Math.ceil(i.aVista+(dividir-maxP)),'money','alert']]:[])],resumo:[['Valor do imóvel',i.valorImovel,'money'],['Avaliação da Caixa',i.avaliacaoCaixa,'money'],['Valor do financiamento',i.financiamento,'money'],['FGTS',i.fgts||0,'money'],...(i.subsidio>0?[['Subsídio',i.subsidio,'money']]:[]),['Entrada à vista (1ª parte)',i.aVista,'money'],['Sinal intercalado (2ª parte)',i.sinalIntercalado||0,'money'],['Intercaladas anuais',i.qtdIntercaladas>0?`${i.qtdIntercaladas}x de ${money(i.intercalada)}`:'—','text'],['Chave',i.chave,'money'],['A dividir com a construtora',dividir,'money'],['Mensais',`${i.qtdParcelas}x de ${money(parc)}`,'text'],['Parcela Caixa (pós-chaves)',i.parcelaCaixa||0,'money']]};}
+ }
+};
+
+const ORDER=['telesil','engenharq','engemat','barcelos'];
+let active=ORDER[0],seq=0,states={},cards=[],activeCard=null;
+function auto(st,c){c.fields.forEach(f=>{if(f.auto&&!st.t[f.k])st.v[f.k]=f.auto(st.v)})}
+function formatMoneyInput(el){const old=el.value;const s=old.replace(/[^\d,]/g,'');const i=s.indexOf(',');let ip=i>=0?s.slice(0,i):s,dp=i>=0?s.slice(i+1).replace(/,/g,'').slice(0,2):'';ip=ip.replace(/^0+(?=\d)/,'');el.value=(ip?Number(ip).toLocaleString('pt-BR'):'')+(i>=0?',':'')+dp}
+function productApply(st,c){const p=c.products?.[st.product];if(!p)return;for(const k of Object.keys(p)){if(k!=='nome')st.v[k]=p[k]}}
+function renderTabs(){const t=document.getElementById('tabs');t.innerHTML='';ORDER.forEach(id=>{const c=DATA[id],b=document.createElement('button');b.className='tab'+(id===active?' active':'');b.textContent=c.nome;b.style.setProperty('--tab',c.cor);b.onclick=()=>select(id);t.appendChild(b)})}
+function updateCounter(){const n=cards.length;document.getElementById('counter').textContent=`${n} ${n===1?'simulação aberta':'simulações abertas'}`;}
+function renderSimList(){const box=document.getElementById('simList');box.innerHTML='';cards.forEach((id,idx)=>{const st=states[id],c=DATA[st.c],b=document.createElement('button');b.className='sim-chip'+(id===activeCard?' active':'');const nm=st.clientName||`Simulação ${idx+1}`;const stage=st.stage||'Novo';b.innerHTML=`<span class="dot" style="--chip:${c.cor}"></span><span class="sim-meta"><span class="client">${escapeHtml(nm)}</span><span class="project">· ${c.nome}</span><span class="chip-stage">${escapeHtml(stage)}</span></span>`;b.onclick=()=>showSimulation(id);box.appendChild(b)});updateCounter()}
+function select(id){active=id;cards=[];activeCard=null;renderTabs();const c=DATA[id];document.getElementById('heading').textContent='Calculadora '+c.nome;document.getElementById('obs').textContent=c.obs||'';addCard()}
+function addCard(){const id='c'+(++seq),c=DATA[active];const st={c:active,v:{},t:{},product:Object.keys(c.products||{})[0]||null};c.fields.forEach(f=>st.v[f.k]=f.d);auto(st,c);productApply(st,c);states[id]=st;cards.push(id);activeCard=id;saveDrafts();renderTabs();renderSimList();renderWorkspace(id)}
+function showSimulation(id){activeCard=id;const st=states[id];if(!st)return;active=st.c;renderTabs();document.getElementById('heading').textContent='Calculadora '+DATA[st.c].nome;document.getElementById('obs').textContent=DATA[st.c].obs||'';renderSimList();renderWorkspace(id)}
+function fieldGroup(f){if(f.k==='renda'||f.k==='rendaAprovada')return 'Cliente';if(['valorTabela','valorImovel','desconto','descontoMcem','avaliacaoCaixa'].includes(f.k))return 'Negócio';return 'Pagamento'}
+function renderWorkspace(id){const st=states[id],c=DATA[st.c];if(!st)return;st.clientName=st.clientName||'';st.notes=st.notes||'';st.stage=st.stage||'Novo';const groups={Cliente:[],Negócio:[],Pagamento:[]};c.fields.forEach(f=>groups[fieldGroup(f)].push(f));document.getElementById('productBadge').textContent=st.product&&c.products?.[st.product]?.nome||c.nome;const fp=document.getElementById('formPanel');fp.innerHTML='';let n=1;const meta=document.createElement('div');meta.className='form-section';meta.innerHTML=`<div class="section-title"><span class="section-number">•</span>Identificação</div><div class="grid"><div class="field full"><label>Cliente / identificação da simulação</label><div class="input"><input id="clientName" type="text" value="${escapeAttr(st.clientName)}" placeholder="Ex.: Maria Silva"></div></div><div class="field"><label>Etapa do atendimento</label><select id="stageSelect"><option>Novo</option><option>Em atendimento</option><option>Proposta enviada</option><option>Negociação</option><option>Fechado</option></select></div><div class="field"><label>Salvar observações rápidas</label><div class="input"><input id="noteQuick" type="text" value="${escapeAttr((st.notes||'').split('\n')[0])}" placeholder="Ex.: cliente quer menor entrada"></div></div></div>`;fp.appendChild(meta);meta.querySelector('#stageSelect').value=st.stage;meta.querySelector('#clientName').oninput=e=>{st.clientName=e.target.value;renderSimList();saveDraftDebounced(id);};meta.querySelector('#stageSelect').onchange=e=>{st.stage=e.target.value;renderSimList();saveDraftDebounced(id);};meta.querySelector('#noteQuick').oninput=e=>{const lines=(st.notes||'').split('\n');lines[0]=e.target.value;st.notes=lines.join('\n');saveDraftDebounced(id);};if(c.products){const wrap=document.createElement('div');wrap.className='product-select';wrap.innerHTML=`<div class="field"><label>Empreendimento / produto</label><select id="productSelect">${Object.entries(c.products).map(([k,p])=>`<option value="${k}" ${k===st.product?'selected':''}>${p.nome}</option>`).join('')}</select></div>`;fp.appendChild(wrap);wrap.querySelector('select').onchange=e=>{st.product=e.target.value;productApply(st,c);renderWorkspace(id)};}Object.entries(groups).forEach(([name,fields])=>{if(!fields.length)return;const sec=document.createElement('div');sec.className='form-section';sec.innerHTML=`<div class="section-title"><span class="section-number">${n++}</span>${name}</div><div class="grid"></div>`;const grid=sec.querySelector('.grid');fields.forEach(f=>{const v=st.v[f.k],div=document.createElement('div');div.className='field'+(f.info?' info':'');div.innerHTML=`<label>${f.l}</label><div class="input">${f.t==='money'?'<span class="prefix">R$</span>':''}<input data-k="${f.k}" type="${f.t==='money'?'text':'number'}" ${f.t==='money'?'inputmode="decimal"':''} step="any" value="${f.t==='money'?fmtInput(v):v}"></div>${f.h?`<span class="hint">${f.h}</span>`:''}`;grid.appendChild(div);const inp=div.querySelector('input');inp.oninput=e=>{let x=f.t==='money'?(formatMoneyInput(e.target),parseBR(e.target.value)):parseFloat(e.target.value);if(Number.isNaN(x))x=0;st.v[f.k]=f.t==='int'?Math.round(x):x;st.t[f.k]=true;auto(st,c);renderResult(id)} });fp.appendChild(sec)});const noteCard=document.createElement('div');noteCard.className='notes-card';noteCard.innerHTML=`<div class="notes-head"><strong>Bloco de notas</strong><div class="note-toolbar"><button class="btn compact" type="button" id="openNotesInline">Abrir</button><button class="btn compact" type="button" id="clearNotesInline">Limpar</button></div></div><textarea id="notesArea" placeholder="Anote contexto, objeções, documentos, próximos passos...">${escapeHtml(st.notes||'')}</textarea>`;fp.appendChild(noteCard);noteCard.querySelector('#notesArea').oninput=e=>{st.notes=e.target.value;saveDraftDebounced(id);};noteCard.querySelector('#openNotesInline').onclick=()=>openNotes(id);noteCard.querySelector('#clearNotesInline').onclick=()=>{st.notes='';noteCard.querySelector('#notesArea').value='';saveDraftDebounced(id)};const footer=document.createElement('div');footer.className='form-footer';footer.innerHTML='<button class="btn primary" id="mobileSummary">📄 Gerar resumo da proposta</button>';fp.appendChild(footer);footer.querySelector('button').onclick=()=>modal(id);renderResult(id)}
+function renderResult(id){const st=states[id],c=DATA[st.c],r=c.compute(st.v);const panel=document.getElementById('resultPanel');if(!panel)return;const strong=r.highlight.find(x=>x[3]==='strong')||r.highlight[0];const others=r.highlight.filter(x=>x!==strong);panel.innerHTML=`<div class="status ${r.status.ok?'ok':'bad'}">${r.status.ok?'✓ ':'⚠ '}${r.status.titulo}<ul class="checks">${r.status.checks.map(q=>`<li class="${q.ok?'ok':''}">${q.label}</li>`).join('')}</ul></div><div class="result-hero"><div class="metric primary"><div class="k">${strong[0]}</div><div class="v">${val(strong[1],strong[2])}</div></div>${others.slice(0,1).map(x=>`<div class="metric"><div class="k">${x[0]}</div><div class="v">${val(x[1],x[2])}</div></div>`).join('')}</div>${others.length>1?`<div class="result-section"><div class="result-section-title">Outros destaques</div><div class="facts">${others.slice(1).map(x=>`<div class="fact"><div class="k">${x[0]}</div><div class="v">${val(x[1],x[2])}</div></div>`).join('')}</div></div>`:''}<div class="result-section"><div class="result-section-title">Detalhamento</div><div class="facts">${r.rows.map(x=>`<div class="fact ${x[3]==='alert'?'alert':''}"><div class="k">${x[0]}</div><div class="v">${val(x[1],x[2])}</div></div>`).join('')}</div></div><div class="helper">O indicador principal foi destacado para facilitar a leitura durante o atendimento. Use o resumo para enviar a condição ao cliente.</div><button class="btn primary summary-wide" id="summaryWide">📄 Gerar resumo para cliente</button>`;document.getElementById('summaryWide').onclick=()=>modal(id)}
+function removeCard(id){delete states[id];cards=cards.filter(x=>x!==id);saveDrafts();if(activeCard===id)activeCard=cards.at(-1)||null;if(activeCard){const st=states[activeCard];active=st.c;document.getElementById('heading').textContent='Calculadora '+DATA[st.c].nome;document.getElementById('obs').textContent=DATA[st.c].obs||'';renderWorkspace(activeCard)}else{addCard()}renderSimList()}
+function resetCard(id){const st=states[id];if(!st)return;const c=DATA[st.c];c.fields.forEach(f=>{if(f.t==='money')st.v[f.k]=0});st.t={};auto(st,c);renderWorkspace(id)}
+function modal(id){const st=states[id],c=DATA[st.c],r=c.compute(st.v);const bg=document.createElement('div');bg.className='modal-bg';bg.innerHTML=`<div class="modal" style="--modal:${c.cor}"><div style="display:flex;justify-content:space-between;gap:12px"><div><h3>${escapeHtml(st.clientName||c.nome)}</h3><div class="sub">${r.status.ok?'✓ ':'⚠ '}${r.status.titulo}</div></div><button class="btn" data-close>Fechar</button></div><div class="mrows">${r.resumo.map(x=>`<div class="mrow"><span class="mk">${x[0]}</span><span class="mv">${val(x[1],x[2])}</span></div>`).join('')}</div><div class="mact"><button class="btn" data-close>Fechar</button><button class="btn primary" data-print>🖨️ Imprimir / PDF</button></div></div>`;const close=()=>bg.remove();bg.addEventListener('click',e=>{if(e.target===bg)close()});bg.querySelectorAll('[data-close]').forEach(b=>b.onclick=close);bg.querySelector('[data-print]').onclick=()=>window.print();document.body.appendChild(bg)}
+
+const HISTORY_KEY='orbe-history-v1', DRAFT_KEY='orbe-drafts-v1';
+const STAGES=['Novo','Em atendimento','Proposta enviada','Negociação','Fechado'];
+function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]))}
+function escapeAttr(v){return escapeHtml(v)}
+function saveDrafts(){localStorage.setItem(DRAFT_KEY,JSON.stringify([...cards].map(id=>({id, ...states[id]}))))}
+let draftTimer=null;function saveDraftDebounced(id){clearTimeout(draftTimer);draftTimer=setTimeout(saveDrafts,250);}
+function saveToHistory(id){const st=states[id];if(!st)return;const c=DATA[st.c],r=c.compute(st.v);let hist=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');const item={id:'h'+Date.now(),clientName:st.clientName||'Sem cliente',company:c.nome,product:st.product&&c.products?.[st.product]?.nome||c.nome,stage:st.stage||'Novo',notes:st.notes||'',savedAt:new Date().toISOString(),values:{...st.v},status:r.status?.titulo||'',highlights:r.highlight||[]};hist.unshift(item);hist=hist.slice(0,100);localStorage.setItem(HISTORY_KEY,JSON.stringify(hist));showToast('Simulação salva no histórico');}
+function showToast(msg){const x=document.createElement('div');x.style.cssText='position:fixed;right:18px;bottom:18px;z-index:200;background:#173522;color:#e5f4e8;border:1px solid rgba(164,220,171,.22);padding:10px 14px;border-radius:12px;font:700 10px Manrope, sans-serif;box-shadow:0 18px 45px rgba(0,0,0,.3);';x.textContent=msg;document.body.appendChild(x);setTimeout(()=>x.remove(),1800)}
+function openHistory(){const bg=document.getElementById('featureOverlay');const hist=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');bg.hidden=false;bg.innerHTML=`<div class="overlay-panel"><div class="overlay-head"><div><h3>Histórico de cálculos</h3><p>Propostas salvas neste navegador.</p></div><div class="tool-group"><button class="btn compact" id="clearHistory">Limpar histórico</button><button class="btn compact" id="closeFeature">Fechar</button></div></div><div class="overlay-list">${hist.length?hist.map((h,i)=>`<div class="history-item"><div><strong>${escapeHtml(h.clientName)}</strong><small>${escapeHtml(h.company)} · ${escapeHtml(h.product)} · ${new Date(h.savedAt).toLocaleString('pt-BR')}</small></div><span class="chip-stage">${escapeHtml(h.stage)}</span><button class="btn compact" data-load-history="${i}">Abrir</button></div>`).join(''):'<div class="history-empty">Nenhuma simulação salva ainda.</div>'}</div></div>`;bg.onclick=e=>{if(e.target===bg)bg.hidden=true};bg.querySelector('#closeFeature').onclick=()=>bg.hidden=true;bg.querySelector('#clearHistory').onclick=()=>{localStorage.removeItem(HISTORY_KEY);openHistory()};bg.querySelectorAll('[data-load-history]').forEach(b=>b.onclick=()=>loadHistory(hist[Number(b.dataset.loadHistory)]));}
+function loadHistory(h){const cId=Object.keys(DATA).find(k=>DATA[k].nome===h.company)||ORDER[0];const id='c'+(++seq);states[id]={c:cId,v:{...h.values},t:{},product:Object.keys(DATA[cId].products||{})[0]||null,clientName:h.clientName==='Sem cliente'?'':h.clientName,notes:h.notes||'',stage:h.stage||'Novo'};cards.push(id);activeCard=id;active=cId;activeCard=id;document.getElementById('featureOverlay').hidden=true;renderTabs();showSimulation(id);showToast('Simulação carregada');}
+function openNotes(id=activeCard){if(!id)return;const st=states[id];const bg=document.getElementById('featureOverlay');bg.hidden=false;bg.innerHTML=`<div class="overlay-panel" style="max-width:720px"><div class="overlay-head"><div><h3>Bloco de notas</h3><p>${escapeHtml(st.clientName||'Sem cliente')} · ${escapeHtml(DATA[st.c].nome)}</p></div><button class="btn compact" id="closeFeature">Fechar</button></div><div class="notes-card" style="margin-top:15px"><textarea id="overlayNotes" style="min-height:280px">${escapeHtml(st.notes||'')}</textarea></div><div class="mact"><button class="btn primary" id="saveNotes">Salvar notas</button></div></div>`;bg.onclick=e=>{if(e.target===bg)bg.hidden=true};bg.querySelector('#closeFeature').onclick=()=>bg.hidden=true;bg.querySelector('#saveNotes').onclick=()=>{st.notes=bg.querySelector('#overlayNotes').value;saveDraftDebounced(id);renderWorkspace(id);bg.hidden=true;showToast('Notas atualizadas')};}
+function openKanban(){
+  const bg=document.getElementById('featureOverlay');
+  bg.hidden=false;
+  const by=STAGES.map(stage=>({stage,items:cards.filter(id=>(states[id].stage||'Novo')===stage)}));
+  bg.innerHTML=`<div class="overlay-panel"><div class="overlay-head"><div><h3>Kanban comercial</h3><p>Organize suas simulações por etapa, como um Trello.</p></div><button class="btn compact" id="closeFeature">Fechar</button></div><div class="kanban">${by.map(col=>`<div class="kan-col" data-stage="${escapeAttr(col.stage)}"><div class="kan-head"><strong>${escapeHtml(col.stage)}</strong><span class="kan-count">${col.items.length}</span></div><div class="kan-drop">${col.items.length?col.items.map(id=>{const st=states[id],c=DATA[st.c];return `<div class="kan-card" draggable="true" data-card-id="${id}"><strong>${escapeHtml(st.clientName||'Sem cliente')}</strong><span>${escapeHtml(c.nome)} · ${escapeHtml(st.product&&c.products?.[st.product]?.nome||c.nome)}</span><em>${escapeHtml(c.nome)}</em></div>`}).join(''):'<div class="empty">Arraste uma simulação para cá</div>'}</div></div>`).join('')}</div></div>`;
+  bg.onclick=e=>{if(e.target===bg)bg.hidden=true};
+  bg.querySelector('#closeFeature').onclick=()=>bg.hidden=true;
+  let dragId=null;
+  bg.querySelectorAll('.kan-card').forEach(card=>card.addEventListener('dragstart',()=>dragId=card.dataset.cardId));
+  bg.querySelectorAll('.kan-col').forEach(col=>{
+    col.addEventListener('dragover',e=>e.preventDefault());
+    col.addEventListener('drop',()=>{
+      if(!dragId)return;
+      states[dragId].stage=col.dataset.stage;
+      renderSimList();
+      saveDrafts();
+      openKanban();
+    });
+  });
+}
+function makeOverviewToast(msg){showToast(msg)}
+
+document.getElementById('saveHistory').onclick=()=>activeCard&&saveToHistory(activeCard);document.getElementById('openHistory').onclick=()=>openHistory();document.getElementById('openKanban').onclick=()=>openKanban();document.getElementById('openNotes').onclick=()=>openNotes();document.getElementById('navHistory').onclick=()=>openHistory();document.getElementById('navNotes').onclick=()=>openNotes();document.querySelectorAll('[data-nav=\"kanban\"]').forEach(b=>b.onclick=()=>openKanban());document.querySelectorAll('[data-nav=\"overview\"], [data-nav=\"clients\"], [data-nav=\"settings\"]').forEach(b=>b.onclick=()=>showToast('Módulo em evolução'));document.getElementById('newSimulation').onclick=addCard;document.getElementById('topSummary').onclick=()=>activeCard&&modal(activeCard);document.getElementById('panelSummary').onclick=()=>activeCard&&modal(activeCard);document.getElementById('clearCurrent').onclick=()=>{if(activeCard)resetCard(activeCard)};document.getElementById('clearAll').onclick=()=>cards.slice().forEach(resetCard);renderTabs();select(active);
+
+let deferredInstallPrompt=null;
+const installBtn=document.getElementById('installApp');
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;installBtn.hidden=false;});
+installBtn?.addEventListener('click',async()=>{if(!deferredInstallPrompt)return;deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;installBtn.hidden=true;});
+window.addEventListener('appinstalled',()=>{installBtn.hidden=true;showToast('Orbe instalado no dispositivo');});
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
+
+const themeToggle=document.getElementById('themeToggle');
+const themeIcon=document.getElementById('themeIcon');
+const themeLabel=document.getElementById('themeLabel');
+function applyTheme(mode){const light=mode==='light';document.body.classList.toggle('light',light);themeIcon.textContent=light?'☀':'☾';themeLabel.textContent=light?'Claro':'Escuro';document.querySelector('meta[name="theme-color"]')?.setAttribute('content',light?'#eef6ef':'#0b1510');localStorage.setItem('orbe-theme',mode)}
+applyTheme(localStorage.getItem('orbe-theme')||'dark');
+themeToggle.onclick=()=>applyTheme(document.body.classList.contains('light')?'dark':'light');
+</script></body></html>
