@@ -510,6 +510,52 @@ body.company-active.company-barcelos:after{
 body.light{
   background:linear-gradient(135deg,#e8f0e9 0%,#f4f8f4 58%,#dce8de 100%);
 }
+
+/* MRV payment simulator */
+.mrv-card{--card-accent:#d83b3b;--card-accent-soft:rgba(216,59,59,.12)}
+.start-card.mrv-card{border-color:rgba(216,59,59,.18);background:linear-gradient(155deg,rgba(216,59,59,.055),rgba(255,255,255,.018) 46%,rgba(255,255,255,.012))}
+.start-card.mrv-card:hover{border-color:rgba(216,59,59,.36);box-shadow:0 22px 55px rgba(0,0,0,.28),0 0 32px rgba(216,59,59,.06)}
+.mrv-shell{width:min(940px,100%);max-height:92vh;overflow:auto;border:1px solid rgba(246,178,178,.18);background:linear-gradient(155deg,#1b1111,#100d0d 55%,#0c0b0b);border-radius:24px;box-shadow:0 40px 110px rgba(0,0,0,.62);padding:20px}
+.mrv-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.mrv-brand{display:inline-flex;align-items:center;gap:7px;padding:5px 8px;border:1px solid rgba(216,59,59,.22);border-radius:999px;color:#f2a1a1;background:rgba(216,59,59,.07);font-size:8px;text-transform:uppercase;letter-spacing:1px;font-weight:900}
+.mrv-brand:before{content:"";width:5px;height:5px;border-radius:50%;background:#ef6767;box-shadow:0 0 10px rgba(239,103,103,.8)}
+.mrv-head h2{margin:10px 0 0;font-family:var(--display);font-size:24px;letter-spacing:-.7px}
+.mrv-head p{margin:4px 0 0;color:#a68989;font-size:10px;line-height:1.5;max-width:640px}
+.mrv-layout{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(320px,.98fr);gap:12px;margin-top:16px}
+.mrv-panel{border:1px solid rgba(246,222,222,.08);background:rgba(255,255,255,.018);border-radius:16px;padding:14px}
+.mrv-panel h3{margin:0;font-family:var(--display);font-size:13px}
+.mrv-panel .subline{margin:4px 0 0;color:#927b7b;font-size:8px}
+.mrv-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:13px}
+.mrv-field{display:flex;flex-direction:column;gap:5px}
+.mrv-field.full{grid-column:1/-1}
+.mrv-field label{font-size:8px;color:#917f7f;font-weight:800}
+.mrv-input-wrap{position:relative}
+.mrv-input-wrap span{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:9px;color:#7c6969;font-weight:700;pointer-events:none}
+.mrv-input{width:100%;height:40px;border:1px solid rgba(246,222,222,.10);border-radius:10px;padding:0 10px 0 38px;background:rgba(255,255,255,.03);color:#f3ebeb;font-size:11px;outline:none}
+.mrv-input:focus{border-color:rgba(239,103,103,.42);box-shadow:0 0 0 3px rgba(216,59,59,.09)}
+.mrv-hint{margin-top:6px;font-size:8px;color:#6f6060;line-height:1.4}
+.mrv-calc{display:grid;gap:8px;margin-top:13px}
+.mrv-kpi{padding:12px 13px;border:1px solid rgba(246,222,222,.075);border-radius:13px;background:rgba(255,255,255,.022)}
+.mrv-kpi.primary{border-color:rgba(239,103,103,.20);background:linear-gradient(140deg,rgba(125,23,23,.24),rgba(255,255,255,.02));box-shadow:inset 0 1px 0 rgba(255,255,255,.02)}
+.mrv-kpi .k{font-size:8px;text-transform:uppercase;letter-spacing:.8px;color:#917e7e;font-weight:900}
+.mrv-kpi .v{margin-top:4px;font-family:var(--display);font-size:19px;font-weight:800;letter-spacing:-.5px;color:#f0e6e6}
+.mrv-kpi.primary .v{color:#ffd1d1}
+.mrv-kpi .meta{margin-top:4px;font-size:8px;color:#756767}
+.mrv-formula{margin-top:11px;padding:10px 11px;border:1px dashed rgba(239,103,103,.16);border-radius:11px;background:rgba(216,59,59,.035);color:#8d7979;font-size:8px;line-height:1.45}
+.mrv-status{margin-top:10px;padding:11px 12px;border-radius:11px;border:1px solid rgba(120,211,154,.18);background:rgba(89,198,129,.07);color:#97d7a9;font-size:8px;font-weight:800;line-height:1.45}
+.mrv-status.bad{border-color:rgba(255,140,127,.20);background:rgba(255,110,96,.07);color:#ffaca1}
+.mrv-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:14px}
+.mrv-note{margin-top:10px;color:#675858;font-size:8px;line-height:1.45}
+.mrv-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.mrv-mini{padding:9px 10px;border:1px solid rgba(246,222,222,.065);border-radius:10px;background:rgba(255,255,255,.018)}
+.mrv-mini .k{font-size:7px;color:#776666;text-transform:uppercase;letter-spacing:.7px;font-weight:900}
+.mrv-mini .v{margin-top:3px;font-size:10px;font-weight:800;color:#e7dddd}
+@media (max-width:760px){
+  .mrv-layout{grid-template-columns:1fr}
+  .mrv-fields{grid-template-columns:1fr}
+  .mrv-field.full{grid-column:auto}
+}
+
 </style></head><body>
 <div class="start-screen" id="startScreen">
   <div class="start-shell">
@@ -981,6 +1027,101 @@ function enterProduct(companyId,productId){
   document.getElementById('startScreen').hidden=true;
   window.scrollTo({top:0,behavior:'smooth'});
 }
+
+function openMRVSimulator(){
+  const saved = JSON.parse(localStorage.getItem('orbe-mrv-v1')||'{}');
+  const initial = {
+    imovel: saved.imovel ?? 389990,
+    avaliacao: saved.avaliacao ?? 437800,
+    financiado: saved.financiado ?? 243778.11
+  };
+  const bg = featureRoot(
+    '<div class="mrv-shell">'+
+      '<div class="mrv-head">'+
+        '<div><div class="mrv-brand">MRV · Plano de pagamento</div><h2>Simulador MRV</h2><p>Reprodução da lógica identificada na planilha enviada: entrada à vista, carteira MRV de 19% do valor do imóvel e cálculo do sinal.</p></div>'+
+        '<button class="btn compact" data-feature-close>Fechar</button>'+
+      '</div>'+
+      '<div class="mrv-layout">'+
+        '<div class="mrv-panel">'+
+          '<h3>Dados da proposta</h3><p class="subline">Altere os valores e o plano é recalculado imediatamente.</p>'+
+          '<div class="mrv-fields">'+
+            '<div class="mrv-field"><label>Valor do imóvel</label><div class="mrv-input-wrap"><span>R$</span><input class="mrv-input" id="mrvImovel" inputmode="decimal" value="'+initial.imovel+'"></div></div>'+
+            '<div class="mrv-field"><label>Valor da avaliação</label><div class="mrv-input-wrap"><span>R$</span><input class="mrv-input" id="mrvAvaliacao" inputmode="decimal" value="'+initial.avaliacao+'"></div><div class="mrv-hint">Informativo nesta versão; não entra na fórmula atual da planilha.</div></div>'+
+            '<div class="mrv-field full"><label>Valor financiado</label><div class="mrv-input-wrap"><span>R$</span><input class="mrv-input" id="mrvFinanciado" inputmode="decimal" value="'+initial.financiado+'"></div></div>'+
+          '</div>'+
+          '<div class="mrv-note">Fonte da regra: <b>Calculadora MRV.xlsx</b> enviada nesta conversa. Os 19% representam a carteira/parcelamento MRV calculado no modelo fornecido.</div>'+
+        '</div>'+
+        '<div class="mrv-panel">'+
+          '<h3>Plano calculado</h3><p class="subline">Valores derivados automaticamente.</p>'+
+          '<div class="mrv-calc">'+
+            '<div class="mrv-kpi"><div class="k">Entrada à vista</div><div class="v" id="mrvEntrada">—</div><div class="meta">Valor do imóvel − financiamento</div></div>'+
+            '<div class="mrv-kpi primary"><div class="k">Parcelamento MRV</div><div class="v" id="mrvCarteira">—</div><div class="meta">19% do valor do imóvel</div></div>'+
+            '<div class="mrv-kpi"><div class="k">Valor do sinal</div><div class="v" id="mrvSinal">—</div><div class="meta">Entrada à vista − parcelamento MRV</div></div>'+
+          '</div>'+
+          '<div class="mrv-mini-grid"><div class="mrv-mini"><div class="k">Financiamento</div><div class="v" id="mrvFinMeta">—</div></div><div class="mrv-mini"><div class="k">Carteira / imóvel</div><div class="v">19,00%</div></div></div>'+
+          '<div class="mrv-status" id="mrvStatus">Preencha os valores para validar a proposta.</div>'+
+          '<div class="mrv-formula">Fórmula: entrada à vista = imóvel − financiado; parcelamento MRV = imóvel × 19%; sinal = entrada à vista − parcelamento MRV.</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="mrv-actions"><button class="btn" id="mrvReset">Restaurar exemplo</button><button class="btn primary" id="mrvCopy">Copiar resumo</button></div>'+
+    '</div>'
+  );
+  const $ = id => bg.querySelector(id);
+  function parseMoney(value){
+    const raw=String(value??'').trim().replace(/\s/g,'');
+    if(!raw) return 0;
+    const normalized=raw.includes(',') ? raw.replace(/\./g,'').replace(',','.') : raw.replace(/,/g,'');
+    const n=Number(normalized.replace(/[^0-9.-]/g,''));
+    return Number.isFinite(n) ? n : 0;
+  }
+  function brl(n){
+    return Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  }
+  function sync(){
+    const imovel=parseMoney($('#mrvImovel').value);
+    const avaliacao=parseMoney($('#mrvAvaliacao').value);
+    const financiado=parseMoney($('#mrvFinanciado').value);
+    const entrada=imovel-financiado;
+    const carteira=imovel*0.19;
+    const sinal=entrada-carteira;
+    $('#mrvEntrada').textContent=brl(entrada);
+    $('#mrvCarteira').textContent=brl(carteira);
+    $('#mrvSinal').textContent=brl(sinal);
+    $('#mrvFinMeta').textContent=brl(financiado);
+    const status=$('#mrvStatus');
+    status.classList.remove('bad');
+    if(imovel<=0 || financiado<0){
+      status.textContent='Informe valores válidos para calcular a proposta.';
+      status.classList.add('bad');
+    }else if(financiado>imovel){
+      status.textContent='O financiamento está acima do valor do imóvel. A entrada à vista fica negativa.';
+      status.classList.add('bad');
+    }else if(sinal<0){
+      status.textContent='Com estes números, o parcelamento MRV de 19% supera a entrada à vista. O sinal resultante fica negativo.';
+      status.classList.add('bad');
+    }else{
+      status.textContent='Plano calculado conforme a fórmula da planilha enviada. A avaliação permanece informativa nesta versão.';
+    }
+    localStorage.setItem('orbe-mrv-v1',JSON.stringify({imovel,avaliacao,financiado}));
+  }
+  ['mrvImovel','mrvAvaliacao','mrvFinanciado'].forEach(function(id){
+    const input=$('#'+id);
+    input.addEventListener('input',sync);
+    input.addEventListener('change',sync);
+  });
+  $('#mrvReset').onclick=function(){
+    $('#mrvImovel').value=389990;
+    $('#mrvAvaliacao').value=437800;
+    $('#mrvFinanciado').value=243778.11;
+    sync();
+  };
+  $('#mrvCopy').onclick=function(){
+    const text=['ORBE · SIMULADOR MRV','Valor do imóvel: '+$('#mrvImovel').value,'Valor da avaliação: '+$('#mrvAvaliacao').value,'Valor financiado: '+$('#mrvFinanciado').value,'Entrada à vista: '+$('#mrvEntrada').textContent,'Parcelamento MRV (19%): '+$('#mrvCarteira').textContent,'Valor do sinal: '+$('#mrvSinal').textContent].join('\n');
+    navigator.clipboard?.writeText(text).then(()=>showToast('Resumo MRV copiado')).catch(()=>showToast('Não foi possível copiar automaticamente'));
+  };
+  sync();
+}
+
 function renderStartScreen(){
   const grid=document.getElementById('startGrid');
   if(!grid)return;
@@ -1000,6 +1141,16 @@ function renderStartScreen(){
       '<div class="start-card-foot"><span class="start-count">'+products.length+' '+(products.length===1?'empreendimento':'empreendimentos')+'</span><span class="start-hint">Abrir simulador</span></div>'+
     '</div>';
   }).join('');
+
+  grid.insertAdjacentHTML('beforeend',
+    '<div class="start-card mrv-card" data-start-mrv tabindex="0" role="button">'+
+      '<div class="start-card-head"><span class="start-card-mark" style="background:var(--card-accent-soft);color:var(--card-accent);border-color:rgba(216,59,59,.24)">M</span><button type="button" class="start-card-arrow" data-start-mrv-btn aria-label="Abrir Simulador MRV">→</button></div>'+
+      '<h3>MRV</h3>'+
+      '<p>Calcule rapidamente o plano de pagamento com a lógica da planilha MRV que você me enviou.</p>'+
+      '<div class="start-card-list"><button type="button" class="start-project-btn" data-start-mrv-open>Plano de pagamento</button></div>'+
+      '<div class="start-card-foot"><span class="start-count">Carteira MRV · 19%</span><span class="start-hint">Abrir simulador</span></div>'+
+    '</div>'
+  );
   grid.querySelectorAll('[data-start-company-btn]').forEach(function(btn){
     btn.onclick=function(e){e.stopPropagation();enterCompany(btn.dataset.startCompanyBtn)};
   });
