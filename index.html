@@ -88,6 +88,17 @@ button,input,select{font:inherit}button{cursor:pointer}
 
 /* CRM tools */
 .sim-meta{display:flex;align-items:center;gap:7px;max-width:240px}.sim-meta .client{color:#dbe8de;font-weight:800;overflow:hidden;text-overflow:ellipsis}.sim-meta .project{color:#708277;font-weight:700}.chip-stage{font-size:7px;padding:3px 5px;border-radius:999px;border:1px solid var(--stroke);color:#9db5a2;background:rgba(255,255,255,.025)}
+
+.legacy-tools{display:none!important}
+.tools-menu-trigger{display:inline-flex;align-items:center;gap:6px;padding:8px 12px}
+.tools-menu-trigger span{opacity:.65;font-size:9px}
+.tools-menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.tool-menu-item{border:1px solid var(--stroke);border-radius:13px;padding:12px;text-align:left;background:rgba(255,255,255,.02);color:var(--text);cursor:pointer;transition:transform .18s ease,border-color .18s ease,background .18s ease}
+.tool-menu-item:hover{transform:translateY(-2px);border-color:var(--brand-line);background:var(--brand-soft)}
+.tool-menu-item b{display:block;font-size:10px}
+.tool-menu-item span{display:block;margin-top:4px;color:var(--muted);font-size:8px;line-height:1.4}
+body.light .tool-menu-item{background:#fff;border-color:#dce7df}
+@media(max-width:720px){.tools-bar{margin-top:7px}.tools-menu-grid{grid-template-columns:1fr}.tools-menu-trigger{width:100%;justify-content:center}}
 .tools-bar{max-width:1560px;margin:0 auto 12px;display:flex;justify-content:space-between;align-items:center;gap:8px}.tool-group{display:flex;gap:7px;flex-wrap:wrap}.btn.compact{padding:8px 10px;font-size:9px}.ghost-note{font-size:9px;color:#6f8276}.notes-card{padding:12px;border:1px solid var(--stroke);background:rgba(255,255,255,.022);border-radius:13px;margin-top:12px}.notes-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}.notes-head strong{font-size:9px;text-transform:uppercase;letter-spacing:.9px;color:#8eaa95}.notes-card textarea{width:100%;min-height:105px;resize:vertical;border:1px solid rgba(212,239,218,.10);border-radius:10px;padding:10px;background:rgba(255,255,255,.035);color:var(--text);font-size:10px;outline:none}.notes-card textarea:focus{border-color:rgba(164,220,171,.40);box-shadow:0 0 0 3px rgba(121,184,131,.08)}
 .overlay-panel{width:min(1040px,100%);max-height:88vh;overflow:auto;border:1px solid var(--stroke-strong);background:linear-gradient(155deg,#132219,#0b150f);border-radius:22px;box-shadow:0 35px 100px rgba(0,0,0,.55);padding:18px}.overlay-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.overlay-head h3{margin:0;font-family:var(--display);font-size:20px}.overlay-head p{margin:4px 0 0;color:var(--muted);font-size:9px}.overlay-list{display:grid;gap:8px;margin-top:15px}.history-item{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;padding:12px;border:1px solid var(--stroke);border-radius:13px;background:rgba(255,255,255,.025)}.history-item strong{font-size:11px}.history-item small{display:block;color:var(--muted);font-size:8px;margin-top:3px}.kanban{display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:10px;margin-top:16px}.kan-col{min-height:360px;padding:10px;border:1px solid var(--stroke);background:rgba(255,255,255,.022);border-radius:14px}.kan-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.kan-head strong{font-size:9px}.kan-count{font-size:8px;color:var(--muted)}.kan-drop{min-height:300px;display:grid;gap:7px;align-content:start}.kan-card{padding:10px;border-radius:11px;border:1px solid rgba(212,239,218,.08);background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.02));cursor:grab}.kan-card:active{cursor:grabbing}.kan-card strong{font-size:10px;display:block}.kan-card span{font-size:8px;color:var(--muted);display:block;margin-top:3px}.kan-card em{display:inline-block;font-style:normal;font-size:7px;color:#a8c7ae;margin-top:7px;padding:3px 5px;border-radius:999px;background:rgba(137,191,145,.08);border:1px solid rgba(137,191,145,.11)}.empty{padding:14px;color:#67796d;font-size:8px;text-align:center;border:1px dashed rgba(212,239,218,.08);border-radius:9px}.note-toolbar{display:flex;gap:6px}.history-empty{padding:18px;text-align:center;color:var(--muted);font-size:9px}
 body.light .overlay-panel{background:linear-gradient(155deg,#ffffff,#f1f6f2);box-shadow:0 28px 70px rgba(40,72,48,.18)}body.light .kan-col{background:rgba(40,80,48,.025)}body.light .kan-card,.light .history-item{background:#fff;border-color:#d8e5da}body.light .notes-card{background:#fff}.light .notes-card textarea{background:#f7fbf8;border-color:#d5e2d7;color:#22352a}.light .kan-card strong,.light .history-item strong{color:#1c3023}
@@ -659,7 +670,7 @@ body.light{
     </div>
 
     <div class="simbar"><div class="sim-list" id="simList"></div><div class="sim-actions"><button class="btn" id="clearAll">Limpar sessão</button><button class="btn soft" id="topSummary">▣ Gerar resumo</button></div></div>
-    <div class="tools-bar"><div class="tool-group"><button class="btn compact" id="saveHistory">◌ Salvar no histórico</button><button class="btn compact" id="openHistory">Histórico</button><button class="btn compact" id="openKanban">▦ Kanban</button><button class="btn compact" id="openNotes">▤ Notas</button><button class="btn compact" id="openCompare">⇄ Comparar propostas</button><button class="btn compact" id="openPresentation">◐ Apresentar</button><button class="quick-btn" id="quickActions" type="button">＋ Ações rápidas</button></div><div class="ghost-note">Cada simulação pode ter cliente, observações e etapa.</div></div>
+    <div class="tools-bar"><div class="tool-group"><button class="quick-btn tools-menu-trigger" id="toolsMenu" type="button">☰ Ferramentas <span>⌄</span></button><div class="legacy-tools" aria-hidden="true"><button class="btn compact" id="saveHistory">◌ Salvar no histórico</button><button class="btn compact" id="openHistory">Histórico</button><button class="btn compact" id="openKanban">▦ Kanban</button><button class="btn compact" id="openNotes">▤ Notas</button><button class="btn compact" id="openCompare">⇄ Comparar propostas</button><button class="btn compact" id="openPresentation">◐ Apresentar</button><button class="quick-btn" id="quickActions" type="button">＋ Ações rápidas</button></div></div><div class="ghost-note">Mais ações em um só lugar.</div></div>
 
     <section class="workspace">
       <section class="panel">
@@ -1022,6 +1033,59 @@ function animateNumbers(root){
     el.classList.remove('number-pop'); void el.offsetWidth; el.classList.add('number-pop');
   });
 }
+
+function duplicateSimulation(id=activeCard){
+  if(!id||!states[id]){showToast('Abra uma proposta primeiro');return;}
+  const source=states[id],newId='c'+(++seq);
+  const copy={
+    c:source.c,
+    v:{...source.v},
+    t:{},
+    product:source.product,
+    clientName:source.clientName?(source.clientName+' · cópia'):'',
+    notes:source.notes||'',
+    stage:'Novo'
+  };
+  states[newId]=copy;
+  cards.push(newId);
+  activeCard=newId;
+  active=copy.c;
+  saveDrafts();
+  renderTabs();
+  showSimulation(newId);
+  showToast('Proposta duplicada');
+}
+function openToolsMenu(){
+  const bg=featureRoot(
+    '<div class="feature-head"><div><div class="eyebrow">Central de ferramentas</div><h2>O que você quer fazer?</h2><p class="subline">As funções do Orbe ficam aqui para deixar a área de simulação mais limpa.</p></div><button class="btn compact" data-feature-close>Fechar</button></div>'+
+    '<div class="tools-menu-grid">'+
+      '<button class="tool-menu-item" data-tool-action="save"><b>◌ Salvar no histórico</b><span>Guarde a proposta para retomar depois.</span></button>'+
+      '<button class="tool-menu-item" data-tool-action="duplicate"><b>⧉ Duplicar proposta</b><span>Crie uma cópia para testar outra condição.</span></button>'+
+      '<button class="tool-menu-item" data-tool-action="history"><b>◷ Histórico</b><span>Veja e abra propostas já salvas.</span></button>'+
+      '<button class="tool-menu-item" data-tool-action="kanban"><b>▦ Kanban</b><span>Organize as propostas por etapa.</span></button>'+
+      '<button class="tool-menu-item" data-tool-action="notes"><b>▤ Notas</b><span>Registre contexto e próximos passos.</span></button>'+
+      '<button class="tool-menu-item" data-tool-action="compare"><b>⇄ Comparar propostas</b><span>Coloque duas condições lado a lado.</span></button>'+
+      '<button class="tool-menu-item" data-tool-action="presentation"><b>◐ Apresentar proposta</b><span>Abra a versão pronta para o cliente.</span></button>'+
+      '<button class="tool-menu-item" data-tool-action="quick"><b>＋ Ações rápidas</b><span>Atalhos para as funções mais usadas.</span></button>'+
+      '<button class="tool-menu-item" data-tool-action="settings"><b>⚙ Configurações</b><span>Aparência e regras comerciais.</span></button>'+
+    '</div>'
+  );
+  bg.querySelectorAll('[data-tool-action]').forEach(function(b){
+    b.onclick=function(){
+      const action=b.dataset.toolAction;
+      bg.hidden=true;
+      if(action==='save'){if(activeCard)saveToHistory(activeCard);else showToast('Abra uma proposta primeiro');}
+      if(action==='duplicate')duplicateSimulation();
+      if(action==='history')openHistory();
+      if(action==='kanban')openKanban();
+      if(action==='notes')openNotes();
+      if(action==='compare')openCompare();
+      if(action==='presentation')openPresentation();
+      if(action==='quick')openQuickActions();
+      if(action==='settings')openSettings();
+    };
+  });
+}
 function openQuickActions(){
   const bg=featureRoot(
     '<div class="feature-head"><div><h2>Ações rápidas</h2><p class="subline">Comece a próxima tarefa sem procurar menus.</p></div><div class="feature-actions"><button class="btn compact" data-feature-close>Fechar</button></div></div>'+
@@ -1248,8 +1312,8 @@ function openPresentation(){
 }
 
 function syncDesignEvents(){
-  const search=document.getElementById('commandButton'),quick=document.getElementById('quickActions'),present=document.getElementById('openPresentation');
-  if(search)search.onclick=openSearch;if(quick)quick.onclick=openQuickActions;if(present)present.onclick=openPresentation;
+  const search=document.getElementById('commandButton'),quick=document.getElementById('quickActions'),present=document.getElementById('openPresentation'),tools=document.getElementById('toolsMenu');
+  if(search)search.onclick=openSearch;if(quick)quick.onclick=openQuickActions;if(present)present.onclick=openPresentation;if(tools)tools.onclick=openToolsMenu;
   document.querySelectorAll('[data-nav="overview"]').forEach(function(b){b.onclick=openStartScreen});
   document.querySelectorAll('[data-nav="clients"]').forEach(function(b){b.onclick=openClients});
   document.querySelectorAll('[data-nav="settings"]').forEach(function(b){b.onclick=openSettings});
