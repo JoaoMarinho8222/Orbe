@@ -1,4 +1,4 @@
-const CACHE="orbe-shell-v15";
+const CACHE="orbe-shell-v16";
 const ASSETS=["./","./index.html","./manifest.webmanifest","./icons/icon-192.png","./icons/icon-512.png"];
 self.addEventListener("install",event=>{
   event.waitUntil(
