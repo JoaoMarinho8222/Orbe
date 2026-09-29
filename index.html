@@ -59,7 +59,7 @@ button,input,select{font:inherit}button{cursor:pointer}
 .hud{max-width:1560px;margin:0 auto 18px;display:grid;grid-template-columns:1.1fr .9fr .9fr .9fr;gap:10px}.hud-card{position:relative;overflow:hidden;border:1px solid var(--stroke);background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.025));border-radius:16px;padding:14px 15px;box-shadow:var(--shadow-soft)}.hud-card:after{content:"";position:absolute;width:80px;height:80px;border-radius:50%;right:-25px;top:-25px;background:radial-gradient(circle,rgba(153,214,159,.16),transparent 68%)}.hud-label{font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:#72867a;font-weight:800}.hud-value{font-family:var(--display);font-size:21px;font-weight:700;margin-top:4px;letter-spacing:-.7px}.hud-meta{font-size:9px;color:#74867a;margin-top:4px}.spark{display:flex;gap:2px;height:18px;align-items:end;margin-top:7px}.spark span{width:5px;border-radius:4px 4px 1px 1px;background:linear-gradient(to top,#4b8558,#a9d7ad)}
 
 /* Workspace header */
-.workspace-head{max-width:1560px;margin:0 auto 12px;display:flex;align-items:center;justify-content:space-between;gap:16px}.companybar{display:flex;align-items:center;gap:8px;padding:7px;background:rgba(10,25,16,.72);border:1px solid var(--stroke);border-radius:13px;box-shadow:var(--shadow-soft);backdrop-filter:blur(14px);overflow:auto}.company-label{font-size:8px;text-transform:uppercase;letter-spacing:1px;color:#687b6f;font-weight:900;padding:0 6px;white-space:nowrap}.tabs{display:flex;gap:5px;min-width:max-content}.tab{border:1px solid transparent;background:transparent;color:#7d9182;padding:8px 11px;border-radius:9px;font-size:10px;font-weight:800;transition:.18s}.tab:hover{color:#d3e1d6;background:rgba(255,255,255,.035)}.tab.active{color:#0a160d;background:linear-gradient(135deg,#d5efd8,#85b98b);box-shadow:0 5px 16px rgba(93,149,101,.18)}.workspace-note{font-size:9px;color:#72857a;white-space:nowrap}.workspace-note b{color:#a9c7ae}
+.workspace-head{max-width:1560px;margin:0 auto 12px;display:flex;align-items:center;justify-content:space-between;gap:16px}.companybar{display:flex;align-items:center;gap:8px;padding:7px;background:rgba(10,25,16,.72);border:1px solid var(--stroke);border-radius:13px;box-shadow:var(--shadow-soft);backdrop-filter:blur(14px);overflow:auto}.company-label{font-size:8px;text-transform:uppercase;letter-spacing:1px;color:#687b6f;font-weight:900;padding:0 6px;white-space:nowrap}.tabs{overflow-x:auto;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tabs{display:flex;gap:5px;min-width:max-content}.tab{border:1px solid transparent;background:transparent;color:#7d9182;padding:8px 11px;border-radius:9px;font-size:10px;font-weight:800;transition:.18s}.tab:hover{color:#d3e1d6;background:rgba(255,255,255,.035)}.tab.active{color:#0a160d;background:linear-gradient(135deg,#d5efd8,#85b98b);box-shadow:0 5px 16px rgba(93,149,101,.18)}.workspace-note{font-size:9px;color:#72857a;white-space:nowrap}.workspace-note b{color:#a9c7ae}
 
 /* Simulation strip */
 .simbar{max-width:1560px;margin:0 auto 14px;display:flex;align-items:center;gap:9px}.sim-list{display:flex;gap:6px;overflow:auto;flex:1;padding-bottom:1px}.sim-chip{display:flex;align-items:center;gap:7px;padding:8px 10px;border:1px solid var(--stroke);background:rgba(255,255,255,.03);color:#718478;border-radius:9px;font-size:9px;font-weight:800;white-space:nowrap;transition:.18s}.sim-chip:hover{color:#bfd2c4;background:rgba(255,255,255,.05)}.sim-chip.active{color:#e7f1e9;border-color:rgba(151,213,160,.24);background:rgba(121,178,129,.10)}.dot{width:6px;height:6px;border-radius:50%;background:var(--chip,#719077);box-shadow:0 0 8px color-mix(in srgb,var(--chip,#719077) 60%,transparent)}.sim-actions{display:flex;gap:6px;flex-shrink:0}.sim-actions .btn{padding:8px 10px;font-size:9px}
@@ -475,6 +475,8 @@ body.company-engemat{
 body.company-barcelos{
   --brand:#78986f;--brand-2:#a5c29a;--brand-soft:rgba(120,152,111,.09);--brand-line:rgba(120,152,111,.25);--brand-glow:rgba(120,152,111,.12);
 }
+body.company-stanza{--brand:#f47b20;--brand-2:#ffad70;--brand-soft:rgba(244,123,32,.08);--brand-line:rgba(244,123,32,.25);--brand-glow:rgba(244,123,32,.11)}
+body.company-mouradubeux{--brand:#0f766e;--brand-2:#5bb9b0;--brand-soft:rgba(15,118,110,.08);--brand-line:rgba(15,118,110,.25);--brand-glow:rgba(15,118,110,.11)}
 body.company-mrv{
   --brand:#d83b3b;--brand-2:#ef7777;--brand-soft:rgba(216,59,59,.075);--brand-line:rgba(216,59,59,.24);--brand-glow:rgba(216,59,59,.11);
 }
@@ -694,6 +696,7 @@ body.light{
 </div>
 </section>
 </div>
+<script src="./md_tabelas.js"></script>
 <script>const money=n=>Number.isFinite(n)?n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'—';
 const pct=n=>Number.isFinite(n)?(n*100).toLocaleString('pt-BR',{maximumFractionDigits:1})+'%':'—';
 const val=(v,f)=>f==='pct'?pct(v):f==='text'?v:money(v);
@@ -716,6 +719,27 @@ function health({parcela,capacidade,entradaPct,fi}){
 }
 
 function menorSinal(liquido,fix,inter,entradaMax){const R=ORBE_RULES.common;return Math.max(R.fiMin*liquido-fix,(1-R.entryPct)*liquido-fix-inter,liquido-fix-inter-entradaMax)}
+/* Stanza + Moura Dubeux reference helpers */
+const fmtMoney=n=>money(n);
+const fmtPct=n=>pct(n);
+const mdPlano=id=>typeof MD_PLANOS!=='undefined'?MD_PLANOS.find(p=>p.id===id):null;
+const mdUnidade=v=>{const p=mdPlano(v.plano),lista=p&&p.torres[v.torre];return lista?lista.find(u=>u.u===v.unidade)||null:null};
+const mdAndar=u=>{const n=Math.floor(parseInt(u,10)/100);return n===0?'Térreo':`${n}º andar`};
+const mdPrice=(S,n,i)=>n>0?(i>0?(S*i)/(1-Math.pow(1+i,-n)):S/n):0;
+const MD_ORDEM_ABATE=['intercalada','finMD','mensal'];
+function mdFluxo(v){
+  const p=mdPlano(v.plano),un=mdUnidade(v);if(!p||!un)return null;
+  const comps=p.comp.map((cc,idx)=>({...cc,parcelaTab:un.v[idx],totalTab:un.v[idx]*cc.q,abatido:0}));
+  comps.forEach(cc=>cc.total=cc.totalTab);
+  const sinalC=comps.find(cc=>cc.t==='sinal'),sinalTab=sinalC.totalTab,sinal=v.sinal;
+  let extra=sinal-sinalTab,restante=extra;
+  if(extra>0)MD_ORDEM_ABATE.forEach(tipo=>comps.filter(cc=>cc.t===tipo).forEach(cc=>{const a=Math.min(cc.total,restante);cc.total-=a;cc.abatido+=a;restante-=a;}));
+  else if(extra<0){const alvo=comps.find(cc=>cc.t==='mensal')||comps.find(cc=>cc.t==='finMD');if(alvo){alvo.total+=-extra;alvo.abatido-=-extra;restante=0;}}
+  comps.forEach(cc=>{cc.parcela=cc.q>0?cc.total/cc.q:0;if(cc.prazo)cc.pmt=mdPrice(cc.total,cc.prazo,cc.taxa||0)});
+  return{p,un,comps,sinalTab,sinal,extra,excesso:Math.max(0,restante)};
+}
+function mdDescreve(c){if(c.total<=0.004)return'quitado pelo sinal';if(c.prazo)return`${fmtMoney(c.total)} em até ${c.prazo}x`;return c.q>1?`${c.q}x de ${fmtMoney(c.parcela)}`:fmtMoney(c.total)}
+
 const DATA={
  telesil:{nome:'Telesil',cor:'#2563eb',obs:'Entrada dividida em dois blocos pagos em sequência. Percentual e número de parcelas variam por produto.',products:{'grand-diamond':{nome:'Grand Diamond',q80:28,q20:24,pct80:67},'grand-via':{nome:'Grand Via',q80:31,q20:24,pct80:80},splendido:{nome:'Splendido',q80:35,q20:24,pct80:80},'reserva-aldeprime':{nome:'Reserva Aldeprime',q80:26,q20:28,pct80:70},custom:{nome:'Outro (manual)',q80:35,q20:24,pct80:80}},fields:[
  {k:'renda',l:'Renda do cliente',t:'money',d:7627.29},{k:'valorTabela',l:'Valor de tabela',t:'money',d:275990.39},{k:'desconto',l:'Desconto de tabela',t:'money',d:0},{k:'descontoMcem',l:'Desconto MCEM',t:'money',d:0},{k:'sinal',l:'Sinal (ato)',t:'money',d:50000},{k:'sinalIntercalado',l:'Sinal intercalado (2ª parte)',t:'money',d:0},{k:'financiamento',l:'Financiamento aprovado',t:'money',d:208000},{k:'fgts',l:'FGTS',t:'money',d:0},{k:'subsidio',l:'Subsídio',t:'money',d:0},{k:'semestrais',l:'Nº de semestrais',t:'int',d:0},{k:'valorIntercalada',l:'Valor da intercalada (semestral)',t:'money',d:0,auto:v=>Math.round(v.renda*ORBE_RULES.telesil.intercaladaPct*100)/100},{k:'parcelaCaixa',l:'Parcela Caixa (pós-chaves)',t:'money',d:0,info:true,auto:v=>Math.round(v.renda*ORBE_RULES.common.incomePct*100)/100},{k:'q80',l:'Parcelas do 1º bloco',t:'int',d:35},{k:'q20',l:'Parcelas do 2º bloco',t:'int',d:24}],
@@ -775,7 +799,228 @@ const DATA={
   ]};
   return{status,highlight:[['Valor do sinal',sinal,'money','strong'],['Parcelamento MRV',carteira,'money','strong']],rows:[['Valor do imóvel',imovel,'money'],['Valor da avaliação',avaliacao,'money'],['Valor financiado',financiamento,'money'],['Entrada à vista',entrada,'money'],['Carteira MRV ('+rulePctText(ORBE_RULES.mrv.walletPct)+')',carteira,'money'],['Valor do sinal',sinal,'money'],['Carteira / imóvel',ORBE_RULES.mrv.walletPct,'pct']],resumo:[['Valor do imóvel',imovel,'money'],['Valor da avaliação',avaliacao,'money'],['Valor financiado',financiamento,'money'],['Entrada à vista',entrada,'money'],['Parcelamento MRV',carteira,'money'],['Valor do sinal',sinal,'money']]};
  }
- }
+ },
+stanza: {
+    nome: 'Stanza',
+    cor: '#f47b20',
+    obs: 'Viamar — fluxo da tabela: Ato 2% + 34 mensais até o habite-se (12%) + 2 semestrais de 3% + financiamento associativo 80%. FGTS e subsídio abatem das mensais. Escolha a tipologia para puxar a avaliação oficial Caixa.',
+    // Produtos = tipologias do Viamar; só definem a avaliação oficial Caixa.
+    produtos: {
+      'v2-terreo':   { nome: 'Viamar — 2 Quartos Térreo',   avaliacaoCaixa: 450000 },
+      'v2-giardino': { nome: 'Viamar — 2 Quartos Giardino', avaliacaoCaixa: 550000 },
+      'v2-tipo':     { nome: 'Viamar — 2 Quartos Tipo',     avaliacaoCaixa: 550000 },
+      'v2-pcd':      { nome: 'Viamar — 2 Quartos PCD',      avaliacaoCaixa: 550000 },
+      'v3-terreo':   { nome: 'Viamar — 3 Quartos Térreo',   avaliacaoCaixa: 550000 },
+      'v3-giardino': { nome: 'Viamar — 3 Quartos Giardino', avaliacaoCaixa: 600000 },
+      'v3-tipo':     { nome: 'Viamar — 3 Quartos Tipo',     avaliacaoCaixa: 600000 },
+      'v3-pcd':      { nome: 'Viamar — 3 Quartos PCD',      avaliacaoCaixa: 600000 },
+      'custom':      { nome: 'Outro (manual)' },
+    },
+    fields: [
+      { key: 'renda',          label: 'Renda bruta familiar',            type: 'money', def: 10000 },
+      { key: 'valorTabela',    label: 'Valor total (tabela)',            type: 'money', def: 465000.12 },
+      { key: 'desconto',       label: 'Desconto',                        type: 'money', def: 0 },
+      { key: 'avaliacaoCaixa', label: 'Avaliação oficial Caixa',         type: 'money', def: 550000, info: true,
+        hint: 'Vem da tipologia; editável.' },
+      { key: 'financiamento',  label: 'Financiamento associativo',       type: 'money', def: 0,
+        // a tabela arredonda o financiamento para baixo em reais inteiros (550.000,12 → 440.000,00)
+        autoDefault: (v) => Math.floor(((v.valorTabela || 0) - (v.desconto || 0)) * 0.80),
+        hint: 'Padrão da tabela: 80% do valor.' },
+      { key: 'fgts',           label: 'FGTS',                            type: 'money', def: 0 },
+      { key: 'subsidio',       label: 'Subsídio do governo',             type: 'money', def: 0 },
+      { key: 'ato',            label: 'Ato (1x)',                        type: 'money', def: 0,
+        autoDefault: (v) => Math.round(((v.valorTabela || 0) - (v.desconto || 0)) * 0.02 * 100) / 100,
+        hint: 'Padrão da tabela: 2%.' },
+      { key: 'semestral',      label: 'Valor de cada semestral',         type: 'money', def: 0,
+        autoDefault: (v) => Math.round(((v.valorTabela || 0) - (v.desconto || 0)) * 0.03 * 100) / 100,
+        hint: 'Padrão da tabela: 3% cada.' },
+      { key: 'qtdSemestrais',  label: 'Nº de semestrais',                type: 'int',   def: 2 },
+      { key: 'qtdMensais',     label: 'Nº de mensais (até o habite-se)', type: 'int',   def: 34 },
+      { key: 'parcelaCaixa',   label: 'Parcela Caixa (pós-chaves)',      type: 'money', def: 0, info: true,
+        autoDefault: (v) => Math.round((v.renda || 0) * 0.30 * 100) / 100 },
+    ],
+    compute(i) {
+      const liquido = i.valorTabela - i.desconto;
+      const semestrais = i.semestral * i.qtdSemestrais;
+      const aportes = i.ato + semestrais + i.financiamento + i.fgts + i.subsidio;
+      const totalMensais = liquido - aportes;
+      const mensal = i.qtdMensais > 0 ? totalMensais / i.qtdMensais : 0;
+      const capacidade = i.renda * 0.30;
+      // Caixa financia até 80% do MENOR entre valor de compra e avaliação.
+      const baseFin = Math.min(liquido, i.avaliacaoCaixa || liquido);
+      const finMax = baseFin * 0.80;
+      const okParcela = mensal <= capacidade;
+      const okFin = i.financiamento <= finMax + 1; // tolerância de arredondamento
+      const okFecha = totalMensais >= 0;
+      const okPrazo = i.qtdMensais > 0 && i.qtdMensais <= 34;
+      const ok = okParcela && okFin && okFecha && okPrazo;
+      const pct = (x) => (liquido ? x / liquido : 0);
+      return {
+        status: {
+          ok,
+          titulo: !okFecha ? 'Aportes maiores que o imóvel'
+            : !okPrazo ? 'Nº de mensais fora do limite (máx. 34x até o habite-se)'
+            : ok ? 'Proposta dentro do fluxo' : 'Precisa ajustar a proposta',
+          checks: [
+            { label: 'Mensal ≤ 30% da renda', ok: okParcela },
+            { label: 'Financiamento ≤ 80% do menor entre valor e avaliação', ok: okFin },
+            { label: `Mensais em até 34x (atual: ${i.qtdMensais}x)`, ok: okPrazo },
+            { label: 'Aportes não ultrapassam o valor do imóvel', ok: okFecha },
+          ],
+        },
+        destaque: [
+          { label: 'Total em mensais', valor: totalMensais, fmt: 'money' },
+          { label: `Mensal (${i.qtdMensais}x)`, valor: mensal, fmt: 'money', forte: true },
+          { label: 'Comprometimento de renda', valor: i.renda ? mensal / i.renda : 0, fmt: 'pct', forte: true },
+        ],
+        linhas: [
+          { label: 'Valor líquido', valor: liquido, fmt: 'money' },
+          { label: 'Avaliação oficial Caixa', valor: i.avaliacaoCaixa, fmt: 'money' },
+          { label: `Ato (${fmtPct(pct(i.ato))})`, valor: i.ato, fmt: 'money' },
+          { label: `Semestrais ${i.qtdSemestrais}x (${fmtPct(pct(semestrais))})`, valor: semestrais, fmt: 'money' },
+          { label: `Mensais (${fmtPct(pct(totalMensais))})`, valor: totalMensais, fmt: 'money' },
+          { label: `Financiamento (${fmtPct(pct(i.financiamento))})`, valor: i.financiamento, fmt: 'money' },
+          { label: 'Financiamento máximo (80%)', valor: finMax, fmt: 'money', alerta: !okFin },
+          { label: 'Capacidade de pagamento (30%)', valor: capacidade, fmt: 'money' },
+          { label: 'Mês mais pesado (mensal + semestral)', valor: mensal + (i.qtdSemestrais > 0 ? i.semestral : 0), fmt: 'money' },
+          ...(!okParcela && i.qtdMensais > 0
+            ? [{ label: 'Aumentar ato/semestrais em', valor: (mensal - capacidade) * i.qtdMensais, fmt: 'money', alerta: true }]
+            : []),
+          ...(!okFin ? [{ label: 'Excedente do financiamento', valor: i.financiamento - finMax, fmt: 'money', alerta: true }] : []),
+        ],
+      };
+    },
+    resumo(i, money) {
+      const liquido = i.valorTabela - i.desconto;
+      const semestrais = i.semestral * i.qtdSemestrais;
+      const totalMensais = liquido - i.ato - semestrais - i.financiamento - i.fgts - i.subsidio;
+      const mensal = i.qtdMensais > 0 ? totalMensais / i.qtdMensais : 0;
+      return [
+        { label: 'Valor de tabela', valor: i.valorTabela, fmt: 'money' },
+        ...(i.desconto > 0 ? [{ label: 'Desconto aplicado', valor: i.desconto, fmt: 'money' }] : []),
+        { label: 'Valor líquido', valor: liquido, fmt: 'money' },
+        // Avaliação fica só no card (referência do corretor); não vai para o resumo do cliente.
+        { label: 'Ato', valor: i.ato, fmt: 'money' },
+        { label: 'Mensais até o habite-se', valor: `${i.qtdMensais}x de ${money(mensal)}`, fmt: 'text' },
+        { label: 'Semestrais', valor: i.qtdSemestrais > 0 ? `${i.qtdSemestrais}x de ${money(i.semestral)}` : '—', fmt: 'text' },
+        { label: 'FGTS', valor: i.fgts || 0, fmt: 'money' },
+        ...(i.subsidio > 0 ? [{ label: 'Subsídio', valor: i.subsidio, fmt: 'money' }] : []),
+        { label: 'Financiamento associativo', valor: i.financiamento, fmt: 'money' },
+        { label: 'Parcela Caixa (pós-chaves)', valor: i.parcelaCaixa || 0, fmt: 'money' },
+      ];
+    },
+  },
+mouradubeux: {
+    nome: 'Moura Dubeux',
+    cor: '#0f766e',
+    obs: 'Planos prontos das tabelas de vendas (set/2026). Escolha produto/plano, torre e unidade: o plano da tabela aparece pronto. Sinal maior abate primeiro as intercaladas, depois o financiamento MD (ou parcela de habite-se) e por último as mensais. O financiamento bancário não muda.',
+    produtos: (typeof MD_PLANOS !== 'undefined' ? MD_PLANOS : []).reduce((acc, p) => {
+      acc[p.id] = { nome: `${p.produto} — ${p.plano}`, plano: p.id };
+      return acc;
+    }, {}),
+    fields: [
+      { key: 'sinal', label: 'Sinal / entrada', type: 'money', def: 0,
+        autoDefault: (v) => { const u = mdUnidade(v); return u ? u.v[0] : 0; },
+        hint: 'Vem da tabela. Valor maior abate intercaladas → financiamento MD → mensais.' },
+    ],
+    // Garante torre/unidade válidas para o plano atual (troca de produto ou de torre).
+    normalizar(v) {
+      const p = mdPlano(v.plano);
+      if (!p) return;
+      const torres = Object.keys(p.torres);
+      if (!torres.includes(v.torre)) v.torre = torres[0];
+      const lista = p.torres[v.torre];
+      if (!lista.some((u) => u.u === v.unidade)) v.unidade = lista[0].u;
+    },
+    seletores(v) {
+      const p = mdPlano(v.plano);
+      if (!p) return [];
+      const out = [];
+      const torres = Object.keys(p.torres);
+      if (torres.length > 1) {
+        out.push({ key: 'torre', label: 'Torre', options: torres.map((t) => ({ value: t, label: `Torre ${t}` })) });
+      }
+      const grupos = [];
+      p.torres[v.torre].forEach((u) => {
+        const g = mdAndar(u.u);
+        let grupo = grupos.find((x) => x.label === g);
+        if (!grupo) grupos.push((grupo = { label: g, options: [] }));
+        grupo.options.push({ value: u.u, label: `${u.u} — ${u.a}${u.d ? ' · ' + u.d : ''} — ${fmtMoney(u.t)}` });
+      });
+      out.push({ key: 'unidade', label: 'Andar / unidade', grupos });
+      return out;
+    },
+    compute(i) {
+      const f = mdFluxo(i);
+      if (!f) {
+        return { status: { ok: false, titulo: 'Selecione produto, torre e unidade', checks: [] }, destaque: [], linhas: [] };
+      }
+      const okSinal = f.extra >= -0.005;
+      const okExcesso = f.excesso <= 0.005;
+      const ok = okSinal && okExcesso;
+      const mensal = f.comps.find((c) => c.t === 'mensal');
+      const pct = (x) => (f.un.t ? ` (${fmtPct(x / f.un.t)})` : '');
+      const linhas = [
+        { label: 'Unidade', valor: `${f.un.u} · ${f.p.torres[i.torre] && Object.keys(f.p.torres).length > 1 ? 'Torre ' + i.torre + ' · ' : ''}${f.un.a}${f.un.d ? ' · ' + f.un.d : ''}`, fmt: 'text' },
+      ];
+      f.comps.forEach((c) => {
+        if (c.t === 'sinal') {
+          linhas.push({ label: c.l + pct(c.total), valor: c.total, fmt: 'money' });
+          return;
+        }
+        linhas.push({ label: c.l + pct(c.total), valor: mdDescreve(c), fmt: 'text' });
+        if (c.prazo && c.total > 0.004) {
+          linhas.push({ label: `↳ Parcela estimada em ${c.prazo}x`, valor: c.pmt, fmt: 'money' });
+        }
+      });
+      if (f.un.av) linhas.push({ label: 'Valor de avaliação CEF', valor: f.un.av, fmt: 'money' });
+      if (f.extra > 0.005) {
+        linhas.push({ label: 'Sinal extra sobre a tabela', valor: f.extra, fmt: 'money' });
+        // na mesma ordem em que o sinal extra foi aplicado
+        MD_ORDEM_ABATE.forEach((tipo) => f.comps.filter((c) => c.t === tipo && c.abatido > 0.005).forEach((c) => {
+          linhas.push({ label: `↳ abatido de ${c.l}`, valor: c.abatido, fmt: 'money' });
+        }));
+      }
+      if (!okSinal) linhas.push({ label: 'Diferença somada às parcelas', valor: -f.extra, fmt: 'money', alerta: true });
+      if (!okExcesso) linhas.push({ label: 'Sinal acima do saldo com a construtora', valor: f.excesso, fmt: 'money', alerta: true });
+      return {
+        status: {
+          ok,
+          titulo: !okSinal ? 'Sinal abaixo da tabela'
+            : !okExcesso ? 'Sinal maior que o saldo a parcelar com a construtora'
+            : f.extra > 0.005 ? 'Plano ajustado com sinal maior' : 'Plano da tabela',
+          checks: [
+            { label: `Sinal ≥ tabela (${fmtMoney(f.sinalTab)})`, ok: okSinal },
+            { label: 'Sinal extra absorvido pelo plano', ok: okExcesso },
+          ],
+        },
+        destaque: [
+          { label: 'Valor total', valor: f.un.t, fmt: 'money' },
+          { label: 'Sinal', valor: f.sinal, fmt: 'money', forte: true },
+          mensal
+            ? { label: `Mensal (${mensal.q}x)`, valor: mensal.parcela, fmt: 'money', forte: true }
+            : { label: 'Sinal extra', valor: Math.max(0, f.extra), fmt: 'money' },
+        ],
+        linhas,
+      };
+    },
+    resumo(i) {
+      const f = mdFluxo(i);
+      if (!f) return [];
+      const torreTxt = Object.keys(f.p.torres).length > 1 ? `Torre ${i.torre} · ` : '';
+      return [
+        { label: 'Plano', valor: f.p.plano, fmt: 'text' },
+        { label: 'Unidade', valor: `${torreTxt}${f.un.u} · ${f.un.a}${f.un.d ? ' · ' + f.un.d : ''}`, fmt: 'text' },
+        { label: 'Valor total', valor: f.un.t, fmt: 'money' },
+        ...f.comps.map((c) => (c.t === 'sinal'
+          ? { label: c.l, valor: c.total, fmt: 'money' }
+          : { label: c.l, valor: mdDescreve(c), fmt: 'text' })),
+        ...f.comps.filter((c) => c.prazo && c.total > 0.004).map((c) => ({
+          label: `Parcela estimada ${c.l.toLowerCase()} (${c.prazo}x)`, valor: c.pmt, fmt: 'money',
+        })),
+      ];
+    },
+  },
 };
 
 
@@ -831,11 +1076,27 @@ function saveRuleConfig(){
 }
 function rulePctText(v){return (Number(v)*100).toLocaleString('pt-BR',{maximumFractionDigits:2})+'%'}
 
-const ORDER=['telesil','engenharq','engemat','barcelos','mrv'];
+function getProducts(c){return c?.products||c?.produtos||{}}
+function getFields(c){return c?.fields||[]}
+function getProduct(c,id){return getProducts(c)[id]||null}
+function fieldKey(f){return f?.k??f?.key}
+function fieldLabel(f){return f?.l??f?.label}
+function fieldType(f){return f?.t??f?.type}
+function fieldDefault(f){return f?.d??f?.def}
+function fieldAuto(f){return f?.auto??f?.autoDefault}
+function calcResult(st,c){
+  const raw=c.compute(st.v),r={...raw};
+  if(!r.highlight&&r.destaque)r.highlight=r.destaque.map(x=>[x.label,x.valor,x.fmt,x.forte?'strong':undefined]);
+  if(!r.rows&&r.linhas)r.rows=r.linhas.map(x=>[x.label,x.valor,x.fmt,x.alerta?'alert':undefined]);
+  if(!r.resumo&&typeof c.resumo==='function')r.resumo=c.resumo(st.v,money);
+  return r;
+}
+
+const ORDER=['telesil','engenharq','engemat','barcelos','mrv','stanza','mouradubeux'];
 let active=ORDER[0],seq=0,states={},cards=[],activeCard=null;
-function auto(st,c){c.fields.forEach(f=>{if(f.auto&&!st.t[f.k])st.v[f.k]=f.auto(st.v)})}
+function auto(st,c){getFields(c).forEach(f=>{const k=fieldKey(f),a=fieldAuto(f);if(a&&!st.t[k])st.v[k]=a(st.v)})}
 function formatMoneyInput(el){const old=el.value;const s=old.replace(/[^\d,]/g,'');const i=s.indexOf(',');let ip=i>=0?s.slice(0,i):s,dp=i>=0?s.slice(i+1).replace(/,/g,'').slice(0,2):'';ip=ip.replace(/^0+(?=\d)/,'');el.value=(ip?Number(ip).toLocaleString('pt-BR'):'')+(i>=0?',':'')+dp}
-function productApply(st,c){const p=c.products?.[st.product];if(!p)return;for(const k of Object.keys(p)){if(k!=='nome')st.v[k]=p[k]}}
+function productApply(st,c){const p=getProduct(c,st.product);if(!p)return;for(const k of Object.keys(p)){if(k!=='nome')st.v[k]=p[k]}}
 function renderTabs(){const t=document.getElementById('tabs');t.innerHTML='';ORDER.forEach(id=>{const c=DATA[id],b=document.createElement('button');b.className='tab'+(id===active?' active':'');b.textContent=c.nome;b.style.setProperty('--tab',c.cor);b.onclick=()=>select(id);t.appendChild(b)})}
 function updateCounter(){const n=cards.length;document.getElementById('counter').textContent=`${n} ${n===1?'simulação aberta':'simulações abertas'}`;}
 function renderSimList(){const box=document.getElementById('simList');box.innerHTML='';cards.forEach((id,idx)=>{const st=states[id],c=DATA[st.c],b=document.createElement('button');b.className='sim-chip'+(id===activeCard?' active':'');const nm=st.clientName||`Simulação ${idx+1}`;const stage=st.stage||'Novo';b.innerHTML=`<span class="dot" style="--chip:${c.cor}"></span><span class="sim-meta"><span class="client">${escapeHtml(nm)}</span><span class="project">· ${c.nome}</span><span class="chip-stage">${escapeHtml(stage)}</span></span>`;b.onclick=()=>showSimulation(id);box.appendChild(b)});updateCounter()}
@@ -844,19 +1105,66 @@ function companyThemeClass(id){
 }
 function applyCompanyTheme(id){
   const body=document.body;
-  body.classList.remove('company-active','company-telesil','company-engenharq','company-engemat','company-barcelos','company-mrv');
+  body.classList.remove('company-active','company-telesil','company-engenharq','company-engemat','company-barcelos','company-mrv','company-stanza','company-mouradubeux');
   const cls=companyThemeClass(id);
   if(id){body.classList.add('company-active',cls);}
 }
 function select(id){active=id;cards=[];activeCard=null;applyCompanyTheme(id);renderTabs();const c=DATA[id];document.getElementById('heading').textContent='Calculadora '+c.nome;document.getElementById('obs').textContent=c.obs||'';addCard()}
-function addCard(){const id='c'+(++seq),c=DATA[active];const st={c:active,v:{},t:{},product:Object.keys(c.products||{})[0]||null};c.fields.forEach(f=>st.v[f.k]=f.d);auto(st,c);productApply(st,c);states[id]=st;cards.push(id);activeCard=id;saveDrafts();renderTabs();renderSimList();renderWorkspace(id)}
+function addCard(){const id='c'+(++seq),c=DATA[active],ps=getProducts(c),fs=getFields(c);const st={c:active,v:{},t:{},product:Object.keys(ps||{})[0]||null};fs.forEach(f=>st.v[fieldKey(f)]=fieldDefault(f));auto(st,c);productApply(st,c);if(c.normalizar)c.normalizar(st.v);auto(st,c);states[id]=st;cards.push(id);activeCard=id;saveDrafts();renderTabs();renderSimList();renderWorkspace(id)}
 function showSimulation(id){activeCard=id;const st=states[id];if(!st)return;active=st.c;renderTabs();document.getElementById('heading').textContent='Calculadora '+DATA[st.c].nome;document.getElementById('obs').textContent=DATA[st.c].obs||'';renderSimList();renderWorkspace(id)}
-function fieldGroup(f){if(f.k==='renda'||f.k==='rendaAprovada')return 'Cliente';if(['valorTabela','valorImovel','desconto','descontoMcem','avaliacaoCaixa'].includes(f.k))return 'Negócio';return 'Pagamento'}
-function renderWorkspace(id){const st=states[id],c=DATA[st.c];if(!st)return;st.clientName=st.clientName||'';st.notes=st.notes||'';st.stage=st.stage||'Novo';const groups={Cliente:[],Negócio:[],Pagamento:[]};c.fields.forEach(f=>groups[fieldGroup(f)].push(f));document.getElementById('productBadge').textContent=st.product&&c.products?.[st.product]?.nome||c.nome;const fp=document.getElementById('formPanel');fp.innerHTML='';let n=1;const meta=document.createElement('div');meta.className='form-section';meta.innerHTML=`<div class="section-title"><span class="section-number">•</span>Identificação</div><div class="grid"><div class="field full"><label>Cliente / identificação da simulação</label><div class="input"><input id="clientName" type="text" value="${escapeAttr(st.clientName)}" placeholder="Ex.: Maria Silva"></div></div><div class="field"><label>Etapa do atendimento</label><select id="stageSelect"><option>Novo</option><option>Em atendimento</option><option>Proposta enviada</option><option>Negociação</option><option>Fechado</option></select></div><div class="field"><label>Salvar observações rápidas</label><div class="input"><input id="noteQuick" type="text" value="${escapeAttr((st.notes||'').split('\n')[0])}" placeholder="Ex.: cliente quer menor entrada"></div></div></div>`;fp.appendChild(meta);meta.querySelector('#stageSelect').value=st.stage;meta.querySelector('#clientName').oninput=e=>{st.clientName=e.target.value;renderSimList();saveDraftDebounced(id);};meta.querySelector('#stageSelect').onchange=e=>{st.stage=e.target.value;renderSimList();saveDraftDebounced(id);};meta.querySelector('#noteQuick').oninput=e=>{const lines=(st.notes||'').split('\n');lines[0]=e.target.value;st.notes=lines.join('\n');saveDraftDebounced(id);};if(c.products){const wrap=document.createElement('div');wrap.className='product-select';wrap.innerHTML=`<div class="field"><label>Empreendimento / produto</label><select id="productSelect">${Object.entries(c.products).map(([k,p])=>`<option value="${k}" ${k===st.product?'selected':''}>${p.nome}</option>`).join('')}</select></div>`;fp.appendChild(wrap);wrap.querySelector('select').onchange=e=>{st.product=e.target.value;productApply(st,c);renderWorkspace(id)};}Object.entries(groups).forEach(([name,fields])=>{if(!fields.length)return;const sec=document.createElement('div');sec.className='form-section';sec.innerHTML=`<div class="section-title"><span class="section-number">${n++}</span>${name}</div><div class="grid"></div>`;const grid=sec.querySelector('.grid');fields.forEach(f=>{const v=st.v[f.k],div=document.createElement('div');div.className='field'+(f.t==='money'?' money':'')+(f.info?' info':'');div.innerHTML=`<label>${f.l}</label><div class="input">${f.t==='money'?'<span class="prefix">R$</span>':''}<input data-k="${f.k}" type="${f.t==='money'?'text':'number'}" ${f.t==='money'?'inputmode="decimal"':''} step="any" value="${f.t==='money'?fmtInput(v):v}"></div>${f.h?`<span class="hint">${f.h}</span>`:''}`;grid.appendChild(div);const inp=div.querySelector('input');inp.oninput=e=>{let x=f.t==='money'?(formatMoneyInput(e.target),parseBR(e.target.value)):parseFloat(e.target.value);if(Number.isNaN(x))x=0;st.v[f.k]=f.t==='int'?Math.round(x):x;st.t[f.k]=true;auto(st,c);renderResult(id)} });fp.appendChild(sec)});const noteCard=document.createElement('div');noteCard.className='notes-card';noteCard.innerHTML=`<div class="notes-head"><strong>Bloco de notas</strong><div class="note-toolbar"><button class="btn compact" type="button" id="openNotesInline">Abrir</button><button class="btn compact" type="button" id="clearNotesInline">Limpar</button></div></div><textarea id="notesArea" placeholder="Anote contexto, objeções, documentos, próximos passos...">${escapeHtml(st.notes||'')}</textarea>`;fp.appendChild(noteCard);noteCard.querySelector('#notesArea').oninput=e=>{st.notes=e.target.value;saveDraftDebounced(id);};noteCard.querySelector('#openNotesInline').onclick=()=>openNotes(id);noteCard.querySelector('#clearNotesInline').onclick=()=>{st.notes='';noteCard.querySelector('#notesArea').value='';saveDraftDebounced(id)};const footer=document.createElement('div');footer.className='form-footer';footer.innerHTML='<button class="btn primary" id="mobileSummary">📄 Gerar resumo da proposta</button>';fp.appendChild(footer);footer.querySelector('button').onclick=()=>modal(id);renderResult(id)}
-function renderResult(id){const st=states[id],c=DATA[st.c],r=c.compute(st.v);const panel=document.getElementById('resultPanel');if(!panel)return;const strong=r.highlight.find(x=>x[3]==='strong')||r.highlight[0];const others=r.highlight.filter(x=>x!==strong);panel.innerHTML=`<div class="status ${r.status.ok?'ok':'bad'}">${r.status.ok?'✓ ':'⚠ '}${r.status.titulo}<ul class="checks">${r.status.checks.map(q=>`<li class="${q.ok?'ok':''}"><span>${q.label}</span>${q.detail?`<small>${q.detail}</small>`:''}</li>`).join('')}</ul></div><div class="result-hero"><div class="metric primary"><div class="k">${strong[0]}</div><div class="v">${val(strong[1],strong[2])}</div></div>${others.slice(0,1).map(x=>`<div class="metric"><div class="k">${x[0]}</div><div class="v">${val(x[1],x[2])}</div></div>`).join('')}</div>${others.length>1?`<div class="result-section"><div class="result-section-title">Outros destaques</div><div class="facts">${others.slice(1).map(x=>`<div class="fact"><div class="k">${x[0]}</div><div class="v">${val(x[1],x[2])}</div></div>`).join('')}</div></div>`:''}<div class="result-section"><div class="result-section-title">Detalhamento</div><div class="facts">${r.rows.map(x=>`<div class="fact ${x[3]==='alert'?'alert':''}"><div class="k">${x[0]}</div><div class="v">${val(x[1],x[2])}</div></div>`).join('')}</div></div><div class="helper">O indicador principal foi destacado para facilitar a leitura durante o atendimento. Use o resumo para enviar a condição ao cliente.</div><button class="btn primary summary-wide" id="summaryWide">📄 Gerar resumo para cliente</button>`;document.getElementById('summaryWide').onclick=()=>modal(id)}
+function fieldGroup(f){const k=fieldKey(f);if(k==='renda'||k==='rendaAprovada')return 'Cliente';if(['valorTabela','valorImovel','desconto','descontoMcem','avaliacaoCaixa'].includes(k))return 'Negócio';return 'Pagamento'}
+function renderWorkspace(id){
+  const st=states[id],c=DATA[st.c];if(!st)return;st.clientName=st.clientName||'';st.notes=st.notes||'';st.stage=st.stage||'Novo';
+  const groups={Cliente:[],Negócio:[],Pagamento:[]};getFields(c).forEach(f=>groups[fieldGroup(f)].push(f));
+  document.getElementById('productBadge').textContent=getProduct(c,st.product)?.nome||c.nome;
+  const fp=document.getElementById('formPanel');fp.innerHTML='';let n=1;
+  const meta=document.createElement('div');meta.className='form-section';
+  meta.innerHTML=`<div class="section-title"><span class="section-number">•</span>Identificação</div><div class="grid"><div class="field full"><label>Cliente / identificação da simulação</label><div class="input"><input id="clientName" type="text" value="${escapeAttr(st.clientName)}" placeholder="Ex.: Maria Silva"></div></div><div class="field"><label>Etapa do atendimento</label><select id="stageSelect"><option>Novo</option><option>Em atendimento</option><option>Proposta enviada</option><option>Negociação</option><option>Fechado</option></select></div><div class="field"><label>Salvar observações rápidas</label><div class="input"><input id="noteQuick" type="text" value="${escapeAttr((st.notes||'').split('\\n')[0])}" placeholder="Ex.: cliente quer menor entrada"></div></div></div>`;
+  fp.appendChild(meta);meta.querySelector('#stageSelect').value=st.stage;
+  meta.querySelector('#clientName').oninput=e=>{st.clientName=e.target.value;renderSimList();saveDraftDebounced(id)};meta.querySelector('#stageSelect').onchange=e=>{st.stage=e.target.value;renderSimList();saveDraftDebounced(id)};meta.querySelector('#noteQuick').oninput=e=>{const lines=(st.notes||'').split('\\n');lines[0]=e.target.value;st.notes=lines.join('\\n');saveDraftDebounced(id)};
+  const products=getProducts(c);
+  if(Object.keys(products).length){
+    const wrap=document.createElement('div');wrap.className='product-select';
+    wrap.innerHTML=`<div class="field"><label>Empreendimento / produto</label><select id="productSelect">${Object.entries(products).map(([k,p])=>`<option value="${escapeAttr(k)}" ${k===st.product?'selected':''}>${escapeHtml(p.nome||k)}</option>`).join('')}</select></div>`;
+    fp.appendChild(wrap);
+    wrap.querySelector('select').onchange=e=>{st.product=e.target.value;productApply(st,c);if(c.normalizar)c.normalizar(st.v);st.t={};auto(st,c);renderWorkspace(id)};
+  }
+  if(c.seletores){
+    const wrap=document.createElement('div');wrap.className='product-select';
+    c.seletores(st.v).forEach(s=>{
+      const field=document.createElement('div');field.className='field full';
+      const opt=o=>`<option value="${escapeAttr(o.value)}" ${String(o.value)===String(st.v[s.key])?'selected':''}>${escapeHtml(o.label)}</option>`;
+      const body=s.grupos?s.grupos.map(g=>`<optgroup label="${escapeAttr(g.label)}">${g.options.map(opt).join('')}</optgroup>`).join(''):(s.options||[]).map(opt).join('');
+      field.innerHTML=`<label>${escapeHtml(s.label)}</label><select data-seletor="${escapeAttr(s.key)}">${body}</select>`;
+      wrap.appendChild(field);
+      field.querySelector('select').onchange=e=>{st.v[s.key]=e.target.value;if(c.normalizar)c.normalizar(st.v);st.t={};auto(st,c);renderWorkspace(id)};
+    });
+    fp.appendChild(wrap);
+  }
+  Object.entries(groups).forEach(([name,fields])=>{
+    if(!fields.length)return;
+    const sec=document.createElement('div');sec.className='form-section';sec.innerHTML=`<div class="section-title"><span class="section-number">${n++}</span>${name}</div><div class="grid"></div>`;
+    const grid=sec.querySelector('.grid');
+    fields.forEach(f=>{
+      const k=fieldKey(f),type=fieldType(f),v=st.v[k],hint=f.h??f.hint,disabled=f.productControlled&&st.product!=='custom'?'disabled':'';
+      const box=document.createElement('div');box.className='field '+(type==='money'?'money ':'')+(f.info?'info ':'');
+      const inputType=type==='money'?'type="text" inputmode="decimal"':'type="number" step="any" inputmode="decimal"';
+      box.innerHTML=`<label>${escapeHtml(fieldLabel(f))}</label><div class="input">${type==='money'?'<span class="prefix">R$</span>':''}<input ${inputType} data-key="${escapeAttr(k)}" value="${type==='money'?fmtInputMoney(v):v}" ${disabled}></div>${hint?`<span class="hint">${escapeHtml(hint)}</span>`:''}`;
+      grid.appendChild(box);
+    });
+    fp.appendChild(sec);
+  });
+  const footer=document.createElement('div');footer.className='form-section';footer.innerHTML='<div class="field full"><button class="btn primary summary-wide" id="workspaceSummary">▣ Gerar resumo da proposta</button></div>';fp.appendChild(footer);
+  footer.querySelector('#workspaceSummary').onclick=()=>modal(id);
+  fp.querySelectorAll('input[data-key]').forEach(inp=>{
+    inp.oninput=e=>{const f=getFields(c).find(x=>fieldKey(x)===e.target.dataset.key);if(!f)return;const k=fieldKey(f),type=fieldType(f);let v;if(type==='money'){formatMoneyInput(e.target);v=parseBR(e.target.value)}else{v=parseFloat(e.target.value)}if(isNaN(v))v=0;st.v[k]=type==='int'?Math.round(v):v;st.t[k]=true;auto(st,c);renderResult(id);saveDraftDebounced(id)};
+  });
+  renderResult(id);
+}
+function renderResult(id){const st=states[id],c=DATA[st.c],r=calcResult(st,c);const panel=document.getElementById('resultPanel');if(!panel)return;const strong=r.highlight.find(x=>x[3]==='strong')||r.highlight[0];const others=r.highlight.filter(x=>x!==strong);panel.innerHTML=`<div class="status ${r.status.ok?'ok':'bad'}">${r.status.ok?'✓ ':'⚠ '}${r.status.titulo}<ul class="checks">${r.status.checks.map(q=>`<li class="${q.ok?'ok':''}"><span>${q.label}</span>${q.detail?`<small>${q.detail}</small>`:''}</li>`).join('')}</ul></div><div class="result-hero"><div class="metric primary"><div class="k">${strong[0]}</div><div class="v">${val(strong[1],strong[2])}</div></div>${others.slice(0,1).map(x=>`<div class="metric"><div class="k">${x[0]}</div><div class="v">${val(x[1],x[2])}</div></div>`).join('')}</div>${others.length>1?`<div class="result-section"><div class="result-section-title">Outros destaques</div><div class="facts">${others.slice(1).map(x=>`<div class="fact"><div class="k">${x[0]}</div><div class="v">${val(x[1],x[2])}</div></div>`).join('')}</div></div>`:''}<div class="result-section"><div class="result-section-title">Detalhamento</div><div class="facts">${r.rows.map(x=>`<div class="fact ${x[3]==='alert'?'alert':''}"><div class="k">${x[0]}</div><div class="v">${val(x[1],x[2])}</div></div>`).join('')}</div></div><div class="helper">O indicador principal foi destacado para facilitar a leitura durante o atendimento. Use o resumo para enviar a condição ao cliente.</div><button class="btn primary summary-wide" id="summaryWide">📄 Gerar resumo para cliente</button>`;document.getElementById('summaryWide').onclick=()=>modal(id)}
 function removeCard(id){delete states[id];cards=cards.filter(x=>x!==id);saveDrafts();if(activeCard===id)activeCard=cards.at(-1)||null;if(activeCard){const st=states[activeCard];active=st.c;document.getElementById('heading').textContent='Calculadora '+DATA[st.c].nome;document.getElementById('obs').textContent=DATA[st.c].obs||'';renderWorkspace(activeCard)}else{addCard()}renderSimList()}
-function resetCard(id){const st=states[id];if(!st)return;const c=DATA[st.c];c.fields.forEach(f=>{if(f.t==='money')st.v[f.k]=0});st.t={};auto(st,c);renderWorkspace(id)}
-function modal(id){const st=states[id],c=DATA[st.c],r=c.compute(st.v);const bg=document.createElement('div');bg.className='modal-bg';bg.innerHTML=`<div class="modal" style="--modal:${c.cor}"><div style="display:flex;justify-content:space-between;gap:12px"><div><h3>${escapeHtml(st.clientName||c.nome)}</h3><div class="sub">${r.status.ok?'✓ ':'⚠ '}${r.status.titulo}</div></div><button class="btn" data-close>Fechar</button></div><div class="mrows">${r.resumo.map(x=>`<div class="mrow"><span class="mk">${x[0]}</span><span class="mv">${val(x[1],x[2])}</span></div>`).join('')}</div><div class="mact"><button class="btn" data-close>Fechar</button><button class="btn primary" data-print>🖨️ Imprimir / PDF</button></div></div>`;const close=()=>bg.remove();bg.addEventListener('click',e=>{if(e.target===bg)close()});bg.querySelectorAll('[data-close]').forEach(b=>b.onclick=close);bg.querySelector('[data-print]').onclick=()=>window.print();document.body.appendChild(bg)}
+function resetCard(id){const st=states[id];if(!st)return;const c=DATA[st.c];getFields(c).forEach(f=>{if(fieldType(f)==='money')st.v[fieldKey(f)]=0});st.t={};auto(st,c);renderWorkspace(id)}
+function modal(id){const st=states[id],c=DATA[st.c],r=calcResult(st,c);const bg=document.createElement('div');bg.className='modal-bg';bg.innerHTML=`<div class="modal" style="--modal:${c.cor}"><div style="display:flex;justify-content:space-between;gap:12px"><div><h3>${escapeHtml(st.clientName||c.nome)}</h3><div class="sub">${r.status.ok?'✓ ':'⚠ '}${r.status.titulo}</div></div><button class="btn" data-close>Fechar</button></div><div class="mrows">${r.resumo.map(x=>`<div class="mrow"><span class="mk">${x[0]}</span><span class="mv">${val(x[1],x[2])}</span></div>`).join('')}</div><div class="mact"><button class="btn" data-close>Fechar</button><button class="btn primary" data-print>🖨️ Imprimir / PDF</button></div></div>`;const close=()=>bg.remove();bg.addEventListener('click',e=>{if(e.target===bg)close()});bg.querySelectorAll('[data-close]').forEach(b=>b.onclick=close);bg.querySelector('[data-print]').onclick=()=>window.print();document.body.appendChild(bg)}
 
 const HISTORY_KEY='orbe-history-v1', DRAFT_KEY='orbe-drafts-v1';
 const STAGES=['Novo','Em atendimento','Proposta enviada','Negociação','Fechado'];
@@ -864,7 +1172,7 @@ function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,ch=>({'&':'&amp;'
 function escapeAttr(v){return escapeHtml(v)}
 function saveDrafts(){localStorage.setItem(DRAFT_KEY,JSON.stringify([...cards].map(id=>({id, ...states[id]}))))}
 let draftTimer=null;function saveDraftDebounced(id){clearTimeout(draftTimer);draftTimer=setTimeout(saveDrafts,250);}
-function saveToHistory(id){const st=states[id];if(!st)return;const c=DATA[st.c],r=c.compute(st.v);let hist=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');const item={id:'h'+Date.now(),clientName:st.clientName||'Sem cliente',company:c.nome,product:st.product&&c.products?.[st.product]?.nome||c.nome,stage:st.stage||'Novo',notes:st.notes||'',savedAt:new Date().toISOString(),values:{...st.v},status:r.status?.titulo||'',highlights:r.highlight||[]};hist.unshift(item);hist=hist.slice(0,100);localStorage.setItem(HISTORY_KEY,JSON.stringify(hist));showToast('Simulação salva no histórico');}
+function saveToHistory(id){const st=states[id];if(!st)return;const c=DATA[st.c],r=c.compute(st.v);let hist=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');const item={id:'h'+Date.now(),clientName:st.clientName||'Sem cliente',company:c.nome,product:getProduct(c,st.product)?.nome||c.nome,stage:st.stage||'Novo',notes:st.notes||'',savedAt:new Date().toISOString(),values:{...st.v},status:r.status?.titulo||'',highlights:r.highlight||[]};hist.unshift(item);hist=hist.slice(0,100);localStorage.setItem(HISTORY_KEY,JSON.stringify(hist));showToast('Simulação salva no histórico');}
 function showToast(msg){const x=document.createElement('div');x.style.cssText='position:fixed;right:18px;bottom:18px;z-index:200;background:#173522;color:#e5f4e8;border:1px solid rgba(164,220,171,.22);padding:10px 14px;border-radius:12px;font:700 10px Manrope, sans-serif;box-shadow:0 18px 45px rgba(0,0,0,.3);';x.textContent=msg;document.body.appendChild(x);setTimeout(()=>x.remove(),1800)}
 function openHistory(){const bg=document.getElementById('featureOverlay');const hist=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');bg.hidden=false;bg.innerHTML=`<div class="overlay-panel"><div class="overlay-head"><div><h3>Histórico de cálculos</h3><p>Propostas salvas neste navegador.</p></div><div class="tool-group"><button class="btn compact" id="clearHistory">Limpar histórico</button><button class="btn compact" id="closeFeature">Fechar</button></div></div><div class="overlay-list">${hist.length?hist.map((h,i)=>`<div class="history-item"><div><strong>${escapeHtml(h.clientName)}</strong><small>${escapeHtml(h.company)} · ${escapeHtml(h.product)} · ${new Date(h.savedAt).toLocaleString('pt-BR')}</small></div><span class="chip-stage">${escapeHtml(h.stage)}</span><button class="btn compact" data-load-history="${i}">Abrir</button></div>`).join(''):'<div class="history-empty">Nenhuma simulação salva ainda.</div>'}</div></div>`;bg.onclick=e=>{if(e.target===bg)bg.hidden=true};bg.querySelector('#closeFeature').onclick=()=>bg.hidden=true;bg.querySelector('#clearHistory').onclick=()=>{localStorage.removeItem(HISTORY_KEY);openHistory()};bg.querySelectorAll('[data-load-history]').forEach(b=>b.onclick=()=>loadHistory(hist[Number(b.dataset.loadHistory)]));}
 function loadHistory(h){const cId=Object.keys(DATA).find(k=>DATA[k].nome===h.company)||ORDER[0];const id='c'+(++seq);states[id]={c:cId,v:{...h.values},t:{},product:Object.keys(DATA[cId].products||{})[0]||null,clientName:h.clientName==='Sem cliente'?'':h.clientName,notes:h.notes||'',stage:h.stage||'Novo'};cards.push(id);activeCard=id;active=cId;activeCard=id;document.getElementById('featureOverlay').hidden=true;renderTabs();showSimulation(id);showToast('Simulação carregada');}
@@ -890,7 +1198,7 @@ function openKanban(){
   });
 }
 function compareSummary(st,c){
-  const r=c.compute(st.v);
+  const r=calcResult(st,c);
   const summary=(r.resumo||[]).map(function(x){return {label:String(x[0]||''),value:x[1],fmt:x[2]};});
   function find(patterns){return summary.find(function(x){return patterns.some(function(p){return x.label.toLowerCase().includes(p);});})||null;}
   const parcel=(r.highlight||[]).find(function(x){return /parcela/i.test(String(x[0]))&&x[3]==='strong';})||(r.highlight||[]).find(function(x){return /parcela/i.test(String(x[0]));})||null;
@@ -899,7 +1207,7 @@ function compareSummary(st,c){
 function compareDisplay(x){return x?val(x.value,x.fmt):'—';}
 function compareCardHtml(id){
   const st=states[id],c=DATA[st.c],s=compareSummary(st,c);
-  const product=st.product&&c.products&&c.products[st.product]?c.products[st.product].nome:c.nome;
+  const product=getProduct(c,st.product)?.nome||c.nome;
   const h='<div class="compare-card"><h4>'+escapeHtml(st.clientName||'Sem cliente')+'</h4><div class="compare-sub">'+escapeHtml(c.nome)+' · '+escapeHtml(product)+'</div><div class="compare-status '+(s.r.status.ok?'ok':'bad')+'">'+(s.r.status.ok?'✓':'⚠')+' '+escapeHtml(s.r.status.titulo)+'</div><div class="compare-kpis"><div class="compare-kpi"><div class="k">Valor do imóvel</div><div class="v">'+compareDisplay(s.imovel)+'</div></div><div class="compare-kpi"><div class="k">Financiamento</div><div class="v">'+compareDisplay(s.financiamento)+'</div></div><div class="compare-kpi"><div class="k">Entrada</div><div class="v">'+compareDisplay(s.entrada)+'</div></div><div class="compare-kpi"><div class="k">Parcela principal</div><div class="v">'+compareDisplay(s.parcel)+'</div></div><div class="compare-kpi"><div class="k">Parcela Caixa</div><div class="v">'+compareDisplay(s.caixa)+'</div></div><div class="compare-kpi"><div class="k">F.I. Real</div><div class="v">'+compareDisplay(s.fi)+'</div></div></div></div>';
   return h;
 }
@@ -928,7 +1236,7 @@ function discoverField(label,key,placeholder){
 }
 function buildDiscoveryScenario(companyId,productId,inputs){
   const c=DATA[companyId],st={c:companyId,v:{},t:{},product:productId||null,clientName:'',notes:'',stage:'Novo'};
-  c.fields.forEach(f=>st.v[f.k]=f.d);
+  getFields(c).forEach(f=>st.v[fieldKey(f)]=fieldDefault(f));
   if(c.products&&st.product)productApply(st,c);
   st.v.financiamento=inputs.credito;
   if(Object.prototype.hasOwnProperty.call(st.v,'renda'))st.v.renda=inputs.renda;else if(Object.prototype.hasOwnProperty.call(st.v,'rendaAprovada'))st.v.rendaAprovada=inputs.renda;
@@ -989,7 +1297,7 @@ function openDiscovery(){
       if(!vals.credito||!vals.renda){showToast('Preencha Crédito aprovado e Renda');return;}
       vals.entrada=vals.entrada||0;vals.fgts=vals.fgts||0;vals.subsidio=vals.subsidio||0;
       const results=[];
-      ORDER.forEach(function(companyId){const c=DATA[companyId];Object.entries(c.products||{}).forEach(function(entry){const productId=entry[0],product=entry[1];if(companyId==='mrv'&&!vals.valorImovel){results.push({companyId,productId,product,st:null,r:{status:{ok:false,titulo:'Informar valor do imóvel'},highlight:[],rows:[]},parcel:null,entryLeft:null,compatible:false,blocked:true,company:c});return;}const st=buildDiscoveryScenario(companyId,productId,vals),r=c.compute(st.v),parcel=discoveryParcel(r),entryLeft=discoveryEntry(r),compatible=!!r.status?.ok;results.push({companyId,productId,product,st,r,parcel,entryLeft,compatible,company:c});});});
+      ORDER.forEach(function(companyId){const c=DATA[companyId];if(companyId==='mouradubeux')return;Object.entries(getProducts(c)||{}).forEach(function(entry){const productId=entry[0],product=entry[1];if(companyId==='mrv'&&!vals.valorImovel){results.push({companyId,productId,product,st:null,r:{status:{ok:false,titulo:'Informar valor do imóvel'},highlight:[],rows:[]},parcel:null,entryLeft:null,compatible:false,blocked:true,company:c});return;}const st=buildDiscoveryScenario(companyId,productId,vals),r=c.compute(st.v),parcel=discoveryParcel(r),entryLeft=discoveryEntry(r),compatible=!!r.status?.ok;results.push({companyId,productId,product,st,r,parcel,entryLeft,compatible,company:c});});});
       results.sort(function(a,b){if(a.compatible!==b.compatible)return a.compatible?-1:1;return (a.parcel?.value??Infinity)-(b.parcel?.value??Infinity);});
       const compatibleCount=results.filter(function(x){return x.compatible;}).length;
       const area=bg.querySelector('#discoverResults');
@@ -1112,7 +1420,7 @@ function openQuickActions(){
 function buildRecentRows(){
   const hist=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');
   const current=cards.map(function(id){
-    const st=states[id],ct=DATA[st.c],p=st.product&&ct.products?.[st.product]?.nome||ct.nome;
+    const st=states[id],ct=DATA[st.c],p=getProduct(ct,st.product)?.nome||ct.nome;
     return {kind:'current',id:id,client:st.clientName||'Sem cliente',meta:ct.nome+' · '+p,stage:st.stage||'Novo',date:'Sessão atual'};
   });
   return current.concat(hist.slice(0,8).map(function(h){return {kind:'history',hist:h,client:h.clientName||'Sem cliente',meta:h.company+' · '+h.product,stage:h.stage||'Novo',date:new Date(h.savedAt).toLocaleDateString('pt-BR')};}));
@@ -1190,7 +1498,7 @@ function openRulesManager(){
     if(companyId==='mrv'){
       specific+=numericField('Carteira MRV (% do imóvel)','mrv.walletPct',(R.mrv.walletPct*100).toLocaleString('pt-BR',{maximumFractionDigits:2}),0.01,'pct');
     }
-    const products=Object.entries(c.products||{}).map(function(pair){
+    const products=Object.entries(getProducts(c)||{}).map(function(pair){
       const productId=pair[0],p=pair[1]||{},rp=R.products?.[companyId]?.[productId]||{};
       const numeric=Object.keys(p).filter(function(k){return k!=='nome'&&typeof p[k]==='number';});
       if(!numeric.length)return '';
@@ -1354,6 +1662,7 @@ function enterProduct(companyId,productId){
   if(st && company){
     st.product=productId;
     productApply(st,company);
+    if(company.normalizar)company.normalizar(st.v);
     renderWorkspace(activeCard);
     renderSimList();
   }
@@ -1460,17 +1769,17 @@ function renderStartScreen(){
   if(!grid)return;
   const cardsHtml=ORDER.map(function(id){
     const company=DATA[id]||{nome:id,cor:'#7da887',obs:'',products:{}};
-    const products=Object.entries(company.products||{});
+    const products=Object.entries(getProducts(company)||{});const visibleProducts=products.slice(0,5);
     const accent=company.cor||'#7da887';
     const initial=String(company.nome||id).trim().charAt(0).toUpperCase()||'?';
     return '<div class="start-card" data-start-company="'+escapeAttr(id)+'" tabindex="0" role="button" style="--card-accent:'+accent+';--card-accent-soft:'+accent+'20">'+
       '<div class="start-card-head"><span class="start-card-mark">'+escapeHtml(initial)+'</span><button type="button" class="start-card-arrow" data-start-company-btn="'+escapeAttr(id)+'" aria-label="Abrir '+escapeAttr(company.nome||id)+'">→</button></div>'+
       '<h3>'+escapeHtml(company.nome||id)+'</h3>'+
       '<p>Escolha a construtora ou entre direto no empreendimento.</p>'+
-      '<div class="start-card-list">'+(products.length?products.map(function(pair){
+      '<div class="start-card-list">'+(visibleProducts.length?visibleProducts.map(function(pair){
         const key=pair[0],p=pair[1]||{};
         return '<button type="button" class="start-project-btn" data-start-product="'+escapeAttr(id+'|'+key)+'">'+escapeHtml(p.nome||key)+'</button>';
-      }).join(''):'<span class="start-project">Plano de pagamento</span>')+'</div>'+
+      }).join('')+(products.length>5?'<span class="start-project">+'+(products.length-5)+' opções</span>':''):'<span class="start-project">Plano de pagamento</span>')+'</div>'+
       '<div class="start-card-foot"><span class="start-count">'+products.length+' '+(products.length===1?'empreendimento':'empreendimentos')+'</span><span class="start-hint">Abrir simulador</span></div>'+
     '</div>';
   }).join('');
