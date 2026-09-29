@@ -1149,7 +1149,7 @@ function renderWorkspace(id){
       const k=fieldKey(f),type=fieldType(f),v=st.v[k],hint=f.h??f.hint,disabled=f.productControlled&&st.product!=='custom'?'disabled':'';
       const box=document.createElement('div');box.className='field '+(type==='money'?'money ':'')+(f.info?'info ':'');
       const inputType=type==='money'?'type="text" inputmode="decimal"':'type="number" step="any" inputmode="decimal"';
-      box.innerHTML=`<label>${escapeHtml(fieldLabel(f))}</label><div class="input">${type==='money'?'<span class="prefix">R$</span>':''}<input ${inputType} data-key="${escapeAttr(k)}" value="${type==='money'?fmtInputMoney(v):v}" ${disabled}></div>${hint?`<span class="hint">${escapeHtml(hint)}</span>`:''}`;
+      box.innerHTML=`<label>${escapeHtml(fieldLabel(f))}</label><div class="input">${type==='money'?'<span class="prefix">R$</span>':''}<input ${inputType} data-key="${escapeAttr(k)}" value="${type==='money'?fmtInput(v):v}" ${disabled}></div>${hint?`<span class="hint">${escapeHtml(hint)}</span>`:''}`;
       grid.appendChild(box);
     });
     fp.appendChild(sec);
