@@ -781,7 +781,7 @@ const DATA={
   return{status,highlight:[['A dividir com a construtora',dividir,'money'],[`Parcela (${i.qtdParcelas}x)`,parc,'money','strong'],['Comprometimento de renda',comp,'pct','strong']],rows:[['Renda total',renda,'money'],['Entrada em dinheiro total',entradaTotal,'money'],['Entrada à vista',i.aVista,'money'],['Intercaladas anuais',i.intercalada*i.qtdIntercaladas,'money'],['Chave',i.chave,'money'],[`Parcela da carteira (${money(ORBE_RULES.barcelos.walletBase)} em ${i.qtdParcelas}x)`,pCarteira,'money'],['Parcela extra por renda ('+rulePctText(ORBE_RULES.barcelos.rendaExtraPct)+')',pRenda,'money'],['Limite de parcela (carteira + renda)',limite,'money'],[`Máximo parcelável em ${i.qtdParcelas}x`,maxP,'money'],...(!okP?[[`Nº de parcelas informado`,`${i.qtdParcelas}x`,'text','alert']]:[]),...(!ok?[['Excedente acima do limite',dividir-maxP,'money','alert'],['Entrada à vista sugerida',Math.ceil(i.aVista+(dividir-maxP)),'money','alert']]:[])],resumo:[['Valor do imóvel',i.valorImovel,'money'],['Avaliação da Caixa',i.avaliacaoCaixa,'money'],['Valor do financiamento',i.financiamento,'money'],['FGTS',i.fgts||0,'money'],...(i.subsidio>0?[['Subsídio',i.subsidio,'money']]:[]),['Entrada à vista (1ª parte)',i.aVista,'money'],['Sinal intercalado (2ª parte)',i.sinalIntercalado||0,'money'],['Intercaladas anuais',i.qtdIntercaladas>0?`${i.qtdIntercaladas}x de ${money(i.intercalada)}`:'—','text'],['Chave',i.chave,'money'],['A dividir com a construtora',dividir,'money'],['Mensais',`${i.qtdParcelas}x de ${money(parc)}`,'text'],['Parcela Caixa (pós-chaves)',i.parcelaCaixa||0,'money']]};
  }
  },
- mrv:{nome:'MRV',cor:'#d83b3b',obs:'Plano de pagamento baseado na calculadora MRV enviada. O valor financiado é informado e o Orbe calcula a entrada, a carteira MRV de 19% e o sinal.',products:{mrv:{nome:'Plano de pagamento'}},fields:[
+ mrv:{nome:'MRV',cor:'#d83b3b',obs:'Plano de pagamento MRV: a entrada é parcelada em 52x decrescentes. O valor financiado é informado e o Orbe calcula a entrada, a carteira MRV de 19% e o sinal.',products:{mrv:{nome:'Plano de pagamento'}},fields:[
   {k:'valorImovel',l:'Valor do imóvel',t:'money',d:389990},
   {k:'avaliacao',l:'Valor da avaliação',t:'money',d:437800,info:true},
   {k:'financiamento',l:'Valor financiado',t:'money',d:243778.11}
@@ -797,7 +797,7 @@ const DATA={
       ? {label:`Sinal resultante: ${money(sinal)}`,detail:`Depois de separar a carteira, ainda sobram ${money(sinal)} para o sinal.`,ok:true}
       : {label:`Faltam ${money(Math.abs(sinal))} para o sinal ficar positivo`,detail:'Aumente a entrada ou reduza o financiamento para eliminar o saldo negativo.',ok:false}
   ]};
-  return{status,highlight:[['Valor do sinal',sinal,'money','strong'],['Parcelamento MRV',carteira,'money','strong']],rows:[['Valor do imóvel',imovel,'money'],['Valor da avaliação',avaliacao,'money'],['Valor financiado',financiamento,'money'],['Entrada à vista',entrada,'money'],['Carteira MRV ('+rulePctText(ORBE_RULES.mrv.walletPct)+')',carteira,'money'],['Valor do sinal',sinal,'money'],['Carteira / imóvel',ORBE_RULES.mrv.walletPct,'pct']],resumo:[['Valor do imóvel',imovel,'money'],['Valor da avaliação',avaliacao,'money'],['Valor financiado',financiamento,'money'],['Entrada à vista',entrada,'money'],['Parcelamento MRV',carteira,'money'],['Valor do sinal',sinal,'money']]};
+  return{status,highlight:[['Valor do sinal',sinal,'money','strong'],['Parcelamento','52x decrescentes','text','strong']],rows:[['Valor do imóvel',imovel,'money'],['Valor da avaliação',avaliacao,'money'],['Valor financiado',financiamento,'money'],['Entrada à vista',entrada,'money'],['Carteira MRV ('+rulePctText(ORBE_RULES.mrv.walletPct)+')',carteira,'money'],['Forma de parcelamento','52x decrescentes','text'],['Valor do sinal',sinal,'money'],['Carteira / imóvel',ORBE_RULES.mrv.walletPct,'pct']],resumo:[['Valor do imóvel',imovel,'money'],['Valor da avaliação',avaliacao,'money'],['Valor financiado',financiamento,'money'],['Entrada à vista',entrada,'money'],['Parcelamento da entrada','52x decrescentes','text'],['Valor da carteira MRV',carteira,'money'],['Valor do sinal',sinal,'money']]};
  }
  },
 stanza: {
@@ -1697,12 +1697,12 @@ function openMRVSimulator(){
           '<h3>Plano calculado</h3><p class="subline">Valores derivados automaticamente.</p>'+
           '<div class="mrv-calc">'+
             '<div class="mrv-kpi"><div class="k">Entrada à vista</div><div class="v" id="mrvEntrada">—</div><div class="meta">Valor do imóvel − financiamento</div></div>'+
-            '<div class="mrv-kpi primary"><div class="k">Parcelamento MRV</div><div class="v" id="mrvCarteira">—</div><div class="meta">19% do valor do imóvel</div></div>'+
+            '<div class="mrv-kpi primary"><div class="k">Carteira MRV</div><div class="v" id="mrvCarteira">—</div><div class="meta">Valor reservado para parcelamento</div></div>'+
             '<div class="mrv-kpi"><div class="k">Valor do sinal</div><div class="v" id="mrvSinal">—</div><div class="meta">Entrada à vista − parcelamento MRV</div></div>'+
           '</div>'+
-          '<div class="mrv-mini-grid"><div class="mrv-mini"><div class="k">Financiamento</div><div class="v" id="mrvFinMeta">—</div></div><div class="mrv-mini"><div class="k">Carteira / imóvel</div><div class="v">19,00%</div></div></div>'+
+          '<div class="mrv-mini-grid"><div class="mrv-mini"><div class="k">Financiamento</div><div class="v" id="mrvFinMeta">—</div></div><div class="mrv-mini"><div class="k">Parcelamento da entrada</div><div class="v">52x decrescentes</div></div></div>'+
           '<div class="mrv-status" id="mrvStatus">Preencha os valores para validar a proposta.</div>'+
-          '<div class="mrv-formula">Fórmula: entrada à vista = imóvel − financiado; parcelamento MRV = imóvel × 19%; sinal = entrada à vista − parcelamento MRV.</div>'+
+          '<div class="mrv-formula">Fórmula: entrada à vista = imóvel − financiado; carteira MRV = imóvel × 19%; sinal = entrada à vista − carteira MRV. A entrada é parcelada em 52x decrescentes.</div>'+
         '</div>'+
       '</div>'+
       '<div class="mrv-actions"><button class="btn" id="mrvReset">Restaurar exemplo</button><button class="btn primary" id="mrvCopy">Copiar resumo</button></div>'+
