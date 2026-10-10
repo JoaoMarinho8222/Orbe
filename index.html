@@ -740,11 +740,273 @@ function mdFluxo(v){
 }
 function mdDescreve(c){if(c.total<=0.004)return'quitado pelo sinal';if(c.prazo)return`${fmtMoney(c.total)} em até ${c.prazo}x`;return c.q>1?`${c.q}x de ${fmtMoney(c.parcela)}`:fmtMoney(c.total)}
 
+function abateFimFase(parcela, q, rem) {
+  if (q <= 0 || parcela <= 0.005 || rem <= 0.005) return { cheias: Math.max(q, 0), parcial: 0, usado: 0 };
+  const bloco = parcela * q;
+  if (rem >= bloco - 0.005) return { cheias: 0, parcial: 0, usado: bloco };
+  const n = Math.floor((rem + 1e-9) / parcela); // parcelas inteiras quitadas
+  const resto = rem - n * parcela;
+  return resto > 0.005
+    ? { cheias: q - n - 1, parcial: parcela - resto, usado: rem }
+    : { cheias: q - n, parcial: 0, usado: rem };
+}
+
+function telesilBlocos(i) {
+  const liquido = i.valorTabela - i.desconto;
+  const f80 = (i.pct80 || 80) / 100;
+  const f20 = 1 - f80;
+  const valorInter = i.valorIntercalada || 0;
+  const semestraisTotal = valorInter * i.semestrais;
+  const total = i.sinal + (i.sinalIntercalado || 0) + i.fgts + i.subsidio + i.financiamento;
+  const entrada = liquido - total - semestraisTotal;
+  // produto fora do Minha Casa É Massa (mcem === false): o desconto MCEM não abate
+  const mcemBloqueado = i.mcem === false && (i.descontoMcem || 0) > 0;
+  const mcemAbate = i.mcem === false ? 0 : Math.min(i.descontoMcem || 0, Math.max(entrada, 0));
+  const entradaEfetiva = entrada - mcemAbate;
+  const base = Math.max(entrada, 0);
+  // divisão automática pela % do produto (sobre a entrada bruta)
+  let bloco80 = base * f80;
+  let bloco20 = base * f20;
+  const parcela20Auto = i.q20 > 0 ? bloco20 / i.q20 : 0;
+  // manual = valor digitado difere do automático (o campo guarda o automático
+  // arredondado em centavos enquanto não for editado)
+  const p2 = i.parcela2;
+  const manual = p2 != null && i.q20 > 0 && Math.abs(p2 - Math.round(parcela20Auto * 100) / 100) >= 0.01;
+  let limitada = false;
+  if (manual) {
+    bloco20 = Math.max(p2, 0) * i.q20;
+    if (bloco20 > base) { bloco20 = base; limitada = true; }
+    bloco80 = base - bloco20;
+  }
+  const parcela80 = i.q80 > 0 ? bloco80 / i.q80 : 0;
+  const parcela20 = i.q20 > 0 ? bloco20 / i.q20 : 0;
+  // MCEM de trás para frente: 2ª fase, depois 1ª
+  const fase2 = abateFimFase(parcela20, i.q20, mcemAbate);
+  const fase1 = abateFimFase(parcela80, i.q80, mcemAbate - fase2.usado);
+  const fase2Resta = fase2.cheias > 0 || fase2.parcial > 0;
+  const fase1Resta = fase1.cheias > 0 || fase1.parcial > 0;
+  // última parcela do fluxo (só faz sentido mostrar quando há MCEM)
+  let ultima = null;
+  if (mcemAbate > 0) {
+    ultima = fase2Resta
+      ? { fase: 2, valor: fase2.parcial || parcela20, numero: i.q80 + fase2.cheias + (fase2.parcial ? 1 : 0) }
+      : { fase: 1, valor: fase1.parcial || parcela80, numero: fase1.cheias + (fase1.parcial ? 1 : 0) };
+    if (ultima.numero <= 0) ultima = null; // MCEM quitou toda a entrada
+  }
+  const soma = bloco80 + bloco20;
+  const pctA = manual ? Math.round(soma ? (bloco80 / soma) * 100 : 0) : Math.round(f80 * 100);
+  const pctB = manual ? 100 - pctA : Math.round(f20 * 100);
+  return { liquido, f80, f20, valorInter, semestraisTotal, total, entrada, mcemAbate, entradaEfetiva,
+    bloco80, bloco20, parcela80, parcela20, parcela20Auto, manual, limitada, pctA, pctB,
+    fase1, fase2, fase1Resta, fase2Resta, ultima, mcemBloqueado };
+}
+
+// Texto de uma fase: "28x de R$ 430,48", "19x de R$ 247,37 + 1x de R$ 236,85 (última)".
+function telesilFaseTxt(fase, parcela, money) {
+  if (fase.cheias <= 0 && fase.parcial <= 0) return 'quitada pelo MCEM';
+  const partes = [];
+  if (fase.cheias > 0) partes.push(`${fase.cheias}x de ${money(parcela)}`);
+  if (fase.parcial > 0) partes.push(`1x de ${money(fase.parcial)} (última)`);
+  return partes.join(' + ');
+}
+
+// Barcelos — fluxo compartilhado por compute() e resumo(). No Plano Direto não há
+// banco: financiamento, FGTS e subsídio são ignorados (os valores digitados ficam
+// guardados no card, só não entram na conta, para não se perder ao voltar ao Caixa).
+function barcelosFluxo(i) {
+  const direto = i.plano === 'direto';
+  const renda = i.rendaAprovada + (i.rendaInformal || 0);
+  const fin = direto ? 0 : i.financiamento;
+  const fgts = direto ? 0 : i.fgts;
+  const subsidio = direto ? 0 : i.subsidio;
+  const entradaTotal = i.valorImovel - fin - fgts - subsidio;
+  const sinal = i.aVista + (i.sinalIntercalado || 0);
+  const intercaladas = i.intercalada * i.qtdIntercaladas;
+  const dividir = entradaTotal - sinal - intercaladas - i.chave;
+  const parcela = i.qtdParcelas > 0 ? dividir / i.qtdParcelas : 0;
+  const maxParcelas = i.maxParcelas || (direto ? 36 : 60);
+  const sinalMin = direto ? i.valorImovel * ORBE_RULES.barcelos.diretoSinalPct : ORBE_RULES.barcelos.caixaSinalMin;
+  return { direto, renda, entradaTotal, sinal, intercaladas, dividir, parcela, maxParcelas, sinalMin };
+}
+
+function premissaSaude(args){return health(args)}
+function menorSinalSaudavel(liquido,aportesFixos,interTotal,entradaMax){return menorSinal(liquido,aportesFixos,interTotal,entradaMax)}
+
 const DATA={
- telesil:{nome:'Telesil',cor:'#2563eb',obs:'Entrada dividida em dois blocos pagos em sequência. Percentual e número de parcelas variam por produto.',products:{'grand-diamond':{nome:'Grand Diamond',q80:28,q20:24,pct80:67},'grand-via':{nome:'Grand Via',q80:31,q20:24,pct80:80},splendido:{nome:'Splendido',q80:35,q20:24,pct80:80},'reserva-aldeprime':{nome:'Reserva Aldeprime',q80:26,q20:28,pct80:70},custom:{nome:'Outro (manual)',q80:35,q20:24,pct80:80}},fields:[
- {k:'renda',l:'Renda do cliente',t:'money',d:7627.29},{k:'valorTabela',l:'Valor de tabela',t:'money',d:275990.39},{k:'desconto',l:'Desconto de tabela',t:'money',d:0},{k:'descontoMcem',l:'Desconto MCEM',t:'money',d:0},{k:'sinal',l:'Sinal (ato)',t:'money',d:50000},{k:'sinalIntercalado',l:'Sinal intercalado (2ª parte)',t:'money',d:0},{k:'financiamento',l:'Financiamento aprovado',t:'money',d:208000},{k:'fgts',l:'FGTS',t:'money',d:0},{k:'subsidio',l:'Subsídio',t:'money',d:0},{k:'semestrais',l:'Nº de semestrais',t:'int',d:0},{k:'valorIntercalada',l:'Valor da intercalada (semestral)',t:'money',d:0,auto:v=>Math.round(v.renda*ORBE_RULES.telesil.intercaladaPct*100)/100},{k:'parcelaCaixa',l:'Parcela Caixa (pós-chaves)',t:'money',d:0,info:true,auto:v=>Math.round(v.renda*ORBE_RULES.common.incomePct*100)/100},{k:'q80',l:'Parcelas do 1º bloco',t:'int',d:35},{k:'q20',l:'Parcelas do 2º bloco',t:'int',d:24}],
- compute(i){const c=this;const liq=i.valorTabela-i.desconto;const cap=i.renda*ORBE_RULES.common.incomePct;const f80=(i.pct80||80)/100,f20=1-f80;const inter=(i.valorIntercalada||0)*i.semestrais;const total=i.sinal+(i.sinalIntercalado||0)+i.fgts+i.subsidio+i.financiamento;const entrada=liq-total-inter;const mcemAbate=Math.min(i.descontoMcem||0,Math.max(entrada,0));const efet=entrada-mcemAbate;const b80r=entrada*f80,b20r=entrada*f20,ab20=Math.min(mcemAbate,b20r),ab80=mcemAbate-ab20,b80=Math.max(b80r-ab80,0),b20=Math.max(b20r-ab20,0);const p80=i.q80>0?b80/i.q80:0,p20=i.q20>0?b20/i.q20:0,maxp=Math.max(p80,p20);const fi=liq?(total+mcemAbate)/liq:0,ep=liq?efet/liq:0;const status=health({parcela:maxp,capacidade:cap,entradaPct:ep,fi});const k=Math.max(i.q80>0?f80/i.q80:Infinity,i.q20>0?f20/i.q20:Infinity);const entradaMax=cap/k;const fix=(total-i.sinal)+mcemAbate;const sinalMax=liq-fix-inter;const sinalSug=Math.min(menorSinal(liq,fix,inter,entradaMax),sinalMax);return{status,highlight:[['Entrada parcelada',efet,'money'],[`1ª fase — ${Math.round(f80*100)}% (${i.q80}x)`,p80,'money'],...(b20>.005?[[`2ª fase — ${Math.round(f20*100)}% (${i.q20}x)`,p20,'money']]:[]),...(i.semestrais>0?[['Intercalada (semestral)',i.valorIntercalada,'money']]:[]),['Maior parcela mensal',maxp,'money','strong']],rows:[['Líquido (tabela − desconto)',liq,'money'],['Capacidade de pagamento ('+rulePctText(ORBE_RULES.common.incomePct)+')',cap,'money'],['Total aportado',total,'money'],['Total das intercaladas',inter,'money'],...(mcemAbate>0?[['Entrada parcelada (bruta)',entrada,'money'],['Desconto MCEM aplicado',mcemAbate,'money']]:[]),...(mcemAbate>0&&b20<=0.005?[['2ª fase quitada pelo MCEM','Sim','text']]:[]),['Entrada % do imóvel',ep,'pct'],['F.I. Real',fi,'pct'],...(!status.ok&&sinalSug>i.sinal?[['Sinal sugerido p/ ficar saudável',Math.ceil(sinalSug),'money','alert']]:[])] ,resumo:[['Valor do imóvel',i.valorTabela,'money'],...(i.desconto>0?[['Desconto aplicado',i.desconto,'money']]:[]),['Valor do imóvel com desconto',liq,'money'],['Valor do financiamento',i.financiamento,'money'],['FGTS',i.fgts||0,'money'],...(i.subsidio>0?[['Subsídio',i.subsidio,'money']]:[]),['Sinal (ato)',i.sinal,'money'],['Sinal intercalado',i.sinalIntercalado||0,'money'],...(mcemAbate>0?[['Entrada parcelada (bruta)',entrada,'money'],['Desconto MCEM',mcemAbate,'money']]:[]),['Entrada parcelada (após MCEM)',efet,'money'],['Mensais',b20>.005?`1ª fase (${Math.round(f80*100)}%): ${i.q80}x de ${money(p80)}\n2ª fase (${Math.round(f20*100)}%): ${i.q20}x de ${money(p20)}`:`1ª fase (${Math.round(f80*100)}%): ${i.q80}x de ${money(p80)}`,'text'],['Intercaladas semestrais',i.semestrais>0?`${i.semestrais}x de ${money(i.valorIntercalada)}`:'—','text'],['Valor total das intercaladas',inter,'money'],['Parcela Caixa (pós-chaves)',i.parcelaCaixa||0,'money']]};}
- },
+ telesil: {
+    nome: 'Telesil',
+    cor: '#2563eb',
+    obs: 'Entrada dividida em dois blocos pagos em sequência (paga o 1º bloco inteiro e só depois o 2º). A divisão (%) e o nº de parcelas variam por produto.',
+    // pct80 = % da entrada no 1º bloco (o 2º bloco fica com o restante).
+    // q80/q20 = nº de parcelas de cada bloco.
+    // Condições comerciais de OUTUBRO/2026 (ver diretiva). Ao escolher o produto, os
+    // campos sinal / sinalIntercalado / semestrais recebem os valores da campanha.
+    //   atoMin   = ato mínimo (abaixo dele: alerta; com F.I. ≥ 77% é "caso a caso")
+    //   mcem     = participa do Minha Casa É Massa (false = desconto MCEM não abate)
+    //   campanha = aviso mostrado no card (desconto NÃO é aplicado automaticamente)
+    produtos: {
+      'grand-diamond':     { nome: 'Grand Diamond',     q80: 28, q20: 24, pct80: 67,
+        sinal: 999.99, sinalIntercalado: 999.99, semestrais: 5, atoMin: 999.99, mcem: true,
+        campanha: 'Minha Casa É Massa' },
+      'grand-via':         { nome: 'Grand Via',         q80: 30, q20: 24, pct80: 80,
+        atoMin: 0, mcem: null, campanha: '' },
+      'splendido':         { nome: 'Splendido',         q80: 33, q20: 24, pct80: 85,
+        sinal: 999.99, sinalIntercalado: 999.99, semestrais: 0, atoMin: 999.99, mcem: false,
+        campanha: 'R$ 10 mil de desconto p/ unidades acima de R$ 380 mil (5 primeiras unidades)' },
+      'reserva-aldeprime': { nome: 'Reserva Aldeprime', q80: 24, q20: 28, pct80: 70,
+        sinal: 999.99, sinalIntercalado: 999.99, semestrais: 4, atoMin: 999.99, mcem: true,
+        campanha: 'R$ 10 mil de desconto (10 primeiras unidades) · Minha Casa É Massa' },
+      'reserva-prata':     { nome: 'Reserva do Prata',  q80: 14, q20: 14, pct80: 70,
+        sinal: 999.99, sinalIntercalado: 0, semestrais: 2, atoMin: 999.99, mcem: false,
+        campanha: 'R$ 10 mil de desconto' },
+      'custom':            { nome: 'Outro (manual)',    q80: 35, q20: 24, pct80: 80,
+        atoMin: 0, mcem: null, campanha: '' },
+    },
+    fields: [
+      { key: 'renda',        label: 'Renda do cliente',        type: 'money', def: 7627.29 },
+      { key: 'valorTabela',  label: 'Valor de tabela',         type: 'money', def: 275990.39 },
+      { key: 'desconto',     label: 'Desconto de tabela',      type: 'money', def: 0 },
+      { key: 'descontoMcem', label: 'Desconto MCEM',           type: 'money', def: 0 },
+      { key: 'sinal',        label: 'Sinal (ato)',             type: 'money', def: 50000 },
+      { key: 'sinalIntercalado', label: 'Sinal intercalado (2ª parte do sinal)', type: 'money', def: 0 },
+      { key: 'financiamento',label: 'Financiamento aprovado',  type: 'money', def: 208000 },
+      { key: 'fgts',         label: 'FGTS',                    type: 'money', def: 0 },
+      { key: 'subsidio',     label: 'Subsídio',                type: 'money', def: 0 },
+      { key: 'semestrais',   label: 'Nº de semestrais',        type: 'int',   def: 0 },
+      { key: 'valorIntercalada', label: 'Valor da intercalada (semestral)', type: 'money',
+        autoDefault: (v) => Math.round(v.renda * ORBE_RULES.telesil.intercaladaPct * 100) / 100 },
+      { key: 'parcelaCaixa', label: 'Parcela Caixa (pós-chaves)', type: 'money', def: 0, info: true,
+        autoDefault: (v) => Math.round(v.renda * ORBE_RULES.common.incomePct * 100) / 100 },
+      // A divisão entre os blocos (pct80) vem do produto selecionado e não é
+      // editável na tela — ela já aparece nos rótulos das fases e no resumo.
+      // Sem produto que a defina (ex.: "Outro (manual)"), cai no padrão 80/20.
+      { key: 'q80',          label: 'Parcelas do 1º bloco',    type: 'int',   def: 35 },
+      { key: 'q20',          label: 'Parcelas do 2º bloco',    type: 'int',   def: 24 },
+      // Editável: digitar um valor recalcula a 1ª fase; apagar volta ao automático.
+      { key: 'parcela2',     label: 'Parcela da 2ª fase',      type: 'money', def: 0,
+        vazioAuto: true, resetProduto: true,
+        autoDefault: (v) => Math.round(telesilBlocos({ ...v, parcela2: null }).parcela20Auto * 100) / 100,
+        hint: 'Ajuste manual recalcula a 1ª fase. Apague para voltar ao automático.' },
+    ],
+    compute(i) {
+      const liquido = i.valorTabela - i.desconto;
+      const capacidade = i.renda * ORBE_RULES.common.incomePct;
+      // Divisão da entrada entre os dois blocos (varia por produto).
+      const f80 = (i.pct80 || 80) / 100;
+      const f20 = 1 - f80;
+      const valorInter = i.valorIntercalada || 0;       // valor de cada intercalada (editável)
+      const semestraisTotal = valorInter * i.semestrais; // soma de todas as intercaladas
+      const temInter = i.semestrais > 0;
+      const sinalTotal = i.sinal + (i.sinalIntercalado || 0); // sinal pode ser dividido em 2x
+      const total = sinalTotal + i.fgts + i.subsidio + i.financiamento;
+      const entrada = liquido - total - semestraisTotal;
+      // MCEM: abate exatamente esse valor da entrada parcelada (como um aporte da
+      // construtora), SEM recalcular as parcelas: quita parcelas inteiras de trás para
+      // frente (fim da 2ª fase, depois fim da 1ª) e o resto reduz a última parcela
+      // do fluxo, mostrada à parte. Nunca abate mais do que a própria entrada.
+      const b = telesilBlocos(i);
+      const { mcemAbate, entradaEfetiva, parcela80, parcela20 } = b;
+      const temMcem = mcemAbate > 0;
+      // se o MCEM quitou a 2ª fase, ela some; com ajuste manual mostra sempre
+      const bloco20Ativo = b.fase2Resta || (b.manual && !temMcem);
+      const n80 = b.fase1.cheias, n20 = b.fase2.cheias;
+      const pctA = b.pctA, pctB = b.pctB;
+      // Blocos são SEQUENCIais: paga as q80 parcelas e só depois as q20.
+      // O mês mais pesado é a maior das duas parcelas (+ a intercalada nos meses que ela cai).
+      // A premissa dos 30% mede a PARCELA MENSAL (a intercalada é semestral, paga
+      // com 13º/renda extra — não entra no comprometimento mensal).
+      // só contam as fases que ainda têm parcelas depois do MCEM
+      const parcelaMaxBloco = Math.max(b.fase1Resta ? parcela80 : 0, b.fase2Resta ? parcela20 : 0);
+      const mesMaisPesado = parcelaMaxBloco + (temInter ? valorInter : 0); // informativo
+      const totalParcelar = entradaEfetiva + semestraisTotal; // já com o MCEM abatido
+      // O MCEM abate a entrada efetiva e conta como cobertura do imóvel: melhora
+      // Entrada% e F.I. A parcela NÃO muda (as parcelas não são recalculadas).
+      const fi = liquido ? (total + mcemAbate) / liquido : 0;
+      const entradaPct = liquido ? entradaEfetiva / liquido : 0;
+      const status = premissaSaude({ parcela: parcelaMaxBloco, capacidade, entradaPct, fi });
+      // sinal sugerido: o MCEM entra como aporte fixo (reduz a entrada em todas as premissas)
+      // e o sinal nunca passa do ponto em que a entrada efetiva chega a zero (sinalMax).
+      const k = Math.max(i.q80 > 0 ? f80 / i.q80 : Infinity, i.q20 > 0 ? f20 / i.q20 : Infinity);
+      // com ajuste manual o bloco da 2ª fase é fixo: a entrada máxima é o que cabe na
+      // 1ª fase (30% × q80) mais esse bloco
+      // as parcelas saem da entrada BRUTA (antes do MCEM), então o limite da parcela
+      // vale para a bruta: na entrada efetiva ele fica menor pelo valor do MCEM
+      const entradaMax = (b.manual ? capacidade * i.q80 + b.bloco20 : capacidade / k) - mcemAbate;
+      const aportesFixos = (total - i.sinal) + mcemAbate; // tudo que reduz a entrada, menos o sinal
+      const sinalMax = liquido - aportesFixos - semestraisTotal; // sinal que zera a entrada efetiva
+      const sinalSug = Math.min(menorSinalSaudavel(liquido, aportesFixos, semestraisTotal, entradaMax), sinalMax);
+      return {
+        status,
+        destaque: [
+          { label: 'Entrada parcelada', valor: entradaEfetiva, fmt: 'money' },
+          ...(b.fase1Resta || !temMcem ? [{ label: `1ª fase — ${pctA}% (${n80}x)`, valor: parcela80, fmt: 'money' }] : []),
+          ...(bloco20Ativo ? [{ label: `2ª fase — ${pctB}% (${n20}x)${b.manual ? ' · ajustada' : ''}`, valor: parcela20, fmt: 'money' }] : []),
+          ...(b.ultima ? [{ label: `Última parcela (${b.ultima.fase}ª fase, nº ${b.ultima.numero})`, valor: b.ultima.valor, fmt: 'money' }] : []),
+          ...(temInter ? [{ label: 'Intercalada (semestral)', valor: valorInter, fmt: 'money' }] : []),
+          { label: 'Maior parcela mensal', valor: parcelaMaxBloco, fmt: 'money', forte: true },
+        ],
+        linhas: [
+          ...(i.campanha ? [{ label: 'Campanha do mês', valor: i.campanha, fmt: 'text' }] : []),
+          // Ato mínimo da campanha: com F.I. ≥ 77% a construtora analisa o ato caso a caso
+          ...(i.atoMin > 0 && i.sinal < i.atoMin - 0.005
+            ? [fi >= 0.77
+                ? { label: `Ato abaixo de ${fmtMoney(i.atoMin)} — F.I. ≥ 77%: análise caso a caso`, valor: i.sinal, fmt: 'money' }
+                : { label: `Ato abaixo do mínimo (${fmtMoney(i.atoMin)})`, valor: i.sinal, fmt: 'money', alerta: true }]
+            : []),
+          ...(b.mcemBloqueado
+            ? [{ label: 'Produto fora do Minha Casa É Massa — MCEM não abatido', valor: i.descontoMcem, fmt: 'money', alerta: true }]
+            : []),
+          { label: 'Líquido (tabela − desconto)', valor: liquido, fmt: 'money' },
+          { label: `Capacidade de pagamento (${fmtPct(ORBE_RULES.common.incomePct)})`, valor: capacidade, fmt: 'money' },
+          { label: 'Total aportado', valor: total, fmt: 'money' },
+          { label: 'Total das intercaladas', valor: semestraisTotal, fmt: 'money' },
+          ...(temMcem ? [
+            { label: 'Entrada parcelada (bruta)', valor: entrada, fmt: 'money' },
+            { label: 'Desconto MCEM aplicado', valor: mcemAbate, fmt: 'money' },
+          ] : []),
+          ...(temMcem ? [
+            { label: `1ª fase (${i.q80}x na tabela)`, valor: telesilFaseTxt(b.fase1, parcela80, fmtMoney), fmt: 'text' },
+            { label: `2ª fase (${i.q20}x na tabela)`, valor: telesilFaseTxt(b.fase2, parcela20, fmtMoney), fmt: 'text' },
+          ] : []),
+          ...(b.manual ? [{ label: 'Parcela da 2ª fase automática (referência)', valor: b.parcela20Auto, fmt: 'money' }] : []),
+          ...(b.limitada ? [{ label: '2ª fase limitada ao total da entrada — 1ª fase zerada', valor: parcela20, fmt: 'money', alerta: true }] : []),
+          { label: 'Total a parcelar (entrada + intercaladas)', valor: totalParcelar, fmt: 'money' },
+          ...(temInter ? [{ label: 'Mês mais pesado (parcela + intercalada)', valor: mesMaisPesado, fmt: 'money' }] : []),
+          { label: 'Entrada % do imóvel', valor: entradaPct, fmt: 'pct' },
+          { label: 'F.I. Real', valor: fi, fmt: 'pct' },
+          ...(!status.ok && sinalSug > i.sinal
+            ? [{ label: 'Sinal sugerido p/ ficar saudável', valor: Math.ceil(sinalSug), fmt: 'money', alerta: true }]
+            : []),
+        ],
+      };
+    },
+    // Resumo para apresentar ao cliente (popup). `money` é o formatador de R$.
+    resumo(i, money) {
+      const b = telesilBlocos(i);
+      const { liquido, valorInter, semestraisTotal, entrada, mcemAbate, entradaEfetiva, parcela80, parcela20, pctA, pctB } = b;
+      return [
+        { label: 'Valor do imóvel', valor: i.valorTabela, fmt: 'money' },
+        ...(i.desconto > 0 ? [{ label: 'Desconto aplicado', valor: i.desconto, fmt: 'money' }] : []),
+        { label: 'Valor do imóvel com desconto', valor: liquido, fmt: 'money' },
+        { label: 'Valor do financiamento', valor: i.financiamento, fmt: 'money' },
+        { label: 'FGTS', valor: i.fgts || 0, fmt: 'money' },
+        ...(i.subsidio > 0 ? [{ label: 'Subsídio', valor: i.subsidio, fmt: 'money' }] : []),
+        { label: 'Sinal (ato)', valor: i.sinal, fmt: 'money' },
+        { label: 'Sinal intercalado', valor: i.sinalIntercalado || 0, fmt: 'money' },
+        ...(mcemAbate > 0 ? [
+          { label: 'Entrada parcelada (bruta)', valor: entrada, fmt: 'money' },
+          { label: 'Desconto MCEM', valor: mcemAbate, fmt: 'money' },
+        ] : []),
+        { label: mcemAbate > 0 ? 'Entrada parcelada (após MCEM)' : 'Entrada parcelada', valor: entradaEfetiva, fmt: 'money' },
+        { label: 'Mensais', valor:
+            `1ª fase (${pctA}%): ${telesilFaseTxt(b.fase1, parcela80, money)}` +
+            (b.fase2Resta || mcemAbate > 0 ? `\n2ª fase (${pctB}%): ${telesilFaseTxt(b.fase2, parcela20, money)}` : ''), fmt: 'text' },
+        { label: 'Intercaladas semestrais', valor: i.semestrais > 0 ? `${i.semestrais}x de ${money(valorInter)}` : '—', fmt: 'text' },
+        { label: 'Valor total das intercaladas', valor: semestraisTotal, fmt: 'money' },
+        { label: 'Parcela Caixa (pós-chaves)', valor: i.parcelaCaixa || 0, fmt: 'money' },
+      ];
+    },
+  },
  engenharq:{nome:'Engenharq',cor:'#16a34a',obs:'Carteira parcelável em até R$ 50 mil e até 100x. O que exceder o teto precisa ser distribuído entre sinal e chaves.',products:{castanheiras:{nome:'Castanheiras'},jacarandas:{nome:'Jacarandás'},jequitibas:{nome:'Jequitibás'},coqueirais:{nome:'Coqueirais'},figueiras:{nome:'Figueiras'},laranjeiras:{nome:'Laranjeiras'}},fields:[
  {k:'renda',l:'Renda do cliente',t:'money',d:6300},{k:'valorTabela',l:'Valor de tabela',t:'money',d:296300},{k:'desconto',l:'Desconto de tabela',t:'money',d:15000},{k:'sinal',l:'Sinal (ato)',t:'money',d:10000},{k:'sinalParcelado',l:'Sinal parcelado',t:'money',d:0},{k:'chaves',l:'Chaves',t:'money',d:11300},{k:'financiamento',l:'Financiamento aprovado',t:'money',d:200000},{k:'fgts',l:'FGTS',t:'money',d:0},{k:'subsidio',l:'Subsídio',t:'money',d:0},{k:'tetoCarteira',l:'Teto da carteira (parcelável)',t:'money',d:50000,h:'Padrão R$ 50 mil; ajuste em campanhas.'},{k:'qtdMensais',l:'Nº de parcelas (até 100)',t:'int',d:100},{k:'parcelaCaixa',l:'Parcela Caixa (pós-chaves)',t:'money',d:0,info:true,auto:v=>Math.round(v.renda*ORBE_RULES.common.incomePct*100)/100}],
  compute(i){
@@ -766,21 +1028,115 @@ const DATA={
  {k:'renda',l:'Renda do cliente',t:'money',d:3297.44},{k:'valorTabela',l:'Valor de tabela',t:'money',d:260000},{k:'desconto',l:'Desconto de tabela',t:'money',d:15000},{k:'sinal',l:'Sinal (ato)',t:'money',d:3000},{k:'chaves',l:'Chaves',t:'money',d:0},{k:'financiamento',l:'Financiamento aprovado',t:'money',d:190159.81},{k:'fgts',l:'FGTS',t:'money',d:4254.5},{k:'subsidio',l:'Subsídio',t:'money',d:3624},{k:'semestrais',l:'Nº de intercaladas semestrais',t:'int',d:0},{k:'valorIntercalada',l:'Valor da intercalada (semestral)',t:'money',d:0,auto:v=>Math.round(v.renda*ORBE_RULES.engemat.intercaladaPct*100)/100},{k:'qtdMensais',l:'Nº de parcelas mensais',t:'int',d:80},{k:'parcelaCaixa',l:'Parcela Caixa (pós-chaves)',t:'money',d:0,info:true,auto:v=>Math.round(v.renda*ORBE_RULES.common.incomePct*100)/100}],
  compute(i){const liq=i.valorTabela-i.desconto,cap=i.renda*ORBE_RULES.common.incomePct,inter=(i.valorIntercalada||0)*i.semestrais,total=i.sinal+i.chaves+i.fgts+i.subsidio+i.financiamento,entrada=liq-total-inter,parc=i.qtdMensais>0?entrada/i.qtdMensais:0,fi=liq?total/liq:0,ep=liq?entrada/liq:0,okP=i.qtdMensais>0&&i.qtdMensais<=ORBE_RULES.engemat.maxParcelas,status=health({parcela:parc,capacidade:cap,entradaPct:ep,fi});const entradaMax=cap*i.qtdMensais,sinalMax=liq-(total-i.sinal)-inter,sinalSug=Math.min(menorSinal(liq,total-i.sinal,inter,entradaMax),sinalMax);return{status:{...status,ok:status.ok&&okP,titulo:!okP?`Nº de parcelas fora do limite (máx. ${ORBE_RULES.engemat.maxParcelas}x)`:status.titulo,checks:[...status.checks,{label:`Parcelamento em até ${ORBE_RULES.engemat.maxParcelas}x (atual: ${i.qtdMensais}x)`,ok:okP}]},highlight:[['Entrada parcelada',entrada,'money'],[`Parcela mensal (${i.qtdMensais}x)`,parc,'money','strong']],rows:[['Líquido (tabela − desconto)',liq,'money'],['Capacidade de pagamento ('+rulePctText(ORBE_RULES.common.incomePct)+')',cap,'money'],['Total aportado',total,'money'],['Intercaladas semestrais',inter,'money'],['Entrada % do imóvel',ep,'pct'],['F.I. Real',fi,'pct'],...(!status.ok&&sinalSug>i.sinal?[['Sinal sugerido p/ ficar saudável',Math.ceil(sinalSug),'money','alert']]:[])],resumo:[['Valor do imóvel',i.valorTabela,'money'],...(i.desconto>0?[['Desconto aplicado',i.desconto,'money']]:[]),['Valor do imóvel com desconto',liq,'money'],['Valor do financiamento',i.financiamento,'money'],['FGTS',i.fgts||0,'money'],...(i.subsidio>0?[['Subsídio',i.subsidio,'money']]:[]),['Sinal (ato)',i.sinal,'money'],['Chaves',i.chaves,'money'],['Entrada parcelada',entrada,'money'],['Mensais',`${i.qtdMensais}x de ${money(parc)}`,'text'],['Intercaladas semestrais',i.semestrais>0?`${i.semestrais}x de ${money(i.valorIntercalada)}`:'—','text'],['Valor total das intercaladas',inter,'money'],['Parcela Caixa (pós-chaves)',i.parcelaCaixa||0,'money'],...(!okP?[['Nº de parcelas informado',`${i.qtdMensais}x`,'text','alert']]:[])]};}
  },
- barcelos:{nome:'Barcelos',cor:'#7c3aed',obs:'Entrada dividida com a construtora em até 60x. Carteira-base de R$ 30 mil + parcela extra de 20% da renda.',products:{barcelos:{nome:'Barcelos'}},fields:[
- {k:'rendaAprovada',l:'Renda aprovada na Caixa',t:'money',d:10235.74},{k:'valorImovel',l:'Valor do imóvel',t:'money',d:210000},{k:'avaliacaoCaixa',l:'Avaliação da Caixa',t:'money',d:220000,info:true},{k:'financiamento',l:'Valor do financiamento',t:'money',d:131192.88},{k:'fgts',l:'FGTS',t:'money',d:0},{k:'subsidio',l:'Subsídio do governo',t:'money',d:0},{k:'aVista',l:'Entrada à vista (1ª parte)',t:'money',d:15000},{k:'sinalIntercalado',l:'Sinal intercalado (2ª parte)',t:'money',d:0},{k:'intercalada',l:'Valor de cada intercalada anual',t:'money',d:10000},{k:'qtdIntercaladas',l:'Nº de intercaladas anuais',t:'int',d:2},{k:'chave',l:'Chave',t:'money',d:13807.12},{k:'qtdParcelas',l:'Nº de parcelas (até 60)',t:'int',d:60},{k:'parcelaCaixa',l:'Parcela Caixa (pós-chaves)',t:'money',d:0,info:true,auto:v=>Math.round((v.rendaAprovada||0)*ORBE_RULES.common.incomePct*100)/100}],
- compute(i){
-  const renda=i.rendaAprovada+(i.rendaInformal||0),entradaTotal=i.valorImovel-i.financiamento-i.fgts-i.subsidio,dividir=entradaTotal-i.aVista-(i.sinalIntercalado||0)-(i.intercalada*i.qtdIntercaladas)-i.chave,parc=i.qtdParcelas>0?dividir/i.qtdParcelas:0,comp=renda?parc/renda:0,base=ORBE_RULES.barcelos.walletBase,pCarteira=i.qtdParcelas>0?base/i.qtdParcelas:0,pRenda=renda*ORBE_RULES.barcelos.rendaExtraPct,limite=pCarteira+pRenda,maxP=limite*i.qtdParcelas,okP=i.qtdParcelas>0&&i.qtdParcelas<=ORBE_RULES.barcelos.maxParcelas,ok=parc<=limite&&okP,margemParcela=limite-parc,ajusteCarteira=Math.max(0,dividir-maxP);
-  const status={ok,titulo:!okP?`Parcelamento acima de ${ORBE_RULES.barcelos.maxParcelas}x`:ok?'Tudo dentro do limite de parcela':'Parcela acima do limite — ajustar',checks:[
-    parc<=limite
-      ? {label:`Parcela de ${money(parc)} dentro do limite`,detail:`Seu limite é ${money(limite)} por mês: ${money(pCarteira)} de carteira-base + ${rulePctText(ORBE_RULES.barcelos.rendaExtraPct)} da renda. Margem: ${money(margemParcela)}.`,ok:true}
-      : {label:`Parcela passou do limite em ${money(parc-limite)}`,detail:`Limite: ${money(limite)} por mês. Para ficar dentro mantendo ${i.qtdParcelas}x, retire aproximadamente ${money(ajusteCarteira)} da carteira aumentando a entrada/sinal/chaves.`,ok:false},
-    okP
-      ? {label:`Parcelamento em ${i.qtdParcelas}x — dentro do limite`,detail:`O máximo é ${ORBE_RULES.barcelos.maxParcelas}x.`,ok:true}
-      : {label:`Parcelamento em ${i.qtdParcelas}x — acima do limite`,detail:`O máximo é ${ORBE_RULES.barcelos.maxParcelas}x. Reduza a quantidade de parcelas.`,ok:false}
-  ]};
-  return{status,highlight:[['A dividir com a construtora',dividir,'money'],[`Parcela (${i.qtdParcelas}x)`,parc,'money','strong'],['Comprometimento de renda',comp,'pct','strong']],rows:[['Renda total',renda,'money'],['Entrada em dinheiro total',entradaTotal,'money'],['Entrada à vista',i.aVista,'money'],['Intercaladas anuais',i.intercalada*i.qtdIntercaladas,'money'],['Chave',i.chave,'money'],[`Parcela da carteira (${money(ORBE_RULES.barcelos.walletBase)} em ${i.qtdParcelas}x)`,pCarteira,'money'],['Parcela extra por renda ('+rulePctText(ORBE_RULES.barcelos.rendaExtraPct)+')',pRenda,'money'],['Limite de parcela (carteira + renda)',limite,'money'],[`Máximo parcelável em ${i.qtdParcelas}x`,maxP,'money'],...(!okP?[[`Nº de parcelas informado`,`${i.qtdParcelas}x`,'text','alert']]:[]),...(!ok?[['Excedente acima do limite',dividir-maxP,'money','alert'],['Entrada à vista sugerida',Math.ceil(i.aVista+(dividir-maxP)),'money','alert']]:[])],resumo:[['Valor do imóvel',i.valorImovel,'money'],['Avaliação da Caixa',i.avaliacaoCaixa,'money'],['Valor do financiamento',i.financiamento,'money'],['FGTS',i.fgts||0,'money'],...(i.subsidio>0?[['Subsídio',i.subsidio,'money']]:[]),['Entrada à vista (1ª parte)',i.aVista,'money'],['Sinal intercalado (2ª parte)',i.sinalIntercalado||0,'money'],['Intercaladas anuais',i.qtdIntercaladas>0?`${i.qtdIntercaladas}x de ${money(i.intercalada)}`:'—','text'],['Chave',i.chave,'money'],['A dividir com a construtora',dividir,'money'],['Mensais',`${i.qtdParcelas}x de ${money(parc)}`,'text'],['Parcela Caixa (pós-chaves)',i.parcelaCaixa||0,'money']]};
- }
- },
+ barcelos: {
+    nome: 'Barcelos',
+    cor: '#7c3aed',
+    obs: 'Escolha o plano: Plano Caixa (MCMV — sinal mín. R$ 1.000, saldo em até 60x) ou Plano Direto (sem banco — sinal mín. 30%, saldo em até 36x). Nos dois: 2 intercaladas + chaves, e a parcela mensal fica limitada a 20% da renda.',
+    produtos: {
+      'caixa':  { nome: 'Plano Caixa (MCMV)', plano: 'caixa',  maxParcelas: 60, qtdParcelas: 60, qtdIntercaladas: 2 },
+      'direto': { nome: 'Plano Direto',       plano: 'direto', maxParcelas: 36, qtdParcelas: 36, qtdIntercaladas: 2 },
+    },
+    fields: [
+      { key: 'rendaAprovada',  label: (v) => (v.plano === 'direto' ? 'Renda do cliente' : 'Renda aprovada na Caixa'), type: 'money', def: 10235.74 },
+      { key: 'valorImovel',    label: 'Valor do imóvel',                type: 'money', def: 230000,
+        hint: (v) => (v.plano === 'direto' ? '' : 'Unidades a partir de R$ 230.000.') },
+      { key: 'avaliacaoCaixa', label: 'Avaliação da Caixa',             type: 'money', def: 220000, info: true,
+        visivel: (v) => v.plano !== 'direto' },
+      { key: 'financiamento',  label: 'Valor do financiamento',         type: 'money', def: 131192.88,
+        visivel: (v) => v.plano !== 'direto' },
+      { key: 'fgts',           label: 'FGTS',                           type: 'money', def: 0,
+        visivel: (v) => v.plano !== 'direto' },
+      { key: 'subsidio',       label: 'Subsídio do governo',            type: 'money', def: 0,
+        visivel: (v) => v.plano !== 'direto' },
+      { key: 'aVista',         label: 'Sinal / entrada à vista (1ª parte)', type: 'money', def: 15000,
+        hint: (v) => (v.plano === 'direto' ? 'Sinal mínimo: 30% do imóvel (soma com a 2ª parte).' : 'Sinal mínimo: R$ 1.000 (soma com a 2ª parte).') },
+      { key: 'sinalIntercalado', label: 'Sinal intercalado (2ª parte)', type: 'money', def: 0 },
+      { key: 'intercalada',    label: 'Valor de cada intercalada',      type: 'money', def: 10000 },
+      { key: 'qtdIntercaladas',label: 'Nº de intercaladas',             type: 'int',   def: 2 },
+      { key: 'chave',          label: 'Chaves',                         type: 'money', def: 13807.12 },
+      { key: 'qtdParcelas',    label: (v) => `Nº de parcelas (até ${v.maxParcelas || 60})`, type: 'int', def: 60 },
+      // Informativo: só começa a ser paga na entrega das chaves (só existe no Plano Caixa).
+      { key: 'parcelaCaixa',   label: 'Parcela Caixa (pós-chaves)',     type: 'money', def: 0, info: true,
+        visivel: (v) => v.plano !== 'direto',
+        autoDefault: (v) => Math.round((v.rendaAprovada || 0) * 0.30 * 100) / 100 },
+    ],
+    compute(i) {
+      const f = barcelosFluxo(i);
+      const LIMITE_RENDA = ORBE_RULES.barcelos.incomePct;
+      const limiteParcela = f.renda * LIMITE_RENDA;
+      const maxParcelavel = limiteParcela * i.qtdParcelas;
+      const okParcela = f.parcela <= limiteParcela + 0.005;
+      const parcelasOk = i.qtdParcelas > 0 && i.qtdParcelas <= f.maxParcelas;
+      const okSinal = f.sinal >= f.sinalMin - 0.005;
+      const okFecha = f.dividir >= -0.005;
+      const ok = okParcela && parcelasOk && okSinal && okFecha;
+      const comprometimento = f.renda ? f.parcela / f.renda : 0;
+      // Prazo inválido vem antes no título: com 0 parcelas a parcela zera e passaria
+      // no teste dos 20% sem significar nada.
+      const titulo = !parcelasOk ? `Nº de parcelas fora do limite (máx. ${f.maxParcelas}x)`
+        : !okFecha ? 'Aportes maiores que o imóvel'
+        : !okSinal ? 'Sinal abaixo do mínimo do plano'
+        : okParcela ? 'Parcela dentro do limite (20% da renda)'
+        : 'Parcela acima de 20% da renda — ajustar';
+      const excedente = Math.max(0, f.dividir - maxParcelavel);
+      // sinal sugerido: cobre o mínimo do plano e o excedente acima dos 20%
+      const faltaSinal = Math.max(0, f.sinalMin - f.sinal);
+      const aVistaSug = i.aVista + Math.max(faltaSinal, okParcela ? 0 : excedente);
+      return {
+        status: {
+          ok,
+          titulo,
+          checks: [
+            { label: `Parcela ≤ 20% da renda (${fmtMoney(limiteParcela)})`, ok: okParcela },
+            { label: `Parcelamento em até ${f.maxParcelas}x (atual: ${i.qtdParcelas}x)`, ok: parcelasOk },
+            { label: `Sinal ≥ ${f.direto ? '30% do imóvel' : 'R$ 1.000'} (${fmtMoney(f.sinalMin)})`, ok: okSinal },
+          ],
+        },
+        destaque: [
+          { label: 'Saldo a dividir com a construtora', valor: f.dividir, fmt: 'money' },
+          { label: `Parcela (${i.qtdParcelas}x)`, valor: f.parcela, fmt: 'money', forte: true },
+          { label: 'Comprometimento de renda', valor: comprometimento, fmt: 'pct', forte: true },
+        ],
+        linhas: [
+          { label: 'Plano', valor: f.direto ? 'Plano Direto (sem banco)' : 'Plano Caixa (MCMV)', fmt: 'text' },
+          ...(!f.direto ? [{ label: 'Entrada em dinheiro (imóvel − financ. − FGTS − subsídio)', valor: f.entradaTotal, fmt: 'money' }] : []),
+          { label: 'Sinal (1ª + 2ª parte)', valor: f.sinal, fmt: 'money' },
+          { label: 'Intercaladas', valor: f.intercaladas, fmt: 'money' },
+          { label: 'Chaves', valor: i.chave, fmt: 'money' },
+          { label: 'Limite de parcela (20% da renda)', valor: limiteParcela, fmt: 'money' },
+          { label: `Máximo parcelável em ${i.qtdParcelas}x`, valor: maxParcelavel, fmt: 'money' },
+          ...(!parcelasOk
+            ? [{ label: `Nº de parcelas informado (máx. ${f.maxParcelas}x)`, valor: `${i.qtdParcelas}x`, fmt: 'text', alerta: true }]
+            : []),
+          ...(!okSinal ? [{ label: 'Falta para o sinal mínimo', valor: faltaSinal, fmt: 'money', alerta: true }] : []),
+          ...(!okParcela ? [{ label: 'Excedente acima de 20% da renda', valor: excedente, fmt: 'money', alerta: true }] : []),
+          ...(!okParcela || !okSinal
+            ? [{ label: 'Entrada à vista sugerida', valor: Math.ceil(aVistaSug), fmt: 'money', alerta: true }]
+            : []),
+        ],
+      };
+    },
+    resumo(i, money) {
+      const f = barcelosFluxo(i);
+      return [
+        { label: 'Plano', valor: f.direto ? 'Plano Direto' : 'Plano Caixa (MCMV)', fmt: 'text' },
+        { label: 'Valor do imóvel', valor: i.valorImovel, fmt: 'money' },
+        ...(!f.direto ? [
+          { label: 'Avaliação da Caixa', valor: i.avaliacaoCaixa, fmt: 'money' },
+          { label: 'Valor do financiamento', valor: i.financiamento, fmt: 'money' },
+          { label: 'FGTS', valor: i.fgts || 0, fmt: 'money' },
+          ...(i.subsidio > 0 ? [{ label: 'Subsídio', valor: i.subsidio, fmt: 'money' }] : []),
+        ] : []),
+        { label: 'Sinal / entrada à vista (1ª parte)', valor: i.aVista, fmt: 'money' },
+        { label: 'Sinal intercalado (2ª parte)', valor: i.sinalIntercalado || 0, fmt: 'money' },
+        { label: 'Intercaladas', valor: i.qtdIntercaladas > 0 ? `${i.qtdIntercaladas}x de ${money(i.intercalada)}` : '—', fmt: 'text' },
+        { label: 'Chaves', valor: i.chave, fmt: 'money' },
+        { label: 'Saldo com a construtora', valor: f.dividir, fmt: 'money' },
+        { label: 'Mensais', valor: `${i.qtdParcelas}x de ${money(f.parcela)}`, fmt: 'text' },
+        ...(!f.direto ? [{ label: 'Parcela Caixa (pós-chaves)', valor: i.parcelaCaixa || 0, fmt: 'money' }] : []),
+      ];
+    },
+  },
  mrv:{nome:'MRV',cor:'#d83b3b',obs:'Plano de pagamento MRV: a entrada é parcelada em 52x decrescentes. O valor financiado é informado e o Orbe calcula a entrada, a carteira MRV de 19% e o sinal.',products:{mrv:{nome:'Plano de pagamento'}},fields:[
   {k:'valorImovel',l:'Valor do imóvel',t:'money',d:389990},
   {k:'avaliacao',l:'Valor da avaliação',t:'money',d:437800,info:true},
@@ -1030,13 +1386,13 @@ const DEFAULT_ORBE_RULES={
   telesil:{intercaladaPct:.50},
   engenharq:{walletCap:50000,maxParcelas:100},
   engemat:{intercaladaPct:.50,maxParcelas:80},
-  barcelos:{walletBase:30000,rendaExtraPct:.20,maxParcelas:60},
+  barcelos:{incomePct:.20,caixaSinalMin:1000,diretoSinalPct:.30},
   mrv:{walletPct:.19},
   products:{}
 };
 Object.keys(DATA).forEach(function(companyId){
   DEFAULT_ORBE_RULES.products[companyId]={};
-  Object.entries(DATA[companyId].products||{}).forEach(function(pair){
+  Object.entries(getProducts(DATA[companyId])||{}).forEach(function(pair){
     const vals={};
     Object.entries(pair[1]||{}).forEach(function(kv){if(kv[0]!=='nome'&&typeof kv[1]==='number')vals[kv[0]]=kv[1]});
     DEFAULT_ORBE_RULES.products[companyId][pair[0]]=vals;
@@ -1057,11 +1413,35 @@ function loadRuleConfig(){
   }catch(e){return mergeRuleObject(DEFAULT_ORBE_RULES,{});}
 }
 let ORBE_RULES=loadRuleConfig();
+
+function migrateOctoberProductDefaults(){
+  let saved={};
+  try{saved=JSON.parse(localStorage.getItem(RULES_KEY)||'{}')}catch(e){}
+  const changes=[
+    ['grand-via','q80',31,30],
+    ['splendido','q80',35,33],
+    ['splendido','pct80',80,85],
+    ['reserva-aldeprime','q80',26,24]
+  ];
+  let changed=false;
+  changes.forEach(function(x){
+    const pid=x[0],key=x[1],oldVal=x[2],newVal=x[3];
+    if(saved.products?.telesil?.[pid]?.[key]===oldVal){
+      ORBE_RULES.products.telesil=ORBE_RULES.products.telesil||{};
+      ORBE_RULES.products.telesil[pid]=ORBE_RULES.products.telesil[pid]||{};
+      ORBE_RULES.products.telesil[pid][key]=newVal;
+      changed=true;
+    }
+  });
+  if(changed)localStorage.setItem(RULES_KEY,JSON.stringify(ORBE_RULES));
+}
+
+migrateOctoberProductDefaults();
 function applyRuleConfigToData(){
   Object.entries(ORBE_RULES.products||{}).forEach(function(companyPair){
     const companyId=companyPair[0],products=companyPair[1]||{};
     Object.entries(products).forEach(function(productPair){
-      const p=DATA[companyId]?.products?.[productPair[0]];
+      const p=getProduct(DATA[companyId],productPair[0]);
       if(!p)return;
       Object.entries(productPair[1]||{}).forEach(function(kv){if(typeof kv[1]==='number'&&kv[0] in p)p[kv[0]]=kv[1];});
     });
@@ -1080,7 +1460,8 @@ function getProducts(c){return c?.products||c?.produtos||{}}
 function getFields(c){return c?.fields||[]}
 function getProduct(c,id){return getProducts(c)[id]||null}
 function fieldKey(f){return f?.k??f?.key}
-function fieldLabel(f){return f?.l??f?.label}
+function fieldLabel(f,v){const x=f?.l??f?.label;return typeof x==='function'?x(v||{}):x}
+function fieldHint(f,v){const x=f?.h??f?.hint;return typeof x==='function'?x(v||{}):x}
 function fieldType(f){return f?.t??f?.type}
 function fieldDefault(f){return f?.d??f?.def}
 function fieldAuto(f){return f?.auto??f?.autoDefault}
@@ -1115,7 +1496,7 @@ function showSimulation(id){activeCard=id;const st=states[id];if(!st)return;acti
 function fieldGroup(f){const k=fieldKey(f);if(k==='renda'||k==='rendaAprovada')return 'Cliente';if(['valorTabela','valorImovel','desconto','descontoMcem','avaliacaoCaixa'].includes(k))return 'Negócio';return 'Pagamento'}
 function renderWorkspace(id){
   const st=states[id],c=DATA[st.c];if(!st)return;st.clientName=st.clientName||'';st.notes=st.notes||'';st.stage=st.stage||'Novo';
-  const groups={Cliente:[],Negócio:[],Pagamento:[]};getFields(c).forEach(f=>groups[fieldGroup(f)].push(f));
+  const groups={Cliente:[],Negócio:[],Pagamento:[]};getFields(c).filter(f=>!f.visivel||f.visivel(st.v)).forEach(f=>groups[fieldGroup(f)].push(f));
   document.getElementById('productBadge').textContent=getProduct(c,st.product)?.nome||c.nome;
   const fp=document.getElementById('formPanel');fp.innerHTML='';let n=1;
   const meta=document.createElement('div');meta.className='form-section';
@@ -1127,7 +1508,13 @@ function renderWorkspace(id){
     const wrap=document.createElement('div');wrap.className='product-select';
     wrap.innerHTML=`<div class="field"><label>Empreendimento / produto</label><select id="productSelect">${Object.entries(products).map(([k,p])=>`<option value="${escapeAttr(k)}" ${k===st.product?'selected':''}>${escapeHtml(p.nome||k)}</option>`).join('')}</select></div>`;
     fp.appendChild(wrap);
-    wrap.querySelector('select').onchange=e=>{st.product=e.target.value;productApply(st,c);if(c.normalizar)c.normalizar(st.v);st.t={};auto(st,c);renderWorkspace(id)};
+    wrap.querySelector('select').onchange=e=>{
+      st.product=e.target.value;productApply(st,c);
+      getFields(c).forEach(f=>{if(f.resetProduto)delete st.t[fieldKey(f)]});
+      auto(st,c);
+      if(c.normalizar){c.normalizar(st.v);st.t={};auto(st,c)}
+      renderWorkspace(id);saveDrafts();
+    };
   }
   if(c.seletores){
     const wrap=document.createElement('div');wrap.className='product-select';
@@ -1146,10 +1533,10 @@ function renderWorkspace(id){
     const sec=document.createElement('div');sec.className='form-section';sec.innerHTML=`<div class="section-title"><span class="section-number">${n++}</span>${name}</div><div class="grid"></div>`;
     const grid=sec.querySelector('.grid');
     fields.forEach(f=>{
-      const k=fieldKey(f),type=fieldType(f),v=st.v[k],hint=f.h??f.hint,disabled=f.productControlled&&st.product!=='custom'?'disabled':'';
+      const k=fieldKey(f),type=fieldType(f),v=st.v[k],hint=fieldHint(f,st.v),label=fieldLabel(f,st.v),disabled=f.productControlled&&st.product!=='custom'?'disabled':'';
       const box=document.createElement('div');box.className='field '+(type==='money'?'money ':'')+(f.info?'info ':'');
       const inputType=type==='money'?'type="text" inputmode="decimal"':'type="number" step="any" inputmode="decimal"';
-      box.innerHTML=`<label>${escapeHtml(fieldLabel(f))}</label><div class="input">${type==='money'?'<span class="prefix">R$</span>':''}<input ${inputType} data-key="${escapeAttr(k)}" value="${type==='money'?fmtInput(v):v}" ${disabled}></div>${hint?`<span class="hint">${escapeHtml(hint)}</span>`:''}`;
+      box.innerHTML=`<label>${escapeHtml(label)}</label><div class="input">${type==='money'?'<span class="prefix">R$</span>':''}<input ${inputType} data-key="${escapeAttr(k)}" value="${type==='money'?fmtInput(v):v}" ${disabled}></div>${hint?`<span class="hint">${escapeHtml(hint)}</span>`:''}`;
       grid.appendChild(box);
     });
     fp.appendChild(sec);
@@ -1157,7 +1544,18 @@ function renderWorkspace(id){
   const footer=document.createElement('div');footer.className='form-section';footer.innerHTML='<div class="field full"><button class="btn primary summary-wide" id="workspaceSummary">▣ Gerar resumo da proposta</button></div>';fp.appendChild(footer);
   footer.querySelector('#workspaceSummary').onclick=()=>modal(id);
   fp.querySelectorAll('input[data-key]').forEach(inp=>{
-    inp.oninput=e=>{const f=getFields(c).find(x=>fieldKey(x)===e.target.dataset.key);if(!f)return;const k=fieldKey(f),type=fieldType(f);let v;if(type==='money'){formatMoneyInput(e.target);v=parseBR(e.target.value)}else{v=parseFloat(e.target.value)}if(isNaN(v))v=0;st.v[k]=type==='int'?Math.round(v):v;st.t[k]=true;auto(st,c);renderResult(id);saveDraftDebounced(id)};
+    inp.onblur=e=>{
+      const f=getFields(c).find(x=>fieldKey(x)===e.target.dataset.key);
+      if(f&&f.vazioAuto&&!st.t[fieldKey(f)])e.target.value=fmtInput(st.v[fieldKey(f)]);
+    };
+    inp.oninput=e=>{const f=getFields(c).find(x=>fieldKey(x)===e.target.dataset.key);if(!f)return;const k=fieldKey(f),type=fieldType(f);let v;if(type==='money'){formatMoneyInput(e.target);v=parseBR(e.target.value)}else{v=parseFloat(e.target.value)}if(isNaN(v))v=0;st.v[k]=type==='int'?Math.round(v):v;st.t[k]=true;
+      if(f.vazioAuto&&fieldAuto(f)&&e.target.value.trim()==='')delete st.t[k];
+      auto(st,c);
+      getFields(c).forEach(af=>{
+        const ak=fieldKey(af),el=fp.querySelector('input[data-key="'+ak+'"]');
+        if(fieldAuto(af)&&!st.t[ak]&&el&&document.activeElement!==el)el.value=fieldType(af)==='money'?fmtInput(st.v[ak]):st.v[ak];
+      });
+      renderResult(id);saveDraftDebounced(id)};
   });
   renderResult(id);
 }
@@ -1491,9 +1889,9 @@ function openRulesManager(){
       specific+=numericField('Máximo de parcelas','engemat.maxParcelas',R.engemat.maxParcelas,1,'company');
     }
     if(companyId==='barcelos'){
-      specific+=numericField('Carteira-base','barcelos.walletBase',R.barcelos.walletBase,100,'company');
-      specific+=numericField('Parcela extra sobre renda','barcelos.rendaExtraPct',(R.barcelos.rendaExtraPct*100).toLocaleString('pt-BR',{maximumFractionDigits:2}),0.01,'pct');
-      specific+=numericField('Máximo de parcelas','barcelos.maxParcelas',R.barcelos.maxParcelas,1,'company');
+      specific+=numericField('Limite da parcela sobre a renda','barcelos.incomePct',(R.barcelos.incomePct*100).toLocaleString('pt-BR',{maximumFractionDigits:2}),0.01,'pct');
+      specific+=numericField('Sinal mínimo · Plano Caixa','barcelos.caixaSinalMin',R.barcelos.caixaSinalMin,100,'company');
+      specific+=numericField('Sinal mínimo · Plano Direto (% do imóvel)','barcelos.diretoSinalPct',(R.barcelos.diretoSinalPct*100).toLocaleString('pt-BR',{maximumFractionDigits:2}),0.01,'pct');
     }
     if(companyId==='mrv'){
       specific+=numericField('Carteira MRV (% do imóvel)','mrv.walletPct',(R.mrv.walletPct*100).toLocaleString('pt-BR',{maximumFractionDigits:2}),0.01,'pct');
@@ -1662,8 +2060,10 @@ function enterProduct(companyId,productId){
   if(st && company){
     st.product=productId;
     productApply(st,company);
-    if(company.normalizar)company.normalizar(st.v);
-    renderWorkspace(activeCard);
+    getFields(company).forEach(f=>{if(f.resetProduto)delete st.t[fieldKey(f)]});
+    auto(st,company);
+    if(company.normalizar){company.normalizar(st.v);st.t={};auto(st,company)}
+    renderWorkspace(activeCard);saveDrafts();
     renderSimList();
   }
   document.getElementById('startScreen').hidden=true;
