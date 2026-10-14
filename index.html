@@ -1465,11 +1465,30 @@ function fieldHint(f,v){const x=f?.h??f?.hint;return typeof x==='function'?x(v||
 function fieldType(f){return f?.t??f?.type}
 function fieldDefault(f){return f?.d??f?.def}
 function fieldAuto(f){return f?.auto??f?.autoDefault}
+function normalizeCalcRows(items){
+  if(!Array.isArray(items))return [];
+  return items.map(function(x){
+    if(Array.isArray(x))return [x[0]??'Detalhe',x[1]??'',x[2]??(typeof x[1]==='number'?'money':'text'),x[3]];
+    if(x&&typeof x==='object'){
+      const label=x.label??x.nome??'Detalhe';
+      const value=x.valor??x.value??'';
+      const fmt=x.fmt??x.type??(typeof value==='number'?'money':'text');
+      const emphasis=x.forte?'strong':x.alerta?'alert':undefined;
+      return [label,value,fmt,emphasis];
+    }
+    return [String(x??'Detalhe'),'','text'];
+  });
+}
 function calcResult(st,c){
-  const raw=c.compute(st.v),r={...raw};
-  if(!r.highlight&&r.destaque)r.highlight=r.destaque.map(x=>[x.label,x.valor,x.fmt,x.forte?'strong':undefined]);
-  if(!r.rows&&r.linhas)r.rows=r.linhas.map(x=>[x.label,x.valor,x.fmt,x.alerta?'alert':undefined]);
-  if(!r.resumo&&typeof c.resumo==='function')r.resumo=c.resumo(st.v,money);
+  const raw=c.compute(st.v)||{},r={...raw};
+  r.highlight=normalizeCalcRows(r.highlight||r.destaque||[]);
+  r.rows=normalizeCalcRows(r.rows||r.linhas||[]);
+  let summary=Array.isArray(r.resumo)?r.resumo:null;
+  if(typeof c.resumo==='function'){
+    const fromCompany=c.resumo(st.v,money);
+    if(Array.isArray(fromCompany)&&fromCompany.length)summary=fromCompany;
+  }
+  r.resumo=normalizeCalcRows(summary||[]);
   return r;
 }
 
@@ -1562,7 +1581,7 @@ function renderWorkspace(id){
 function renderResult(id){const st=states[id],c=DATA[st.c],r=calcResult(st,c);const panel=document.getElementById('resultPanel');if(!panel)return;const strong=r.highlight.find(x=>x[3]==='strong')||r.highlight[0];const others=r.highlight.filter(x=>x!==strong);panel.innerHTML=`<div class="status ${r.status.ok?'ok':'bad'}">${r.status.ok?'✓ ':'⚠ '}${r.status.titulo}<ul class="checks">${r.status.checks.map(q=>`<li class="${q.ok?'ok':''}"><span>${q.label}</span>${q.detail?`<small>${q.detail}</small>`:''}</li>`).join('')}</ul></div><div class="result-hero"><div class="metric primary"><div class="k">${strong[0]}</div><div class="v">${val(strong[1],strong[2])}</div></div>${others.slice(0,1).map(x=>`<div class="metric"><div class="k">${x[0]}</div><div class="v">${val(x[1],x[2])}</div></div>`).join('')}</div>${others.length>1?`<div class="result-section"><div class="result-section-title">Outros destaques</div><div class="facts">${others.slice(1).map(x=>`<div class="fact"><div class="k">${x[0]}</div><div class="v">${val(x[1],x[2])}</div></div>`).join('')}</div></div>`:''}<div class="result-section"><div class="result-section-title">Detalhamento</div><div class="facts">${r.rows.map(x=>`<div class="fact ${x[3]==='alert'?'alert':''}"><div class="k">${x[0]}</div><div class="v">${val(x[1],x[2])}</div></div>`).join('')}</div></div><div class="helper">O indicador principal foi destacado para facilitar a leitura durante o atendimento. Use o resumo para enviar a condição ao cliente.</div><button class="btn primary summary-wide" id="summaryWide">📄 Gerar resumo para cliente</button>`;document.getElementById('summaryWide').onclick=()=>modal(id)}
 function removeCard(id){delete states[id];cards=cards.filter(x=>x!==id);saveDrafts();if(activeCard===id)activeCard=cards.at(-1)||null;if(activeCard){const st=states[activeCard];active=st.c;document.getElementById('heading').textContent='Calculadora '+DATA[st.c].nome;document.getElementById('obs').textContent=DATA[st.c].obs||'';renderWorkspace(activeCard)}else{addCard()}renderSimList()}
 function resetCard(id){const st=states[id];if(!st)return;const c=DATA[st.c];getFields(c).forEach(f=>{if(fieldType(f)==='money')st.v[fieldKey(f)]=0});st.t={};auto(st,c);renderWorkspace(id)}
-function modal(id){const st=states[id],c=DATA[st.c],r=calcResult(st,c);const bg=document.createElement('div');bg.className='modal-bg';bg.innerHTML=`<div class="modal" style="--modal:${c.cor}"><div style="display:flex;justify-content:space-between;gap:12px"><div><h3>${escapeHtml(st.clientName||c.nome)}</h3><div class="sub">${r.status.ok?'✓ ':'⚠ '}${r.status.titulo}</div></div><button class="btn" data-close>Fechar</button></div><div class="mrows">${r.resumo.map(x=>`<div class="mrow"><span class="mk">${x[0]}</span><span class="mv">${val(x[1],x[2])}</span></div>`).join('')}</div><div class="mact"><button class="btn" data-close>Fechar</button><button class="btn primary" data-print>🖨️ Imprimir / PDF</button></div></div>`;const close=()=>bg.remove();bg.addEventListener('click',e=>{if(e.target===bg)close()});bg.querySelectorAll('[data-close]').forEach(b=>b.onclick=close);bg.querySelector('[data-print]').onclick=()=>window.print();document.body.appendChild(bg)}
+function modal(id){const st=states[id],c=DATA[st.c],r=calcResult(st,c);const bg=document.createElement('div');bg.className='modal-bg';bg.innerHTML=`<div class="modal" style="--modal:${c.cor}"><div style="display:flex;justify-content:space-between;gap:12px"><div><h3>${escapeHtml(st.clientName||c.nome)}</h3><div class="sub">${r.status.ok?'✓ ':'⚠ '}${r.status.titulo}</div></div><button class="btn" data-close>Fechar</button></div><div class="mrows">${r.resumo.map(x=>`<div class="mrow"><span class="mk">${escapeHtml(String(x[0]))}</span><span class="mv">${escapeHtml(String(val(x[1],x[2])))}</span></div>`).join('')}</div><div class="mact"><button class="btn" data-close>Fechar</button><button class="btn primary" data-print>🖨️ Imprimir / PDF</button></div></div>`;const close=()=>bg.remove();bg.addEventListener('click',e=>{if(e.target===bg)close()});bg.querySelectorAll('[data-close]').forEach(b=>b.onclick=close);bg.querySelector('[data-print]').onclick=()=>window.print();document.body.appendChild(bg)}
 
 const HISTORY_KEY='orbe-history-v1', DRAFT_KEY='orbe-drafts-v1';
 const STAGES=['Novo','Em atendimento','Proposta enviada','Negociação','Fechado'];
@@ -1570,7 +1589,7 @@ function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,ch=>({'&':'&amp;'
 function escapeAttr(v){return escapeHtml(v)}
 function saveDrafts(){localStorage.setItem(DRAFT_KEY,JSON.stringify([...cards].map(id=>({id, ...states[id]}))))}
 let draftTimer=null;function saveDraftDebounced(id){clearTimeout(draftTimer);draftTimer=setTimeout(saveDrafts,250);}
-function saveToHistory(id){const st=states[id];if(!st)return;const c=DATA[st.c],r=c.compute(st.v);let hist=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');const item={id:'h'+Date.now(),clientName:st.clientName||'Sem cliente',company:c.nome,product:getProduct(c,st.product)?.nome||c.nome,stage:st.stage||'Novo',notes:st.notes||'',savedAt:new Date().toISOString(),values:{...st.v},status:r.status?.titulo||'',highlights:r.highlight||[]};hist.unshift(item);hist=hist.slice(0,100);localStorage.setItem(HISTORY_KEY,JSON.stringify(hist));showToast('Simulação salva no histórico');}
+function saveToHistory(id){const st=states[id];if(!st)return;const c=DATA[st.c],r=calcResult(st,c);let hist=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');const item={id:'h'+Date.now(),clientName:st.clientName||'Sem cliente',company:c.nome,product:getProduct(c,st.product)?.nome||c.nome,stage:st.stage||'Novo',notes:st.notes||'',savedAt:new Date().toISOString(),values:{...st.v},status:r.status?.titulo||'',highlights:r.highlight||[]};hist.unshift(item);hist=hist.slice(0,100);localStorage.setItem(HISTORY_KEY,JSON.stringify(hist));showToast('Simulação salva no histórico');}
 function showToast(msg){const x=document.createElement('div');x.style.cssText='position:fixed;right:18px;bottom:18px;z-index:200;background:#173522;color:#e5f4e8;border:1px solid rgba(164,220,171,.22);padding:10px 14px;border-radius:12px;font:700 10px Manrope, sans-serif;box-shadow:0 18px 45px rgba(0,0,0,.3);';x.textContent=msg;document.body.appendChild(x);setTimeout(()=>x.remove(),1800)}
 function openHistory(){const bg=document.getElementById('featureOverlay');const hist=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');bg.hidden=false;bg.innerHTML=`<div class="overlay-panel"><div class="overlay-head"><div><h3>Histórico de cálculos</h3><p>Propostas salvas neste navegador.</p></div><div class="tool-group"><button class="btn compact" id="clearHistory">Limpar histórico</button><button class="btn compact" id="closeFeature">Fechar</button></div></div><div class="overlay-list">${hist.length?hist.map((h,i)=>`<div class="history-item"><div><strong>${escapeHtml(h.clientName)}</strong><small>${escapeHtml(h.company)} · ${escapeHtml(h.product)} · ${new Date(h.savedAt).toLocaleString('pt-BR')}</small></div><span class="chip-stage">${escapeHtml(h.stage)}</span><button class="btn compact" data-load-history="${i}">Abrir</button></div>`).join(''):'<div class="history-empty">Nenhuma simulação salva ainda.</div>'}</div></div>`;bg.onclick=e=>{if(e.target===bg)bg.hidden=true};bg.querySelector('#closeFeature').onclick=()=>bg.hidden=true;bg.querySelector('#clearHistory').onclick=()=>{localStorage.removeItem(HISTORY_KEY);openHistory()};bg.querySelectorAll('[data-load-history]').forEach(b=>b.onclick=()=>loadHistory(hist[Number(b.dataset.loadHistory)]));}
 function loadHistory(h){const cId=Object.keys(DATA).find(k=>DATA[k].nome===h.company)||ORDER[0];const id='c'+(++seq);states[id]={c:cId,v:{...h.values},t:{},product:Object.keys(DATA[cId].products||{})[0]||null,clientName:h.clientName==='Sem cliente'?'':h.clientName,notes:h.notes||'',stage:h.stage||'Novo'};cards.push(id);activeCard=id;active=cId;activeCard=id;document.getElementById('featureOverlay').hidden=true;renderTabs();showSimulation(id);showToast('Simulação carregada');}
@@ -1695,7 +1714,7 @@ function openDiscovery(){
       if(!vals.credito||!vals.renda){showToast('Preencha Crédito aprovado e Renda');return;}
       vals.entrada=vals.entrada||0;vals.fgts=vals.fgts||0;vals.subsidio=vals.subsidio||0;
       const results=[];
-      ORDER.forEach(function(companyId){const c=DATA[companyId];if(companyId==='mouradubeux')return;Object.entries(getProducts(c)||{}).forEach(function(entry){const productId=entry[0],product=entry[1];if(companyId==='mrv'&&!vals.valorImovel){results.push({companyId,productId,product,st:null,r:{status:{ok:false,titulo:'Informar valor do imóvel'},highlight:[],rows:[]},parcel:null,entryLeft:null,compatible:false,blocked:true,company:c});return;}const st=buildDiscoveryScenario(companyId,productId,vals),r=c.compute(st.v),parcel=discoveryParcel(r),entryLeft=discoveryEntry(r),compatible=!!r.status?.ok;results.push({companyId,productId,product,st,r,parcel,entryLeft,compatible,company:c});});});
+      ORDER.forEach(function(companyId){const c=DATA[companyId];if(companyId==='mouradubeux')return;Object.entries(getProducts(c)||{}).forEach(function(entry){const productId=entry[0],product=entry[1];if(companyId==='mrv'&&!vals.valorImovel){results.push({companyId,productId,product,st:null,r:{status:{ok:false,titulo:'Informar valor do imóvel'},highlight:[],rows:[]},parcel:null,entryLeft:null,compatible:false,blocked:true,company:c});return;}const st=buildDiscoveryScenario(companyId,productId,vals),r=calcResult(st,c),parcel=discoveryParcel(r),entryLeft=discoveryEntry(r),compatible=!!r.status?.ok;results.push({companyId,productId,product,st,r,parcel,entryLeft,compatible,company:c});});});
       results.sort(function(a,b){if(a.compatible!==b.compatible)return a.compatible?-1:1;return (a.parcel?.value??Infinity)-(b.parcel?.value??Infinity);});
       const compatibleCount=results.filter(function(x){return x.compatible;}).length;
       const area=bg.querySelector('#discoverResults');
@@ -1978,7 +1997,7 @@ function openSearch(){
   input.oninput=function(){render(input.value)};render('');setTimeout(function(){input.focus()},30);
 }
 function proposalText(st,c,r){
-  const product=st.product&&c.products?.[st.product]?.nome||c.nome;
+  const product=getProduct(c,st.product)?.nome||c.nome;
   const lines=['ORBE · PROPOSTA COMERCIAL','Cliente: '+(st.clientName||'Proposta personalizada'),'Construtora: '+c.nome,'Empreendimento: '+product];
   (r.resumo||[]).forEach(function(x){lines.push(String(x[0])+': '+val(x[1],x[2]));});
   lines.push('Status: '+(r.status?.titulo||'Condição calculada'));
@@ -1986,7 +2005,7 @@ function proposalText(st,c,r){
 }
 function openPresentation(){
   if(!activeCard){showToast('Abra uma simulação primeiro');return;}
-  const st=states[activeCard],c=DATA[st.c],r=c.compute(st.v),summary=r.resumo||[],product=st.product&&c.products?.[st.product]?.nome||c.nome;
+  const st=states[activeCard],c=DATA[st.c],r=calcResult(st,c),summary=r.resumo||[],product=getProduct(c,st.product)?.nome||c.nome;
   const primary=(r.highlight||[]).find(function(x){return x[3]==='strong'})||r.highlight?.[0];
   const imovel=summary.find(function(x){return /valor do imóvel|valor do imovel/i.test(String(x[0]))});
   const financiamento=summary.find(function(x){return /valor (do )?financiamento|financiamento/i.test(String(x[0]))});
