@@ -1007,21 +1007,21 @@ const DATA={
       ];
     },
   },
- engenharq:{nome:'Engenharq',cor:'#16a34a',obs:'Carteira parcelável em até R$ 50 mil e até 100x. O que exceder o teto precisa ser distribuído entre sinal e chaves.',products:{castanheiras:{nome:'Castanheiras'},jacarandas:{nome:'Jacarandás'},jequitibas:{nome:'Jequitibás'},coqueirais:{nome:'Coqueirais'},figueiras:{nome:'Figueiras'},laranjeiras:{nome:'Laranjeiras'}},fields:[
- {k:'renda',l:'Renda do cliente',t:'money',d:6300},{k:'valorTabela',l:'Valor de tabela',t:'money',d:296300},{k:'desconto',l:'Desconto de tabela',t:'money',d:15000},{k:'sinal',l:'Sinal (ato)',t:'money',d:10000},{k:'sinalParcelado',l:'Sinal parcelado',t:'money',d:0},{k:'chaves',l:'Chaves',t:'money',d:11300},{k:'financiamento',l:'Financiamento aprovado',t:'money',d:200000},{k:'fgts',l:'FGTS',t:'money',d:0},{k:'subsidio',l:'Subsídio',t:'money',d:0},{k:'tetoCarteira',l:'Teto da carteira (parcelável)',t:'money',d:50000,h:'Padrão R$ 50 mil; ajuste em campanhas.'},{k:'qtdMensais',l:'Nº de parcelas (até 100)',t:'int',d:100},{k:'parcelaCaixa',l:'Parcela Caixa (pós-chaves)',t:'money',d:0,info:true,auto:v=>Math.round(v.renda*ORBE_RULES.common.incomePct*100)/100}],
+ engenharq:{nome:'Engenharq',cor:'#16a34a',obs:'Carteira parcelável em até R$ 50 mil e até 100x. O excedente pode ser distribuído entre sinal, chaves e intercaladas.',products:{castanheiras:{nome:'Castanheiras'},jacarandas:{nome:'Jacarandás'},jequitibas:{nome:'Jequitibás'},coqueirais:{nome:'Coqueirais'},figueiras:{nome:'Figueiras'},laranjeiras:{nome:'Laranjeiras'}},fields:[
+ {k:'renda',l:'Renda do cliente',t:'money',d:6300},{k:'valorTabela',l:'Valor de tabela',t:'money',d:296300},{k:'desconto',l:'Desconto de tabela',t:'money',d:15000},{k:'sinal',l:'Sinal (ato)',t:'money',d:10000},{k:'sinalParcelado',l:'Sinal parcelado',t:'money',d:0},{k:'chaves',l:'Chaves',t:'money',d:11300},{k:'valorIntercalada',l:'Valor de cada intercalada',t:'money',d:0},{k:'qtdIntercaladas',l:'Nº de intercaladas',t:'int',d:0},{k:'financiamento',l:'Financiamento aprovado',t:'money',d:200000},{k:'fgts',l:'FGTS',t:'money',d:0},{k:'subsidio',l:'Subsídio',t:'money',d:0},{k:'tetoCarteira',l:'Teto da carteira (parcelável)',t:'money',d:50000,h:'Padrão R$ 50 mil; ajuste em campanhas.'},{k:'qtdMensais',l:'Nº de parcelas (até 100)',t:'int',d:100},{k:'parcelaCaixa',l:'Parcela Caixa (pós-chaves)',t:'money',d:0,info:true,auto:v=>Math.round(v.renda*ORBE_RULES.common.incomePct*100)/100}],
  compute(i){
-  const teto=i.tetoCarteira||ORBE_RULES.engenharq.walletCap,liq=i.valorTabela-i.desconto,cap=i.renda*ORBE_RULES.common.incomePct,total=i.sinal+i.sinalParcelado+i.chaves+i.fgts+i.subsidio+i.financiamento,nec=liq-total,carteira=Math.min(Math.max(nec,0),teto),exced=Math.max(0,nec-teto),parc=i.qtdMensais>0?carteira/i.qtdMensais:0,fi=liq?total/liq:0,sobra=Math.max(0,-nec),okP=i.qtdMensais>0&&i.qtdMensais<=ORBE_RULES.engenharq.maxParcelas,ok=exced<=0&&okP&&sobra===0,margemCarteira=teto-carteira;
+  const teto=i.tetoCarteira||ORBE_RULES.engenharq.walletCap,liq=i.valorTabela-i.desconto,cap=i.renda*ORBE_RULES.common.incomePct,intercaladas=(i.valorIntercalada||0)*(i.qtdIntercaladas||0),total=i.sinal+i.sinalParcelado+i.chaves+intercaladas+i.fgts+i.subsidio+i.financiamento,nec=liq-total,carteira=Math.min(Math.max(nec,0),teto),exced=Math.max(0,nec-teto),parc=i.qtdMensais>0?carteira/i.qtdMensais:0,fi=liq?total/liq:0,sobra=Math.max(0,-nec),okP=i.qtdMensais>0&&i.qtdMensais<=ORBE_RULES.engenharq.maxParcelas,ok=exced<=0&&okP&&sobra===0,margemCarteira=teto-carteira;
   const status={ok,titulo:sobra?'Aportes maiores que o imóvel — revisar':!okP?`Parcelamento acima de ${ORBE_RULES.engenharq.maxParcelas}x`:exced?`Carteira acima do teto em ${money(exced)}`:'Tudo dentro do teto da carteira',checks:[
     sobra
       ? {label:`Aportes acima do valor do imóvel em ${money(sobra)}`,detail:'Reduza os aportes antes de continuar.',ok:false}
       : exced
-        ? {label:`Carteira passou do teto em ${money(exced)}`,detail:`Teto: ${money(teto)}. Coloque pelo menos ${money(exced)} a mais em sinal ou chaves para sair da carteira.`,ok:false}
+        ? {label:`Carteira passou do teto em ${money(exced)}`,detail:`Teto: ${money(teto)}. Coloque pelo menos ${money(exced)} a mais em sinal, chaves ou intercaladas para sair da carteira.`,ok:false}
         : {label:`Carteira de ${money(carteira)} dentro do teto`,detail:`Teto: ${money(teto)}. Margem disponível: ${money(Math.max(margemCarteira,0))}.`,ok:true},
     okP
       ? {label:`Parcelamento em ${i.qtdMensais}x — dentro do limite`,detail:`O máximo é ${ORBE_RULES.engenharq.maxParcelas}x.`,ok:true}
       : {label:`Parcelamento em ${i.qtdMensais}x — acima do limite`,detail:`O máximo é ${ORBE_RULES.engenharq.maxParcelas}x. Reduza a quantidade de parcelas.`,ok:false}
   ]};
-  return{status,highlight:[['Carteira a parcelar',carteira,'money'],[`Parcela mensal (${i.qtdMensais}x)`,parc,'money','strong'],...(exced>0?[['A distribuir entre sinal/chaves',exced,'money','strong']]:[])],rows:[['Líquido (tabela − desconto)',liq,'money'],['Total aportado',total,'money'],['Entrada necessária (além dos aportes)',nec,'money'],['Capacidade de pagamento ('+rulePctText(ORBE_RULES.common.incomePct)+')',cap,'money'],['F.I. Real',fi,'pct'],...(sobra>0?[['Sobra de aportes',sobra,'money','alert']]:[]),...(exced>0?[['Excedente acima do teto',exced,'money','alert'],['Sinal sugerido',Math.ceil(i.sinal+exced),'money','alert']]:[]),...(!okP?[['Nº de parcelas informado',`${i.qtdMensais}x`,'text','alert']]:[])],resumo:[['Valor do imóvel',i.valorTabela,'money'],...(i.desconto>0?[['Desconto aplicado',i.desconto,'money']]:[]),['Valor do imóvel com desconto',liq,'money'],['Valor do financiamento',i.financiamento,'money'],['FGTS',i.fgts||0,'money'],...(i.subsidio>0?[['Subsídio',i.subsidio,'money']]:[]),['Sinal (ato)',i.sinal,'money'],['Sinal parcelado',i.sinalParcelado,'money'],['Chaves',i.chaves,'money'],['Entrada parcelada (carteira)',carteira,'money'],...(exced>0?[['A distribuir (sinal/chaves)',exced,'money']]:[]),['Mensais',`${i.qtdMensais}x de ${money(parc)}`,'text'],['Parcela Caixa (pós-chaves)',i.parcelaCaixa||0,'money']]};
+  return{status,highlight:[['Carteira a parcelar',carteira,'money'],[`Parcela mensal (${i.qtdMensais}x)`,parc,'money','strong'],...(exced>0?[['A distribuir entre sinal/chaves/intercaladas',exced,'money','strong']]:[])],rows:[['Líquido (tabela − desconto)',liq,'money'],['Total aportado',total,'money'],['Entrada necessária (além dos aportes)',nec,'money'],['Capacidade de pagamento ('+rulePctText(ORBE_RULES.common.incomePct)+')',cap,'money'],['F.I. Real',fi,'pct'],...(sobra>0?[['Sobra de aportes',sobra,'money','alert']]:[]),...(intercaladas>0?[['Intercaladas',`${i.qtdIntercaladas}x de ${money(i.valorIntercalada)} = ${money(intercaladas)}`,'text']]:[]),...(exced>0?[['Excedente acima do teto',exced,'money','alert'],['Sinal sugerido (se todo excedente virar sinal)',Math.ceil(i.sinal+exced),'money','alert'],...(i.qtdIntercaladas>0?[['Intercalada sugerida (se todo excedente for para as intercaladas)',Math.ceil((i.valorIntercalada||0)+exced/i.qtdIntercaladas),'money','alert']]:[])]:[]),...(!okP?[['Nº de parcelas informado',`${i.qtdMensais}x`,'text','alert']]:[])],resumo:[['Valor do imóvel',i.valorTabela,'money'],...(i.desconto>0?[['Desconto aplicado',i.desconto,'money']]:[]),['Valor do imóvel com desconto',liq,'money'],['Valor do financiamento',i.financiamento,'money'],['FGTS',i.fgts||0,'money'],...(i.subsidio>0?[['Subsídio',i.subsidio,'money']]:[]),['Sinal (ato)',i.sinal,'money'],['Sinal parcelado',i.sinalParcelado,'money'],['Chaves',i.chaves,'money'],...(intercaladas>0?[['Intercaladas',`${i.qtdIntercaladas}x de ${money(i.valorIntercalada)}`,'text']]:[]),['Entrada parcelada (carteira)',carteira,'money'],...(exced>0?[['A distribuir (sinal/chaves/intercaladas)',exced,'money']]:[]),['Mensais',`${i.qtdMensais}x de ${money(parc)}`,'text'],['Parcela Caixa (pós-chaves)',i.parcelaCaixa||0,'money']]};
  }
  },
  engemat:{nome:'Engemat',cor:'#ea580c',obs:'Entrada parcelada em 80x, com intercaladas semestrais.',products:{'villas-lisboa':{nome:'Villas de Lisboa'},'plaza-santa-lucia-2':{nome:'Plaza Santa Lúcia II'}},fields:[
@@ -1124,12 +1124,12 @@ const DATA={
         ...(!f.direto ? [
           { label: 'Avaliação da Caixa', valor: i.avaliacaoCaixa, fmt: 'money' },
           { label: 'Valor do financiamento', valor: i.financiamento, fmt: 'money' },
-          { label: 'FGTS', valor: i.fgts || 0, fmt: 'money' },
+          ...(i.fgts > 0 ? [{ label: 'FGTS', valor: i.fgts, fmt: 'money' }] : []),
           ...(i.subsidio > 0 ? [{ label: 'Subsídio', valor: i.subsidio, fmt: 'money' }] : []),
         ] : []),
         { label: 'Sinal / entrada à vista (1ª parte)', valor: i.aVista, fmt: 'money' },
-        { label: 'Sinal intercalado (2ª parte)', valor: i.sinalIntercalado || 0, fmt: 'money' },
-        { label: 'Intercaladas', valor: i.qtdIntercaladas > 0 ? `${i.qtdIntercaladas}x de ${money(i.intercalada)}` : '—', fmt: 'text' },
+        ...(i.sinalIntercalado > 0 ? [{ label: 'Sinal intercalado (2ª parte)', valor: i.sinalIntercalado, fmt: 'money' }] : []),
+        ...(i.qtdIntercaladas > 0 && i.intercalada > 0 ? [{ label: 'Intercaladas', valor: `${i.qtdIntercaladas}x de ${money(i.intercalada)}`, fmt: 'text' }] : []),
         { label: 'Chaves', valor: i.chave, fmt: 'money' },
         { label: 'Saldo com a construtora', valor: f.dividir, fmt: 'money' },
         { label: 'Mensais', valor: `${i.qtdParcelas}x de ${money(f.parcela)}`, fmt: 'text' },
@@ -1269,7 +1269,7 @@ stanza: {
 mouradubeux: {
     nome: 'Moura Dubeux',
     cor: '#0f766e',
-    obs: 'Planos prontos das tabelas de vendas (set/2026). Escolha produto/plano, torre e unidade: o plano da tabela aparece pronto. Sinal maior abate primeiro as intercaladas, depois o financiamento MD (ou parcela de habite-se) e por último as mensais. O financiamento bancário não muda.',
+    obs: 'Planos prontos das tabelas de vendas (out/2026). Escolha produto/plano, torre e unidade: o plano da tabela aparece pronto. Sinal maior abate primeiro as intercaladas, depois o financiamento MD (ou parcela de habite-se) e por último as mensais. O financiamento bancário não muda.',
     produtos: (typeof MD_PLANOS !== 'undefined' ? MD_PLANOS : []).reduce((acc, p) => {
       acc[p.id] = { nome: `${p.produto} — ${p.plano}`, plano: p.id };
       return acc;
@@ -1765,7 +1765,7 @@ function duplicateSimulation(id=activeCard){
   const copy={
     c:source.c,
     v:{...source.v},
-    t:{},
+    t:{...(source.t||{})},
     product:source.product,
     clientName:source.clientName?(source.clientName+' · cópia'):'',
     notes:source.notes||'',
